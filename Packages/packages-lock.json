@@ -143,6 +143,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "open-source-unity-package.utility-system": {
+      "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8be48f188c01886c7e6c27375c2e3be9bc5e4738"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
