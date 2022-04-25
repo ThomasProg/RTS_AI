@@ -31,8 +31,7 @@ public class GameServices : MonoBehaviour
     UnitController[] ControllersArray;
     TargetBuilding[] TargetBuildingArray;
     GameState CurrentGameState = null;
-    private List<BaseEntity>[] m_teamsUnits = new List<BaseEntity>[(int) ETeam.TeamCount];
-    public TerrainInfluenceMap[] teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
+    [SerializeField] private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
 
     Terrain CurrentTerrain = null;
     Bounds PlayableBounds;
@@ -60,6 +59,12 @@ public class GameServices : MonoBehaviour
     {
         return Instance.CurrentGameState.GetOpponent(team);
     }
+    
+    public TerrainInfluenceMap GetInfluenceMap(ETeam team)
+    {
+        return m_teamInfluenceMap[(int) team];
+    }
+    
     public static TargetBuilding[] GetTargetBuildings() { return Instance.TargetBuildingArray; }
 
     // return RGB color struct for each team
@@ -116,10 +121,9 @@ public class GameServices : MonoBehaviour
     ///}
     /// </example>
     /// <param name="team"></param>
-    public void RegisterUnit(ETeam team, BaseEntity unit)
+    public void RegisterUnit(ETeam team, IInfluencer unit)
     {
-        m_teamsUnits[(int) team].Add(unit);
-        teamInfluenceMap[(int)team].RegisterEntity(unit);
+        m_teamInfluenceMap[(int)team].RegisterEntity(unit);
     }
 
     /// <summary>
@@ -133,10 +137,9 @@ public class GameServices : MonoBehaviour
     ///}
     /// </example>
     /// <param name="team"></param>
-    public void UnregisterUnit(ETeam team, BaseEntity unit)
+    public void UnregisterUnit(ETeam team, IInfluencer unit)
     {
-        m_teamsUnits[(int) team].Remove(unit);
-        teamInfluenceMap[(int)team].UnregisterEntity(unit);
+        m_teamInfluenceMap[(int)team].UnregisterEntity(unit);
     }
 
     #region MonoBehaviour methods
@@ -180,12 +183,16 @@ public class GameServices : MonoBehaviour
             PlayableBounds.SetMinMax(   new Vector3(-DefaultPlayableBoundsSize, -10.0f, -DefaultPlayableBoundsSize) + clampedOne * NonPlayableBorder / 2f,
                                         new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) - clampedOne * NonPlayableBorder / 2f);
         }
-
-        for (var index = 0; index < m_teamsUnits.Length; index++)
-        {
-            m_teamsUnits[index] = new List<BaseEntity>();
-        }
     }
+
+    public GameObject Barycenter;
+    
+    private void Update()
+    {
+        Vector2 blueBarycenter = Statistic.GetTeamBarycenter(ETeam.Blue);
+        Barycenter.transform.position = new Vector3(blueBarycenter.x, Barycenter.transform.position.y, blueBarycenter.y);
+    }
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.green;

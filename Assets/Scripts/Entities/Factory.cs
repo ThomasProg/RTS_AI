@@ -135,6 +135,13 @@ public sealed class Factory : BaseEntity
         GameServices.GetGameState().DecreaseTeamScore(Team);
         Destroy(gameObject);
     }
+    #region IInfluencable
+    public override float GetInfluenceRadius()
+    {
+        return 25f;
+    }
+    #endregion
+    
     #region IRepairable
     override public bool NeedsRepairing()
     {

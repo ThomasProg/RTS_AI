@@ -119,12 +119,12 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     }
     #endregion
 
-    public Vector2 GetInfluencePosition()
+    public virtual Vector2 GetInfluencePosition()
     {
         return new Vector2(transform.position.x, transform.position.z);
     }
 
-    public float GetInfluenceRadius()
+    public virtual float GetInfluenceRadius()
     {
         return 10f;
     }
