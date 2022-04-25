@@ -143,6 +143,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "open-source-unity-package.influence-map": {
+      "version": "https://github.com/OpenSourceUnityPackage/InfluenceMap.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "023c189a5299f1b8e249a261566226293668a5f3"
+    },
     "open-source-unity-package.utility-system": {
       "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git",
       "depth": 0,
