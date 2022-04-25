@@ -1600,6 +1600,8 @@ GameObject:
   - component: {fileID: 1776657142}
   - component: {fileID: 1776657146}
   - component: {fileID: 1776657145}
+  - component: {fileID: 1776657148}
+  - component: {fileID: 1776657147}
   m_Layer: 8
   m_Name: Terrain
   m_TagString: Untagged
@@ -1723,6 +1725,38 @@ MonoBehaviour:
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: b626c90acb9353d4ab5167f0e5855cda, type: 2}
+--- !u!114 &1776657147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776657141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e6736dc8a011b47802b7438ce3732c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 963c73b5e75feef479e6ea76a4ef0d93, type: 3}
+  resolution: 7
+  lowPrescision: 1
+  m_drawDebug: 0
+--- !u!114 &1776657148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776657141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e6736dc8a011b47802b7438ce3732c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 963c73b5e75feef479e6ea76a4ef0d93, type: 3}
+  resolution: 7
+  lowPrescision: 1
+  m_drawDebug: 0
 --- !u!224 &1857385670 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3297987965787243821, guid: 6274f44d969a12f4f9c683eb6eef2d05,
@@ -2053,6 +2087,21 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: teamInfluenceMap.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: teamInfluenceMap.Array.data[0]
+      value: 
+      objectReference: {fileID: 1776657148}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: teamInfluenceMap.Array.data[1]
+      value: 
+      objectReference: {fileID: 1776657147}
     - target: {fileID: 4669120816251285810, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
       propertyPath: FirstTeamColor

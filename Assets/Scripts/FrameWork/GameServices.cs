@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using InfluenceMapPackage;
+using UnityEngine;
+using UnityEngine.UI;
 
 public enum ETeam
 {
@@ -6,7 +10,8 @@ public enum ETeam
     Red = 1,
     //Green,
 
-    Neutral
+    Neutral = 2,
+    TeamCount = 3
 }
 
 [RequireComponent(typeof(GameState))]
@@ -26,6 +31,8 @@ public class GameServices : MonoBehaviour
     UnitController[] ControllersArray;
     TargetBuilding[] TargetBuildingArray;
     GameState CurrentGameState = null;
+    private List<BaseEntity>[] m_teamsUnits = new List<BaseEntity>[(int) ETeam.TeamCount];
+    public TerrainInfluenceMap[] teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
 
     Terrain CurrentTerrain = null;
     Bounds PlayableBounds;
@@ -98,6 +105,39 @@ public class GameServices : MonoBehaviour
     }
 
     #endregion
+    
+    /// <summary>
+    /// Need to be called in OnEnable
+    /// </summary>
+    /// <example>
+    ///private void OnEnable()
+    ///{
+    ///    GameManager.Instance.RegisterUnit(team, this);
+    ///}
+    /// </example>
+    /// <param name="team"></param>
+    public void RegisterUnit(ETeam team, BaseEntity unit)
+    {
+        m_teamsUnits[(int) team].Add(unit);
+        teamInfluenceMap[(int)team].RegisterEntity(unit);
+    }
+
+    /// <summary>
+    /// Need to be called in OnDisable
+    /// </summary>
+    /// <example>
+    ///private void OnDisable()
+    ///{
+    ///    if(gameObject.scene.isLoaded)
+    ///        GameManager.Instance.UnregisterUnit(team, this);
+    ///}
+    /// </example>
+    /// <param name="team"></param>
+    public void UnregisterUnit(ETeam team, BaseEntity unit)
+    {
+        m_teamsUnits[(int) team].Remove(unit);
+        teamInfluenceMap[(int)team].UnregisterEntity(unit);
+    }
 
     #region MonoBehaviour methods
     void Awake()
@@ -139,6 +179,11 @@ public class GameServices : MonoBehaviour
             Vector3 clampedOne = new Vector3(1f, 0f, 1f);
             PlayableBounds.SetMinMax(   new Vector3(-DefaultPlayableBoundsSize, -10.0f, -DefaultPlayableBoundsSize) + clampedOne * NonPlayableBorder / 2f,
                                         new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) - clampedOne * NonPlayableBorder / 2f);
+        }
+
+        for (var index = 0; index < m_teamsUnits.Length; index++)
+        {
+            m_teamsUnits[index] = new List<BaseEntity>();
         }
     }
     void OnDrawGizmos()

@@ -430,6 +430,21 @@ PrefabInstance:
       propertyPath: NonPlayableBorder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: teamInfluenceMap.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: teamInfluenceMap.Array.data[0]
+      value: 
+      objectReference: {fileID: 727041327}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: teamInfluenceMap.Array.data[1]
+      value: 
+      objectReference: {fileID: 727041328}
     - target: {fileID: 4669120816251285810, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
       propertyPath: FirstTeamColor
@@ -486,6 +501,8 @@ GameObject:
   - component: {fileID: 727041322}
   - component: {fileID: 727041326}
   - component: {fileID: 727041325}
+  - component: {fileID: 727041327}
+  - component: {fileID: 727041328}
   m_Layer: 8
   m_Name: Terrain
   m_TagString: Untagged
@@ -609,6 +626,38 @@ MonoBehaviour:
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: 9ec21a39ba751df4992097d95838a9c2, type: 2}
+--- !u!114 &727041327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727041321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e6736dc8a011b47802b7438ce3732c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 963c73b5e75feef479e6ea76a4ef0d93, type: 3}
+  resolution: 6
+  lowPrescision: 1
+  m_drawDebug: 0
+--- !u!114 &727041328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727041321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e6736dc8a011b47802b7438ce3732c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 963c73b5e75feef479e6ea76a4ef0d93, type: 3}
+  resolution: 6
+  lowPrescision: 1
+  m_drawDebug: 0
 --- !u!20 &817550761 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3124353299293301188, guid: 32676265f95fdeb40833df7b0b170998,
