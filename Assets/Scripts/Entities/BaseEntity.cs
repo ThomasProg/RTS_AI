@@ -1,8 +1,9 @@
 ﻿using System;
+using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRepairable
+public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRepairable, IInfluencer
 {
     [SerializeField]
     protected ETeam Team;
@@ -102,8 +103,29 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     {
         UpdateHpUI();
     }
+
+    protected void OnEnable()
+    {
+        GameServices.GetGameServices().RegisterUnit(Team,this);
+    }
+
+    private void OnDisable()
+    {
+        GameServices.GetGameServices().UnregisterUnit(Team,this);
+    }
+
     virtual protected void Update()
     {
     }
     #endregion
+
+    public virtual Vector2 GetInfluencePosition()
+    {
+        return new Vector2(transform.position.x, transform.position.z);
+    }
+
+    public virtual float GetInfluenceRadius()
+    {
+        return 10f;
+    }
 }

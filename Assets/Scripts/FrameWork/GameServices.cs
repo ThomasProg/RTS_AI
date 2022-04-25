@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using InfluenceMapPackage;
+using UnityEngine;
+using UnityEngine.UI;
 
 public enum ETeam
 {
@@ -6,7 +10,8 @@ public enum ETeam
     Red = 1,
     //Green,
 
-    Neutral
+    Neutral = 2,
+    TeamCount = 3
 }
 
 [RequireComponent(typeof(GameState))]
@@ -26,6 +31,7 @@ public class GameServices : MonoBehaviour
     UnitController[] ControllersArray;
     TargetBuilding[] TargetBuildingArray;
     GameState CurrentGameState = null;
+    [SerializeField] private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
 
     Terrain CurrentTerrain = null;
     Bounds PlayableBounds;
@@ -53,6 +59,12 @@ public class GameServices : MonoBehaviour
     {
         return Instance.CurrentGameState.GetOpponent(team);
     }
+    
+    public TerrainInfluenceMap GetInfluenceMap(ETeam team)
+    {
+        return m_teamInfluenceMap[(int) team];
+    }
+    
     public static TargetBuilding[] GetTargetBuildings() { return Instance.TargetBuildingArray; }
 
     // return RGB color struct for each team
@@ -98,6 +110,37 @@ public class GameServices : MonoBehaviour
     }
 
     #endregion
+    
+    /// <summary>
+    /// Need to be called in OnEnable
+    /// </summary>
+    /// <example>
+    ///private void OnEnable()
+    ///{
+    ///    GameManager.Instance.RegisterUnit(team, this);
+    ///}
+    /// </example>
+    /// <param name="team"></param>
+    public void RegisterUnit(ETeam team, IInfluencer unit)
+    {
+        m_teamInfluenceMap[(int)team].RegisterEntity(unit);
+    }
+
+    /// <summary>
+    /// Need to be called in OnDisable
+    /// </summary>
+    /// <example>
+    ///private void OnDisable()
+    ///{
+    ///    if(gameObject.scene.isLoaded)
+    ///        GameManager.Instance.UnregisterUnit(team, this);
+    ///}
+    /// </example>
+    /// <param name="team"></param>
+    public void UnregisterUnit(ETeam team, IInfluencer unit)
+    {
+        m_teamInfluenceMap[(int)team].UnregisterEntity(unit);
+    }
 
     #region MonoBehaviour methods
     void Awake()
@@ -141,6 +184,15 @@ public class GameServices : MonoBehaviour
                                         new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) - clampedOne * NonPlayableBorder / 2f);
         }
     }
+
+    public GameObject Barycenter;
+    
+    private void Update()
+    {
+        Vector2 blueBarycenter = Statistic.GetTeamBarycenter(ETeam.Blue);
+        Barycenter.transform.position = new Vector3(blueBarycenter.x, Barycenter.transform.position.y, blueBarycenter.y);
+    }
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.green;

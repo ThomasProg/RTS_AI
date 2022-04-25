@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using InfluenceMapPackage;
+using UnityEngine;
 using UnityEngine.UI;
-public class TargetBuilding : MonoBehaviour
+public class TargetBuilding : MonoBehaviour, IInfluencer
 {
     [SerializeField]
     float CaptureGaugeStart = 100f;
@@ -113,11 +114,14 @@ public class TargetBuilding : MonoBehaviour
 
             if (OwningTeam != ETeam.Neutral)
             {
+                GameServices.GetGameServices().UnregisterUnit(OwningTeam, this);
+
                 // remove points to previously owning team
                 teamController = GameServices.GetControllerByTeam(OwningTeam);
                 if (teamController != null)
                     teamController.LoseTarget(BuildPoints);
             }
+            GameServices.GetGameServices().RegisterUnit(newTeam, this);
         }
 
         ResetCapture();
@@ -125,4 +129,14 @@ public class TargetBuilding : MonoBehaviour
         BuildingMeshRenderer.material = newTeam == ETeam.Blue ? BlueTeamMaterial : RedTeamMaterial;
     }
     #endregion
+
+    public virtual Vector2 GetInfluencePosition()
+    {
+        return new Vector2(transform.position.x, transform.position.z);
+    }
+
+    public virtual float GetInfluenceRadius()
+    {
+        return 6f;
+    }
 }
