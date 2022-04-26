@@ -9,6 +9,7 @@ public class Unit : BaseEntity
     float LastActionDate = 0f;
     BaseEntity EntityTarget = null;
     TargetBuilding CaptureTarget = null;
+    TargetBuilding NextCaptureTarget = null;
     NavMeshAgent NavMeshAgent;
     public UnitDataScriptable GetUnitData { get { return UnitData; } }
     public int Cost { get { return UnitData.Cost; } }
@@ -67,6 +68,15 @@ public class Unit : BaseEntity
             else
                 ComputeRepairing();
         }
+
+        if (NextCaptureTarget != null)
+        {
+            if (CanCapture(NextCaptureTarget))
+            {
+                StartCapture(NextCaptureTarget);
+                NextCaptureTarget = null;
+            }
+        }
 	}
     #endregion
 
@@ -122,7 +132,7 @@ public class Unit : BaseEntity
     // Targetting Task - capture
     public void SetCaptureTarget(TargetBuilding target)
     {
-        if (CanCapture(target) == false)
+        if (target.GetTeam() == GetTeam())
             return;
 
         if (EntityTarget != null)
@@ -131,8 +141,8 @@ public class Unit : BaseEntity
         if (IsCapturing())
             StopCapture();
 
-        if (target.GetTeam() != GetTeam())
-            StartCapture(target);
+        SetTargetPos(target.transform.position);
+        NextCaptureTarget = target;
     }
 
     // Targetting Task - repairing
