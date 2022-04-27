@@ -17,6 +17,36 @@ public enum ETeam
 [RequireComponent(typeof(GameState))]
 public class GameServices : MonoBehaviour
 {
+#if UNITY_EDITOR
+    [System.Serializable]
+    public struct TargetAnalysisDebug
+    {
+        public bool drawTargetStatistic;
+        public float targetStatisticRadius;
+    }
+    
+    [System.Serializable]
+    public struct BarycenterDebug
+    {
+        [HideInInspector] public bool prevDrawBarycenters;
+        [HideInInspector] public GameObject globalBarycenterInstance;
+        [HideInInspector] public GameObject redBarycenterInstance;
+        [HideInInspector] public GameObject blueBarycenterInstance;
+        
+        public bool drawBarycenters;
+        public GameObject globalBarycenterPrefab;
+        public GameObject redBarycenterPrefab;
+        public GameObject blueBarycenterPrefab;
+    }
+    
+    [System.Serializable]
+    public struct DebugSettings
+    {
+        public TargetAnalysisDebug targetAnalysis;
+        public BarycenterDebug barycenter;
+    }
+#endif
+    
     [SerializeField, Tooltip("Generic material used for 3D models, in the following order : blue, red and green")]
     Material[] TeamMaterials = new Material[3];
 
@@ -35,6 +65,10 @@ public class GameServices : MonoBehaviour
 
     Terrain CurrentTerrain = null;
     Bounds PlayableBounds;
+
+#if UNITY_EDITOR
+    public DebugSettings debug;
+#endif
 
     #region Static methods
     public static GameServices GetGameServices()
@@ -184,19 +218,69 @@ public class GameServices : MonoBehaviour
                                         new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) - clampedOne * NonPlayableBorder / 2f);
         }
     }
-
-    public GameObject Barycenter;
+    #endregion
     
     private void Update()
     {
-        Vector2 blueBarycenter = Statistic.GetTeamBarycenter(ETeam.Blue);
-        Barycenter.transform.position = new Vector3(blueBarycenter.x, Barycenter.transform.position.y, blueBarycenter.y);
+        
+#if UNITY_EDITOR
+        if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
+        {
+            debug.barycenter.prevDrawBarycenters = debug.barycenter.drawBarycenters;
+
+            if (debug.barycenter.drawBarycenters)
+            {
+                debug.barycenter.globalBarycenterInstance = Instantiate(debug.barycenter.globalBarycenterPrefab);
+                debug.barycenter.blueBarycenterInstance = Instantiate(debug.barycenter.blueBarycenterPrefab);
+                debug.barycenter.redBarycenterInstance = Instantiate(debug.barycenter.redBarycenterPrefab);
+            }
+            else
+            {
+                Destroy(debug.barycenter.globalBarycenterInstance);
+                Destroy(debug.barycenter.blueBarycenterInstance);
+                Destroy(debug.barycenter.redBarycenterInstance);
+            }
+        }
+        
+        if (debug.barycenter.drawBarycenters)
+        {
+            Vector2 globalBarycenter = Statistic.GetGlobalBarycenter();
+            Vector2 blueBarycenter = Statistic.GetTeamBarycenter(ETeam.Blue);
+            Vector2 redBarycenter = Statistic.GetTeamBarycenter(ETeam.Red);
+            debug.barycenter.globalBarycenterInstance.transform.position = new Vector3(globalBarycenter.x,
+                debug.barycenter.globalBarycenterInstance.transform.position.y, globalBarycenter.y);
+            debug.barycenter.blueBarycenterInstance.transform.position = new Vector3(blueBarycenter.x,
+                debug.barycenter.blueBarycenterInstance.transform.position.y, blueBarycenter.y);
+            debug.barycenter.redBarycenterInstance.transform.position = new Vector3(redBarycenter.x,
+                debug.barycenter.redBarycenterInstance.transform.position.y, redBarycenter.y);
+        }
+#endif
     }
 
-    void OnDrawGizmos()
+    private void OnGUI()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(PlayableBounds.center, PlayableBounds.size);
+#if UNITY_EDITOR
+        if (debug.targetAnalysis.drawTargetStatistic)
+        {
+            Statistic.TargetBuildingAnalysisData[] targetBuildingAnalysisData = Statistic.GetTargetBuildingAnalysisData(ETeam.Blue, debug.targetAnalysis.targetStatisticRadius);
+            
+            GUILayout.BeginVertical("box");
+            GUILayout.Label("Target building analysis");
+
+            foreach (Statistic.TargetBuildingAnalysisData buildingAnalysisData in targetBuildingAnalysisData)
+            {
+                GUILayout.BeginHorizontal("box");
+                
+                GUILayout.Label($"{buildingAnalysisData.target.name}:");
+                GUILayout.Label($"Distance from blue team barycenter: {Mathf.Sqrt(buildingAnalysisData.sqrDistanceFromTeamBarycenter)}");
+                GUILayout.Label($"Blue occupation: {buildingAnalysisData.balancing.occupationTeam1 * 100f}%");
+                GUILayout.Label($"Red occupation: {buildingAnalysisData.balancing.occupationTeam2 * 100f}%");
+
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.EndVertical();
+        }
+#endif
     }
-    #endregion
 }

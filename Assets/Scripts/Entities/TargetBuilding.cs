@@ -1,4 +1,5 @@
-﻿using InfluenceMapPackage;
+﻿using System;
+using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.UI;
 public class TargetBuilding : MonoBehaviour, IInfluencer
@@ -138,5 +139,23 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
     public virtual float GetInfluenceRadius()
     {
         return 6f;
+    }
+
+    public Vector2 Get2DPosition()
+    {
+        return new Vector2(transform.position.x, transform.position.z);
+    }
+
+    public void OnDrawGizmos()
+    {
+#if UNITY_EDITOR
+        GameServices gameServices = GameServices.GetGameServices();
+        if (gameServices != null && gameServices.debug.targetAnalysis.drawTargetStatistic)
+        {
+            Gizmos.color = Color.red;
+            // avoid z fighting with y up
+            Gizmos.DrawWireSphere(transform.position + Vector3.up, gameServices.debug.targetAnalysis.targetStatisticRadius);
+        }
+#endif
     }
 }

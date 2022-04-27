@@ -88,6 +88,8 @@ public sealed class Factory : BaseEntity
     }
     override protected void Update()
     {
+        base.Update();
+        
         switch (CurrentState)
         {
             case State.Available:

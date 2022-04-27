@@ -23,7 +23,8 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
             return;
 
         Team = _team;
-
+        GameServices.GetGameServices().RegisterUnit(Team,this);
+        
         IsInitialized = true;
     }
     public Color GetColor()
@@ -103,12 +104,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     {
         UpdateHpUI();
     }
-
-    protected void OnEnable()
-    {
-        GameServices.GetGameServices().RegisterUnit(Team,this);
-    }
-
+    
     private void OnDisable()
     {
         GameServices.GetGameServices().UnregisterUnit(Team,this);
@@ -116,6 +112,11 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
 
     virtual protected void Update()
     {
+        if (!IsInitialized)
+        {
+            GameServices.GetGameServices().RegisterUnit(Team, this);
+            IsInitialized = true;
+        }
     }
     #endregion
 
