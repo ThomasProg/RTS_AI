@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 public class TargetBuilding : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class TargetBuilding : MonoBehaviour
     ETeam CapturingTeam = ETeam.Neutral;
     public ETeam GetTeam() { return OwningTeam; }
 
+    List<Unit> capturingUnits = new List<Unit>();
 
     #region MonoBehaviour methods
     void Start()
@@ -60,6 +62,7 @@ public class TargetBuilding : MonoBehaviour
         if (unit == null)
             return;
 
+        capturingUnits.Add(unit);
         TeamScore[(int)unit.GetTeam()] += unit.Cost;
 
         if (CapturingTeam == ETeam.Neutral)
@@ -81,6 +84,7 @@ public class TargetBuilding : MonoBehaviour
         if (unit == null)
             return;
 
+        capturingUnits.Remove(unit);
         TeamScore[(int)unit.GetTeam()] -= unit.Cost;
         if (TeamScore[(int)unit.GetTeam()] == 0)
         {
@@ -117,6 +121,15 @@ public class TargetBuilding : MonoBehaviour
                 teamController = GameServices.GetControllerByTeam(OwningTeam);
                 if (teamController != null)
                     teamController.LoseTarget(BuildPoints);
+            }
+        }
+
+        for (int i = capturingUnits.Count - 1; i >= 0; i--)
+        {
+            Unit unit = capturingUnits[i];
+            if (unit.GetTeam() == newTeam)
+            {
+                unit.StopCapture();
             }
         }
 

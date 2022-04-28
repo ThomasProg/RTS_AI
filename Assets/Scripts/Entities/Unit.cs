@@ -10,6 +10,10 @@ public class Unit : BaseEntity
     BaseEntity EntityTarget = null;
     TargetBuilding CaptureTarget = null;
     TargetBuilding NextCaptureTarget = null;
+
+    public Formation formation;
+
+    public bool IsIdle { get { return NextCaptureTarget == null && CaptureTarget == null && EntityTarget == null; }  }
     NavMeshAgent NavMeshAgent;
     public UnitDataScriptable GetUnitData { get { return UnitData; } }
     public int Cost { get { return UnitData.Cost; } }
@@ -75,6 +79,11 @@ public class Unit : BaseEntity
             {
                 StartCapture(NextCaptureTarget);
                 NextCaptureTarget = null;
+            }
+            else if (NextCaptureTarget.GetTeam() == GetTeam())
+            {
+                NextCaptureTarget = null;
+                SetTargetPos(transform.position);
             }
         }
 	}
