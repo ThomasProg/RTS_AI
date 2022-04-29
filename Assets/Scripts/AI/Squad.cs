@@ -223,7 +223,7 @@ public class Squad : IInfluencer
         return newSquadList;
     }
     
-    /* TODO: Move this to a squad manager
+    // TODO: Move this to a squad manager
     /// <summary>
     /// Merge the squads together if they are close enough
     /// </summary>
@@ -238,7 +238,7 @@ public class Squad : IInfluencer
                 if (i == j) continue;
 
                 squads[i].MergeIf(squads[j], (squad, unit) =>
-                    (squad.GetAveragePosition() - unit.transform.position).sqrMagnitude < dist * dist);
+                    (squad.GetAveragePosition() - unit.GetInfluencePosition()).sqrMagnitude < dist * dist);
             }
         }
 
@@ -258,7 +258,7 @@ public class Squad : IInfluencer
     /// <param name="units">Units to share between squads</param>
     /// <param name="dist">Maximum distance for the squads to be merged</param>
     /// <returns>The list of merged squads</returns>
-    public static List<Squad> MakeSquadsDependingOnDistance(List<Unit> units, float dist = 50)
+    public static List<Squad> MakeSquadsDependingOnDistance(IEnumerable<Unit> units, float dist = 50)
     {
         List<Squad> squads = new List<Squad>();
         foreach (Unit unit in units)
@@ -271,7 +271,6 @@ public class Squad : IInfluencer
         FuseSquadsDependingOnDistance(squads, dist);
         return squads;
     }
-    */
 
     public void GoCapturePoint(TargetBuilding targetCapturePoint)
     {
