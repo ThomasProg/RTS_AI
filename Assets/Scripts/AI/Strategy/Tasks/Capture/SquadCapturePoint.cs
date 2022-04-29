@@ -17,7 +17,7 @@ public class SquadCapturePoint : InBetweenTask
 
     float GetCapturePointTacticalScore(TargetBuilding targetBuilding, Vector2 pos)
     {
-        return -Vector2.Distance(targetBuilding.Get2DPosition(), pos) / 30f;
+        return -Vector2.Distance(targetBuilding.Get2DPosition(), pos) / 500f;
     }
 
     IEnumerator StartAsync()
