@@ -19,7 +19,8 @@ public class TryGetIdleGroups : PredicateTask
     {
         yield return new WaitForSeconds(0.5f);
 
-        idleGroups = Squad.MakeSquadsDependingOnDistance(blackboard.allyUnits.FindAll((Unit unit) => unit.IsIdle));
+        // FIXME: Proper function call
+        // idleGroups = Squad.MakeSquadsDependingOnDistance(blackboard.allyUnits.FindAll((Unit unit) => unit.IsIdle));
 
         RunNextTask();
     }

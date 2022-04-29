@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // $$$ TO DO :)
@@ -37,7 +39,7 @@ public sealed class AIController : UnitController
             }
         }
 
-        idleUnitGroups = Squad.MakeSquadsDependingOnDistance(UnitList.FindAll((Unit unit) => unit.IsIdle));
+        // idleUnitGroups = Squad.MakeSquadsDependingOnDistance(UnitList.FindAll((Unit unit) => unit.IsIdle));
 
         List<Squad> toRemove = new List<Squad>();
 
@@ -70,9 +72,9 @@ public sealed class AIController : UnitController
             TargetBuilding targetCapturePoint = e.Current.Value;
 
             Formation formation = new Formation();
-            formation.units = group.units;
+            formation.units = group.UnitList;
 
-            foreach (Unit unit in group.units)
+            foreach (Unit unit in group.Units)
             {
                 unit.SetCaptureTarget(targetCapturePoint);
                 unit.formation = formation;
@@ -94,7 +96,7 @@ public sealed class AIController : UnitController
         base.Start();
 
         allCapturePoints = FindObjectsOfType(typeof(TargetBuilding)) as TargetBuilding[];
-        idleUnitGroups.Add(new Squad { units = UnitList });
+        idleUnitGroups.Add(new Squad(UnitList));
     }
 
     float timer = 3f;
