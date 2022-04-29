@@ -212,4 +212,105 @@ public static class Statistic
         
         return pointOfInterestEvaluations;
     }
+
+    public enum EObjectiveType
+    {
+        CaptureTargetBuilding,
+        ProtectFactory,
+        AttackFactory,
+        AttackSquad
+    }
+    
+    public struct SquadObjective
+    {
+        public Vector2 position;
+        public float sqrtDistanceFromSquad; // including error marge
+        public EObjectiveType type;
+        
+        public float allyStrength;
+        public float enemyStrength;
+
+        public float GetStrategyEffectivity()
+        {
+            return allyStrength / (Mathf.Max(enemyStrength, 1) * Mathf.Sqrt(sqrtDistanceFromSquad));
+        }
+    }
+    
+    public struct EnemySquadObjectiveEvaluation
+    {
+        public Squad current;
+        public List<SquadObjective> objectives;
+    }
+    
+    public static List<EnemySquadObjectiveEvaluation> EvaluateEnemySquadObjective(ETeam enemyTeam, float groupDistance, float radiusErrorCoef)
+    {
+        UnitController controllerCurrent = GameServices.GetControllerByTeam(enemyTeam);
+        UnitController controllerEnemy = GameServices.GetControllerByTeam(enemyTeam == ETeam.Blue ? ETeam.Red : ETeam.Blue);
+        
+        List<Squad> squadsCurrent = Squad.MakeSquadsDependingOnDistance(controllerCurrent.Units, groupDistance);
+        List<Squad> squadsEnemy = Squad.MakeSquadsDependingOnDistance(controllerEnemy.Units, groupDistance);
+        
+        TargetBuilding[] targetBuildings = GameServices.GetTargetBuildings();
+        
+        Factory[] factoriesCurrent = controllerCurrent.Factories;
+        Factory[] factoriesEnemy = controllerEnemy.Factories;
+
+        List<EnemySquadObjectiveEvaluation> squadsObjective = new List<EnemySquadObjectiveEvaluation>();
+        
+        // Need to compare squad distance with enemy squad, building and target building. 
+        foreach (Squad squad in squadsCurrent)
+        {
+            EnemySquadObjectiveEvaluation squadObjective = new EnemySquadObjectiveEvaluation();
+            squadObjective.objectives = new List<SquadObjective>();
+            squadObjective.current = squad;
+            
+            float squadSqrInfluenceRadius = squad.GetSqrInfluenceRadius();
+            Vector2 squadPos = squad.GetAveragePosition();
+
+            ProcessObjective(radiusErrorCoef, targetBuildings, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.CaptureTargetBuilding);
+            ProcessObjective(radiusErrorCoef, factoriesCurrent, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.ProtectFactory);
+            ProcessObjective(radiusErrorCoef, factoriesEnemy, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.AttackFactory);
+            ProcessObjective(radiusErrorCoef, squadsEnemy, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.AttackSquad);
+            
+            squadsObjective.Add(squadObjective);
+        }
+
+        return squadsObjective;
+    }
+
+    private static void ProcessObjective<T>(float radiusErrorCoef, IEnumerable<T> influencers, Vector2 squadPos,
+        float squadSqrInfluenceRadius, List<Squad> squadsCurrent, List<Squad> squadsEnemy, ref EnemySquadObjectiveEvaluation squadObjective, EObjectiveType type) where T : IInfluencer
+    {
+        foreach (T influencer in influencers)
+        {
+            float squadCurrentDefendingPoint = 0f;
+            float squadEnemyAttackingPoint = 0f;
+            float sqrDistSquadTarget =
+                (influencer.GetInfluencePosition() - squadPos).sqrMagnitude + squadSqrInfluenceRadius;
+            sqrDistSquadTarget *= radiusErrorCoef; // multiply by error coef to scale the radius and anticipate squad movement
+
+            foreach (Squad squadAlly in squadsCurrent)
+            {
+                float sqrDistAllySquadTarget = (influencer.GetInfluencePosition() - squadAlly.GetInfluencePosition()).sqrMagnitude + squadAlly.GetInfluenceRadius();
+                if (sqrDistAllySquadTarget < sqrDistSquadTarget)
+                    squadCurrentDefendingPoint += squadAlly.GetStrength();
+            }
+
+            foreach (Squad enemySquad in squadsEnemy)
+            {
+                float sqrDistEnemySquadTarget = (influencer.GetInfluencePosition() - enemySquad.GetInfluencePosition()).sqrMagnitude + enemySquad.GetInfluenceRadius();
+                if (sqrDistEnemySquadTarget < sqrDistSquadTarget)
+                    squadEnemyAttackingPoint += enemySquad.GetStrength();
+            }
+
+            SquadObjective objective = new SquadObjective();
+            objective.position = influencer.GetInfluencePosition();
+            objective.sqrtDistanceFromSquad = sqrDistSquadTarget;
+            objective.type = type;
+            objective.allyStrength = squadCurrentDefendingPoint;
+            objective.enemyStrength = squadEnemyAttackingPoint;
+
+            squadObjective.objectives.Add(objective);
+        }
+    }
 }

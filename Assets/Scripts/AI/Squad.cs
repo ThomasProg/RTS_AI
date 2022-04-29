@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using InfluenceMapPackage;
 using UnityEngine;
 
-public class Squad
+public class Squad : IInfluencer
 {
     public List<Unit> units;
 
@@ -14,6 +15,41 @@ public class Squad
             averagePosition += unit.GetInfluencePosition();
         }
         return averagePosition / units.Count;
+    }
+
+    public float GetStrength()
+    {
+        float strength = 0;
+        foreach (Unit unit in units)
+        {
+            strength += unit.Cost;
+        }
+
+        return strength;
+    }
+    
+    public float GetSqrInfluenceRadius()
+    {
+        float sqrInfluenceRadius = 0;
+        Vector2 squadPos = GetAveragePosition();
+        
+        foreach (Unit unit in units)
+        {
+            float unitInflRad = unit.GetInfluenceRadius();
+            sqrInfluenceRadius = Mathf.Max(sqrInfluenceRadius, (squadPos - unit.GetInfluencePosition()).sqrMagnitude + unitInflRad * unitInflRad);
+        }
+
+        return sqrInfluenceRadius;
+    }
+    
+    public Vector2 GetInfluencePosition()
+    {
+        return GetAveragePosition();
+    }
+
+    public float GetInfluenceRadius()
+    {
+        return GetSqrInfluenceRadius();
     }
 
     // Modifiy in place
