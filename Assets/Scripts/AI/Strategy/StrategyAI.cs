@@ -19,6 +19,9 @@ public class StrategyAI : MonoBehaviour
         public List<Unit> allyUnits;
         public List<Factory> allyFactories;
         public int nbBuildPoints;
+
+        public List<Squad> idleGroups;
+        public TargetBuilding[] allCapturePoints;
     }
 
 
@@ -54,10 +57,11 @@ public class StrategyAI : MonoBehaviour
             new TryGetIdleGroups
             {
                 falseCase = new TryBuildUnit(),
-                trueCase = new ActionTask 
-                {
-                     action = (TaskRunner taskRunner) => { Debug.Log("Idle units available"); taskRunner.AssignNewTask(null); }
-                }
+                trueCase = new SquadCapturePoint()
+                //trueCase = new ActionTask 
+                //{
+                //     action = (TaskRunner taskRunner) => { Debug.Log("Idle units available"); taskRunner.AssignNewTask(null); }
+                //}
                 //trueCase = new HasEnoughUnits
                 //{
                 //    falseCase = new TryCreateUnitsTask(),

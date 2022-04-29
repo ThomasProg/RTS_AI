@@ -24,18 +24,21 @@ public class TryBuildUnit : PredicateTask
             yield break;
         }
 
-        bool isUnitBuilding = blackboard.allyFactories[0].RequestUnitBuild(0);
-        if (isUnitBuilding)
+        yield return new WaitForSeconds(0.2f);
+
+        bool isUnitBuilding;
+        do
         {
-            yield return new WaitForSeconds(0.2f);
-            isSuccess = true;
-            RunNextTask();
-        }
-        else
-        {
-            yield return new WaitForSeconds(0.02f);
-            RunNextTask();
-        }
+
+            isUnitBuilding = blackboard.allyFactories[0].RequestUnitBuild(0);
+            if (isUnitBuilding)
+            {
+                yield return new WaitForSeconds(0.14f);
+                isSuccess = true;
+            }
+        } while (isUnitBuilding);
+
+        RunNextTask();
     }
 
     protected override bool IsPredicateTrue()

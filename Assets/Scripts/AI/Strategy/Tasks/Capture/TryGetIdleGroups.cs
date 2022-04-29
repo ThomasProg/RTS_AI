@@ -6,8 +6,6 @@ public class TryGetIdleGroups : PredicateTask
 {
     StrategyAI.Blackboard blackboard;
 
-    public List<Squad> idleGroups;
-
     public override void OnStart()
     {
         blackboard = (StrategyAI.Blackboard)taskRunner.blackboard;
@@ -17,15 +15,15 @@ public class TryGetIdleGroups : PredicateTask
 
     IEnumerator StartAsync()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.5f);
 
-        idleGroups = Squad.MakeSquadsDependingOnDistance(blackboard.allyUnits.FindAll((Unit unit) => unit.IsIdle));
+        blackboard.idleGroups = Squad.MakeSquadsDependingOnDistance(blackboard.allyUnits.FindAll((Unit unit) => unit.IsIdle));
 
         RunNextTask();
     }
 
     protected override bool IsPredicateTrue()
     {
-        return idleGroups.Count > 0;
+        return blackboard.idleGroups.Count > 0;
     }
 }
