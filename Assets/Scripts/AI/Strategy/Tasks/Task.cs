@@ -71,6 +71,16 @@ public abstract class PredicateTask : Task
     protected abstract bool IsPredicateTrue();
 }
 
+public abstract class InBetweenTask : Task
+{
+    public Task next;
+
+    protected void RunNextTask()
+    {
+        taskRunner.AssignNewTask(next);
+    }
+}
+
 public class ActionTask : Task
 {
     public System.Action<TaskRunner> action;
