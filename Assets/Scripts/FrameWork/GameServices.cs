@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using InfluenceMapPackage;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,6 +45,7 @@ public class GameServices : MonoBehaviour
     public struct AISquadDecisionPrevision
     {
         public bool displayStatistic;
+        public bool display3MainObjectif;
     }
     
     [System.Serializable]
@@ -276,6 +278,49 @@ public class GameServices : MonoBehaviour
 #endif
     }
 
+    private void OnDrawGizmos()
+    {
+        if (debug.aiSquadDecisionPrevision.display3MainObjectif)
+        {
+            List<Statistic.EnemySquadObjectiveEvaluation> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+            
+            foreach (Statistic.EnemySquadObjectiveEvaluation squadObjective in squadsObjective)
+            {
+                squadObjective.objectives.Sort((delegate(Statistic.SquadObjective objective,
+                    Statistic.SquadObjective objective1)
+                {
+                    return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
+                    
+                }));
+                
+                
+                Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
+
+                float efficiencyTotal = 0f;
+                for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+                {
+                    efficiencyTotal += squadObjective.objectives[i].GetStrategyEffectivity();
+                }
+
+                // display the 3 main objectives
+                float thickness = 4f;
+                for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+                {
+                    Statistic.SquadObjective lastObjective = squadObjective.objectives[i];
+                    Color color = lastObjective.type == Statistic.EObjectiveType.ProtectFactory
+                        ? Color.blue
+                        : Color.red;
+                    Vector3 p1 = new Vector3(influencePosition.x, 1f, influencePosition.y);
+                    Vector3 p2 = new Vector3(lastObjective.position.x, 1f, lastObjective.position.y);
+                    Handles.DrawBezier(p1, p2, p1, p2, color,null, thickness);
+                    thickness -= 1;
+
+                    Handles.Label( (p2 + p1) / 2f, $"{lastObjective.GetStrategyEffectivity() / efficiencyTotal * 100f}%");
+                }
+            }
+        }
+    }
+
     private void OnGUI()
     {
 #if UNITY_EDITOR
@@ -322,13 +367,17 @@ public class GameServices : MonoBehaviour
                 GUILayout.Label($"Squad {squadID} | Units = {squadObjective.current.units.Count} | Strength = {squadObjective.current.GetStrength()}:");
                 
                 GUILayout.BeginHorizontal("box");
-                
-                GUILayout.Label($"Main objective: {squadObjective.objectives.Last().type.ToString()} | Enemy stregth {squadObjective.objectives.Last().enemyStrength} | Efficiency {squadObjective.objectives.Last().GetStrategyEffectivity()} | Distance {Mathf.Sqrt(squadObjective.objectives.Last().sqrtDistanceFromSquad)}");
+
+                Statistic.SquadObjective lastObjective = squadObjective.objectives.Last();
+                GUILayout.Label($"Main objective: {lastObjective.type.ToString()} | Enemy stregth {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
 
                 GUILayout.EndHorizontal();
                 
                 GUILayout.EndVertical();
                 ++squadID;
+
+                Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
+                Debug.DrawLine(new Vector3(influencePosition.x, 10f, influencePosition.y), new Vector3(lastObjective.position.x, 10f, lastObjective.position.y), lastObjective.type == Statistic.EObjectiveType.ProtectFactory ? Color.blue : Color.red);
             }
             
             GUILayout.EndVertical();
