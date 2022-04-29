@@ -48,7 +48,25 @@ MonoBehaviour:
   - {fileID: 2100000, guid: d7f0c86ff6be81e4d8e82f13e6fa7691, type: 2}
   - {fileID: 2100000, guid: 03993c9801677ca4b9741101b3033488, type: 2}
   - {fileID: 2100000, guid: 8d99f6689328c0c479f78811db5e37ec, type: 2}
-  gameState: {fileID: 0}
+  NonPlayableBorder: 100
+  DefaultPlayableBoundsSize: 100
+  m_teamInfluenceMap:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  debug:
+    targetAnalysis:
+      drawTargetStatistic: 0
+      targetStatisticRadius: 0
+    barycenter:
+      prevDrawBarycenters: 0
+      globalBarycenterInstance: {fileID: 0}
+      redBarycenterInstance: {fileID: 0}
+      blueBarycenterInstance: {fileID: 0}
+      drawBarycenters: 0
+      globalBarycenterPrefab: {fileID: 0}
+      redBarycenterPrefab: {fileID: 0}
+      blueBarycenterPrefab: {fileID: 0}
 --- !u!114 &4669120816251285810
 MonoBehaviour:
   m_ObjectHideFlags: 0
