@@ -6,12 +6,12 @@ public class Squad
 {
     public List<Unit> units;
 
-    public Vector3 GetAveragePosition()
+    public Vector2 GetAveragePosition()
     {
-        Vector3 averagePosition = Vector3.zero;
+        Vector2 averagePosition = Vector2.zero;
         foreach (Unit unit in units)
         {
-            averagePosition += unit.transform.position;
+            averagePosition += unit.GetInfluencePosition();
         }
         return averagePosition / units.Count;
     }
@@ -23,7 +23,7 @@ public class Squad
         {
             for (int j = i + 1; j < squads.Count; j++)
             {
-                if (Vector3.Distance(squads[i].GetAveragePosition(), squads[j].GetAveragePosition()) < dist)
+                if ((squads[i].GetAveragePosition() - squads[j].GetAveragePosition()).sqrMagnitude < dist * dist)
                 {
                     squads[i].units.AddRange(squads[j].units);
                     squads.RemoveAt(j);
@@ -34,7 +34,7 @@ public class Squad
         }
     }
 
-    public static List<Squad> MakeSquadsDependingOnDistance(List<Unit> units, float dist = 50)
+    public static List<Squad> MakeSquadsDependingOnDistance(IEnumerable<Unit> units, float dist = 50)
     {
         List<Squad> squads = new List<Squad>();
         foreach (Unit unit in units)
