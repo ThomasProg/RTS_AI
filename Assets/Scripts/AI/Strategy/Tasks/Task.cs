@@ -53,7 +53,7 @@ public abstract class Task
     public virtual void OnStop() {}
 }
 
-abstract class PredicateTask : Task
+public abstract class PredicateTask : Task
 {
     public Task falseCase;
     public Task trueCase;
@@ -69,4 +69,14 @@ abstract class PredicateTask : Task
     }
 
     protected abstract bool IsPredicateTrue();
+}
+
+public class ActionTask : Task
+{
+    public System.Action<TaskRunner> action;
+
+    public override void OnStart()
+    {
+        action?.Invoke(taskRunner);
+    }
 }
