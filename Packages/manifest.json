@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.coffee.upm-git-extension": "https://github.com/mob-sakai/UpmGitExtension.git",
+    "com.jetbrains.riderflow": "2022.1.0-164",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "3.7.5",
@@ -14,8 +15,10 @@
     "com.unity.test-framework": "1.1.29",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.6.2",
+    "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.0",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.legacyinputhelpers": "2.1.8",
+    "open-source-unity-package.influence-map": "https://github.com/OpenSourceUnityPackage/InfluenceMap.git#1.2.0",
     "open-source-unity-package.utility-system": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
@@ -47,7 +50,15 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0",
-    "open-source-unity-package.influence-map": "https://github.com/OpenSourceUnityPackage/InfluenceMap.git#1.2.0"
-  }
+    "com.unity.modules.xr": "1.0.0"
+  },
+  "scopedRegistries": [
+    {
+      "name": "Jetbrains",
+      "url": "https://npm.pkg.jetbrains.space/public/p/jetbrains-gamedev/jetbrains-gamedev/",
+      "scopes": [
+        "com.jetbrains"
+      ]
+    }
+  ]
 }
