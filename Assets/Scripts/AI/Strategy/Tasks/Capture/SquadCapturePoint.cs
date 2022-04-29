@@ -15,9 +15,9 @@ public class SquadCapturePoint : InBetweenTask
         blackboard.controller.StartCoroutine(StartAsync());
     }
 
-    float GetCapturePointTacticalScore(TargetBuilding targetBuilding, Vector3 pos)
+    float GetCapturePointTacticalScore(TargetBuilding targetBuilding, Vector2 pos)
     {
-        return -Vector3.Distance(targetBuilding.transform.position, pos) / 1000f;
+        return -Vector2.Distance(targetBuilding.Get2DPosition(), pos) / 1000f;
     }
 
     IEnumerator StartAsync()
@@ -27,7 +27,7 @@ public class SquadCapturePoint : InBetweenTask
         Squad group = blackboard.idleGroups[0];
         //foreach (UnitGroup group in idleUnitGroups)
         {
-            Vector3 pos = group.GetAveragePosition();
+            Vector2 pos = group.GetAveragePosition();
 
             SortedDictionary<float, TargetBuilding> capturePointsByPriority = new SortedDictionary<float, TargetBuilding>();
             float score = 0f;
