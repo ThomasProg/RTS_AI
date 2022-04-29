@@ -17,27 +17,30 @@ public class SquadCapturePoint : InBetweenTask
 
     float GetCapturePointTacticalScore(TargetBuilding targetBuilding, Vector2 pos)
     {
-        return -Vector2.Distance(targetBuilding.Get2DPosition(), pos) / 1000f;
+        return -Vector2.Distance(targetBuilding.Get2DPosition(), pos) / 30f;
     }
 
     IEnumerator StartAsync()
     {
         yield return new WaitForSeconds(0.1f);
 
-        Squad group = blackboard.idleGroups[0];
-        //foreach (UnitGroup group in idleUnitGroups)
+        Squad squad = blackboard.idleGroups[0];
+        //foreach (UnitGroup squad in idleUnitGroups)
         {
-            Vector2 pos = group.GetAveragePosition();
+            Vector2 pos = squad.GetAveragePosition();
 
             SortedDictionary<float, TargetBuilding> capturePointsByPriority = new SortedDictionary<float, TargetBuilding>();
-            float score = 0f;
             foreach (TargetBuilding capturePoint in blackboard.allCapturePoints)
             {
+                float score = 0f;
+                if (blackboard.squadManager.IsSquadGoingToCapturePoint(capturePoint))
+                    score -= 6f;
+
                 if (capturePoint.GetTeam() == ETeam.Neutral)
-                    score = 3f;
+                    score += 3f;
                 else if (capturePoint.GetTeam() != blackboard.controller.GetTeam())
                 {
-                    score = 6f;
+                    score += 6f;
                 }
 
                 score += GetCapturePointTacticalScore(capturePoint, pos);
@@ -49,17 +52,14 @@ public class SquadCapturePoint : InBetweenTask
             e.MoveNext();
             TargetBuilding targetCapturePoint = e.Current.Value;
 
-            Formation formation = new Formation();
-            formation.units = group.units;
-
-            toRemove.Clear();
-
-            foreach (Unit unit in group.units)
+            if (targetCapturePoint != null)
             {
-                unit.SetCaptureTarget(targetCapturePoint);
-                unit.formation = formation;
+                toRemove.Clear();
+
+                squad.GoCapturePoint(targetCapturePoint);
+
+                toRemove.Add(squad);
             }
-            toRemove.Add(group);
         }
 
         foreach (Squad g in toRemove)

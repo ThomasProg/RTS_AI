@@ -38,7 +38,8 @@ public sealed class AIController : UnitController
                 allyUnits = UnitList,
                 allyFactories = FactoryList,
                 nbBuildPoints = TotalBuildPoints,
-                allCapturePoints = allCapturePoints
+                allCapturePoints = allCapturePoints,
+                squadManager = strategyAI.squadManager
             };
             strategyAI.RunCaptureStrategy(blackboard);
         }
