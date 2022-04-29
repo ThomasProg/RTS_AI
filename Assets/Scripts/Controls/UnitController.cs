@@ -7,7 +7,7 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
     [SerializeField]
-    protected ETeam Team;
+    public ETeam Team;
     public ETeam GetTeam() { return Team; }
 
     [SerializeField]
@@ -199,7 +199,7 @@ public class UnitController : MonoBehaviour
         if (TeamRoot)
             Debug.LogFormat("TeamRoot {0} found !", rootName);
     }
-    virtual protected void Start ()
+    virtual protected void OnEnable ()
     {
         CapturedTargets = 0;
         TotalBuildPoints = StartingBuildPoints;

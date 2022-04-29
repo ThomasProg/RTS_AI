@@ -89,9 +89,9 @@ public sealed class AIController : UnitController
         return;
     }
 
-    protected override void Start()
+    protected override void OnEnable()
     {
-        base.Start();
+        base.OnEnable();
 
         allCapturePoints = FindObjectsOfType(typeof(TargetBuilding)) as TargetBuilding[];
         idleUnitGroups.Add(new Squad { units = UnitList });

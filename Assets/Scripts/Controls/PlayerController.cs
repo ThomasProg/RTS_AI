@@ -68,6 +68,7 @@ public sealed class PlayerController : UnitController
     Action OnFocusBasePressed = null;
     Action OnCancelBuildPressed = null;
     Action OnDestroyEntityPressed = null;
+    Action OnSwapTeamPressed = null;
     Action OnCancelFactoryPositioning = null;
     Action OnSelectAllPressed = null;
     Action [] OnCategoryPressed = new Action[9];
@@ -124,14 +125,15 @@ public sealed class PlayerController : UnitController
             Debug.LogWarning("EventSystem not assigned in PlayerController, searching in current scene...");
             SceneEventSystem = FindObjectOfType<EventSystem>();
         }
-        // Set up the new Pointer Event
-        MenuPointerEventData = new PointerEventData(SceneEventSystem);
     }
 
-    override protected void Start()
+    override protected void OnEnable()
     {
-        base.Start();
+        base.OnEnable();
 
+        // Set up the new Pointer Event
+        MenuPointerEventData = new PointerEventData(SceneEventSystem);
+        
         PreviewShader = Shader.Find("Legacy Shaders/Transparent/Diffuse");
 
         // left click : selection
@@ -165,6 +167,13 @@ public sealed class PlayerController : UnitController
             }
         };
 
+        // Swap team
+        OnSwapTeamPressed +=  () =>
+        {
+            GameServices.GetGameServices().SwapTeam();
+            Debug.Log($"You are now {Team.ToString()}");
+        };
+        
         // Destroy selected unit command
         OnDestroyEntityPressed += () =>
         {
@@ -260,6 +269,9 @@ public sealed class PlayerController : UnitController
     }
     void UpdateActionInput()
     {
+        if (Input.GetKeyDown(KeyCode.Tab))
+            OnSwapTeamPressed?.Invoke();
+        
         if (Input.GetKeyDown(KeyCode.Delete))
             OnDestroyEntityPressed?.Invoke();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,10 +41,17 @@ public class GameServices : MonoBehaviour
     }
     
     [System.Serializable]
+    public struct AISquadDecisionPrevision
+    {
+        public bool displayStatistic;
+    }
+    
+    [System.Serializable]
     public struct DebugSettings
     {
         public TargetAnalysisDebug targetAnalysis;
         public BarycenterDebug barycenter;
+        public AISquadDecisionPrevision aiSquadDecisionPrevision;
     }
 #endif
     
@@ -59,6 +67,7 @@ public class GameServices : MonoBehaviour
     static GameServices Instance = null;
 
     UnitController[] ControllersArray;
+    PlayerController playerController;
     TargetBuilding[] TargetBuildingArray;
     GameState CurrentGameState = null;
     [SerializeField] private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
@@ -144,6 +153,14 @@ public class GameServices : MonoBehaviour
     }
 
     #endregion
+
+    public void SwapTeam()
+    {
+        foreach (UnitController controller in ControllersArray)
+        {
+            controller.Team = GetOpponent(controller.Team);
+        }
+    }
     
     /// <summary>
     /// Need to be called in OnEnable
@@ -177,7 +194,7 @@ public class GameServices : MonoBehaviour
     }
 
 #region MonoBehaviour methods
-    void Awake()
+    void OnEnable()
     {
         Instance = this;
 
@@ -186,6 +203,9 @@ public class GameServices : MonoBehaviour
         foreach (UnitController controller in FindObjectsOfType<UnitController>())
         {
             ControllersArray[(int)controller.GetTeam()] = controller;
+
+            if (controller is PlayerController)
+                playerController = controller as PlayerController;
         }
 
         // Store TargetBuildings
@@ -261,7 +281,8 @@ public class GameServices : MonoBehaviour
 #if UNITY_EDITOR
         if (debug.targetAnalysis.drawTargetStatistic)
         {
-            Statistic.TargetBuildingAnalysisData[] targetBuildingAnalysisData = Statistic.GetTargetBuildingAnalysisData(ETeam.Blue, debug.targetAnalysis.targetStatisticRadius);
+            
+            Statistic.TargetBuildingAnalysisData[] targetBuildingAnalysisData = Statistic.GetTargetBuildingAnalysisData(playerController.GetTeam(), debug.targetAnalysis.targetStatisticRadius);
             
             GUILayout.BeginVertical("box");
             GUILayout.Label("Target building analysis");
@@ -278,6 +299,38 @@ public class GameServices : MonoBehaviour
                 GUILayout.EndHorizontal();
             }
 
+            GUILayout.EndVertical();
+        }
+        else if (debug.aiSquadDecisionPrevision.displayStatistic)
+        {
+            List<Statistic.EnemySquadObjectiveEvaluation> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+            
+            GUILayout.BeginVertical("box");
+            GUILayout.Label("AI squad decision prevision");
+
+            int squadID = 0;
+            foreach (Statistic.EnemySquadObjectiveEvaluation squadObjective in squadsObjective)
+            {
+                squadObjective.objectives.Sort((delegate(Statistic.SquadObjective objective,
+                    Statistic.SquadObjective objective1)
+                {
+                    return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
+                    
+                }));
+                
+                GUILayout.BeginVertical("box");
+                GUILayout.Label($"Squad {squadID} | Units = {squadObjective.current.units.Count} | Strength = {squadObjective.current.GetStrength()}:");
+                
+                GUILayout.BeginHorizontal("box");
+                
+                GUILayout.Label($"Main objective: {squadObjective.objectives.Last().type.ToString()} | Enemy stregth {squadObjective.objectives.Last().enemyStrength} | Efficiency {squadObjective.objectives.Last().GetStrategyEffectivity()} | Distance {Mathf.Sqrt(squadObjective.objectives.Last().sqrtDistanceFromSquad)}");
+
+                GUILayout.EndHorizontal();
+                
+                GUILayout.EndVertical();
+                ++squadID;
+            }
+            
             GUILayout.EndVertical();
         }
 #endif
