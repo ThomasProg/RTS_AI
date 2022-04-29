@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-class UnitGroup
+public class UnitGroup
 {
     public List<Unit> units;
 
@@ -18,13 +18,13 @@ class UnitGroup
     }
 
     // Modifiy in place
-    public static void FuseGroupsDependingOnDistance(List<UnitGroup> groups)
+    public static void FuseGroupsDependingOnDistance(List<UnitGroup> groups, float dist = 50)
     {
         for (int i = 0; i < groups.Count; i++)
         {
             for (int j = i + 1; j < groups.Count; j++)
             {
-                if (Vector3.Distance(groups[i].GetAveragePosition(), groups[j].GetAveragePosition()) < 50)
+                if (Vector3.Distance(groups[i].GetAveragePosition(), groups[j].GetAveragePosition()) < dist)
                 {
                     groups[i].units.AddRange(groups[j].units);
                     groups.RemoveAt(j);
@@ -34,44 +34,44 @@ class UnitGroup
             }
         }
     }
+
+    public static List<UnitGroup> MakeGroupsDependingOnDistance(List<Unit> units)
+    {
+        List<UnitGroup> groups = new List<UnitGroup>();
+        foreach (Unit unit in units)
+        {
+            UnitGroup unitGroup = new UnitGroup { units = new List<Unit>() };
+            unitGroup.units.Add(unit);
+            groups.Add(unitGroup);
+        }
+
+        FuseGroupsDependingOnDistance(groups);
+        return groups;
+    }
 }
 
 
 // $$$ TO DO :)
-
+[RequireComponent(typeof(StrategyAI))]
 public sealed class AIController : UnitController
 {
     TargetBuilding[] allCapturePoints;
-    List<UnitGroup> idleUnitGroups = new List<UnitGroup>(); 
+    List<UnitGroup> idleUnitGroups = new List<UnitGroup>();
+
+    StrategyAI strategyAI;
 
     #region MonoBehaviour methods
 
     protected override void Awake()
     {
         base.Awake();
-    }
 
+        strategyAI = GetComponent<StrategyAI>();
+    }
 
     float GetCapturePointTacticalScore(TargetBuilding targetBuilding, Vector3 pos)
     {
         return - Vector3.Distance(targetBuilding.transform.position, pos) / 1000f;
-    }
-
-    void GetIdleUnitGroups(out List<UnitGroup> idleUnitGroups)
-    {
-        idleUnitGroups = new List<UnitGroup>();
-
-        foreach (Unit unit in UnitList)
-        {
-            if (unit.IsIdle)
-            {
-                UnitGroup unitGroup = new UnitGroup { units = new List<Unit>() };
-                unitGroup.units.Add(unit);
-                idleUnitGroups.Add(unitGroup);
-            }
-        }
-
-        UnitGroup.FuseGroupsDependingOnDistance(idleUnitGroups);
     }
 
     public void CaptureStrategy()
@@ -86,7 +86,7 @@ public sealed class AIController : UnitController
             }
         }
 
-        GetIdleUnitGroups(out idleUnitGroups);
+        idleUnitGroups = UnitGroup.MakeGroupsDependingOnDistance(UnitList.FindAll((Unit unit) => unit.IsIdle));
 
         List<UnitGroup> toRemove = new List<UnitGroup>();
 
@@ -152,12 +152,19 @@ public sealed class AIController : UnitController
     {
         base.Update();
 
-        if (timer < 0f)
+        if (!strategyAI.taskRunner.IsRunningTask())
         {
-            CaptureStrategy();
+            //CaptureStrategy();
+
+            StrategyAI.Blackboard blackboard = new StrategyAI.Blackboard
+            {
+                controller = this,
+                allyUnits = UnitList,
+                allyFactories = FactoryList,
+                nbBuildPoints = TotalBuildPoints
+            };
+            strategyAI.RunCaptureStrategy(blackboard);
         }
-        else
-            timer -= Time.deltaTime;
     }
 
     #endregion

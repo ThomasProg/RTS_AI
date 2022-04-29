@@ -7,32 +7,62 @@ public class StrategyAI : MonoBehaviour
 {
     public class Blackboard
     {
+        public AIController controller;
+
         public int nbUnits;
         public int nbEnemyUnits;
         public int nbBuildings;
         public int nbEnemyBuildings;
+
+        //public float timer = 0f;
+
+        public List<Unit> allyUnits;
+        public List<Factory> allyFactories;
+        public int nbBuildPoints;
     }
 
 
     UtilitySystem.UtilitySystem objectif;
     UtilitySystem.UtilitySystem subjectif;
 
-    TaskRunner taskRunner = new TaskRunner();
+    public TaskRunner taskRunner = new TaskRunner();
 
     private void Awake()
     {
-        taskRunner.blackboard = new Blackboard();
+        //taskRunner = new TaskRunner();
+        //taskRunner.blackboard = new Blackboard();
 
+        //taskRunner.AssignNewTask
+        //(
+        //    new HasEnoughBuildings
+        //    {
+        //        falseCase = new TryCreateBuildingsTask(),
+        //        trueCase = new HasEnoughUnits
+        //        {
+        //            falseCase = new TryCreateUnitsTask(),
+        //            trueCase = new TryAttackTask()
+        //        },
+        //    }
+        //);
+    }
+
+    public void RunCaptureStrategy(Blackboard blackboard)
+    {
+        taskRunner.blackboard = blackboard;
         taskRunner.AssignNewTask
         (
-            new HasEnoughBuildings
+            new TryGetIdleGroups
             {
-                falseCase = new TryCreateBuildingsTask(),
-                trueCase = new HasEnoughUnits
+                falseCase = new TryBuildUnit(),
+                trueCase = new ActionTask 
                 {
-                    falseCase = new TryCreateUnitsTask(),
-                    trueCase = new TryAttackTask()
-                },
+                     action = (TaskRunner taskRunner) => { Debug.Log("Idle units available"); taskRunner.AssignNewTask(null); }
+                }
+                //trueCase = new HasEnoughUnits
+                //{
+                //    falseCase = new TryCreateUnitsTask(),
+                //    trueCase = new TryAttackTask()
+                //},
             }
         );
     }
@@ -49,6 +79,14 @@ public class StrategyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        taskRunner.UpdateCurrentTask();
+        if (taskRunner.blackboard == null)
+            return;
+
+        //Blackboard bb = (Blackboard) taskRunner.blackboard;
+        //if (bb.timer < 0f)
+        if (taskRunner.IsRunningTask())
+            taskRunner.UpdateCurrentTask();
+        //else
+            //bb.timer -= Time.deltaTime;
     }
 }
