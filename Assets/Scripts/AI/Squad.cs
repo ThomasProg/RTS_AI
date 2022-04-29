@@ -5,6 +5,8 @@ using UnityEngine;
 public class Squad
 {
     public List<Unit> units;
+    Formation formation = new Formation();
+    TargetBuilding targetCapturePoint;
 
     public Vector2 GetAveragePosition()
     {
@@ -46,5 +48,20 @@ public class Squad
 
         FuseSquadsDependingOnDistance(squads, dist);
         return squads;
+    }
+
+    public void GoCapturePoint(TargetBuilding targetCapturePoint)
+    {
+        foreach (Unit unit in units)
+        {
+            unit.SetCaptureTarget(targetCapturePoint);
+        }
+
+        this.targetCapturePoint = targetCapturePoint;
+    }
+
+    public bool IsGoingToCapturePoint(TargetBuilding capturePoint)
+    {
+        return targetCapturePoint == capturePoint;
     }
 }
