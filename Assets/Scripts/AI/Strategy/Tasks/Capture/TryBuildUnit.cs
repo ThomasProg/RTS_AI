@@ -6,7 +6,7 @@ public class TryBuildUnit : PredicateTask
 {
     StrategyAI.Blackboard blackboard;
 
-    public List<UnitGroup> idleGroups;
+    public List<Squad> idleGroups;
     bool isSuccess = false;
 
     public override void OnStart()

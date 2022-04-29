@@ -176,7 +176,7 @@ public class GameServices : MonoBehaviour
         m_teamInfluenceMap[(int)team].UnregisterEntity(unit);
     }
 
-    #region MonoBehaviour methods
+#region MonoBehaviour methods
     void Awake()
     {
         Instance = this;
@@ -218,7 +218,6 @@ public class GameServices : MonoBehaviour
                                         new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) - clampedOne * NonPlayableBorder / 2f);
         }
     }
-    #endregion
     
     private void Update()
     {
@@ -283,4 +282,5 @@ public class GameServices : MonoBehaviour
         }
 #endif
     }
+#endregion
 }

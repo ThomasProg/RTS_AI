@@ -2,61 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public class UnitGroup
-{
-    public List<Unit> units;
-
-    public Vector3 GetAveragePosition()
-    {
-        Vector3 averagePosition = Vector3.zero;
-        foreach (Unit unit in units)
-        {
-            averagePosition += unit.transform.position;
-        }
-        return averagePosition / units.Count;
-    }
-
-    // Modifiy in place
-    public static void FuseGroupsDependingOnDistance(List<UnitGroup> groups, float dist = 50)
-    {
-        for (int i = 0; i < groups.Count; i++)
-        {
-            for (int j = i + 1; j < groups.Count; j++)
-            {
-                if (Vector3.Distance(groups[i].GetAveragePosition(), groups[j].GetAveragePosition()) < dist)
-                {
-                    groups[i].units.AddRange(groups[j].units);
-                    groups.RemoveAt(j);
-                    i--;
-                    break;
-                }
-            }
-        }
-    }
-
-    public static List<UnitGroup> MakeGroupsDependingOnDistance(List<Unit> units)
-    {
-        List<UnitGroup> groups = new List<UnitGroup>();
-        foreach (Unit unit in units)
-        {
-            UnitGroup unitGroup = new UnitGroup { units = new List<Unit>() };
-            unitGroup.units.Add(unit);
-            groups.Add(unitGroup);
-        }
-
-        FuseGroupsDependingOnDistance(groups);
-        return groups;
-    }
-}
-
-
 // $$$ TO DO :)
 [RequireComponent(typeof(StrategyAI))]
 public sealed class AIController : UnitController
 {
     TargetBuilding[] allCapturePoints;
-    List<UnitGroup> idleUnitGroups = new List<UnitGroup>();
+    List<Squad> idleUnitGroups = new List<Squad>();
 
     StrategyAI strategyAI;
 
@@ -86,14 +37,14 @@ public sealed class AIController : UnitController
             }
         }
 
-        idleUnitGroups = UnitGroup.MakeGroupsDependingOnDistance(UnitList.FindAll((Unit unit) => unit.IsIdle));
+        idleUnitGroups = Squad.MakeSquadsDependingOnDistance(UnitList.FindAll((Unit unit) => unit.IsIdle));
 
-        List<UnitGroup> toRemove = new List<UnitGroup>();
+        List<Squad> toRemove = new List<Squad>();
 
         if (idleUnitGroups.Count <= 0)
             return;
 
-        UnitGroup group = idleUnitGroups[0];
+        Squad group = idleUnitGroups[0];
         //foreach (UnitGroup group in idleUnitGroups)
         {
             Vector3 pos = group.GetAveragePosition();
@@ -129,7 +80,7 @@ public sealed class AIController : UnitController
             toRemove.Add(group);
         }
 
-        foreach (UnitGroup g in toRemove)
+        foreach (Squad g in toRemove)
         {
             idleUnitGroups.Remove(g);
         }
@@ -143,7 +94,7 @@ public sealed class AIController : UnitController
         base.Start();
 
         allCapturePoints = FindObjectsOfType(typeof(TargetBuilding)) as TargetBuilding[];
-        idleUnitGroups.Add(new UnitGroup { units = UnitList });
+        idleUnitGroups.Add(new Squad { units = UnitList });
     }
 
     float timer = 3f;
