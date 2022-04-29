@@ -169,8 +169,47 @@ public static class Statistic
         return targetBuildingAnalysisDatas;
     }
 
-    public static void GetPackedUnit()
+    public struct PointOfInterestEvaluation
     {
+        public Vector2 position;
+        public float sqrtDistanceFromGroup;
+        public float strength;
+    }
+    
+    public static List<PointOfInterestEvaluation> EvaluatePointOfInterest(Vector2 groupPosition, ETeam team)
+    {
+        UnitController controller = GameServices.GetControllerByTeam(team);
+        Unit[] units = controller.Units;
+        Factory[] factories = controller.Factories;
+        // TODO: Target buidling
 
+        List<PointOfInterestEvaluation> pointOfInterestEvaluations = new List<PointOfInterestEvaluation>();
+        
+        // Iterate on all building and evaluate unit around depending on distance from group.
+        foreach (Factory factory in factories)
+        {
+            PointOfInterestEvaluation pointOfInterestEvaluation = new PointOfInterestEvaluation();
+
+            pointOfInterestEvaluation.position = factory.GetInfluencePosition();
+            
+            float sqrDistGroupFactory = (factory.GetInfluencePosition() - groupPosition).sqrMagnitude;
+            pointOfInterestEvaluation.sqrtDistanceFromGroup = sqrDistGroupFactory;
+            
+            // Get units in radius factory/group radius
+            float strength = 0;
+            foreach (Unit unit in units)
+            {
+                float sqrDistUnityFactory = (factory.GetInfluencePosition() - unit.GetInfluencePosition()).sqrMagnitude;
+                strength += (sqrDistUnityFactory < sqrDistGroupFactory) ? unit.Cost : 0;
+            }
+
+            pointOfInterestEvaluation.strength = strength;
+            pointOfInterestEvaluations.Add(pointOfInterestEvaluation);
+        }
+
+        // Iterate on groups
+        // TODO: get group and do same things 
+        
+        return pointOfInterestEvaluations;
     }
 }

@@ -1,7 +1,8 @@
-﻿using System;
+using System.Collections.Generic;
 using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class TargetBuilding : MonoBehaviour, IInfluencer
 {
     [SerializeField]
@@ -24,6 +25,7 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
     ETeam CapturingTeam = ETeam.Neutral;
     public ETeam GetTeam() { return OwningTeam; }
 
+    List<Unit> capturingUnits = new List<Unit>();
 
     #region MonoBehaviour methods
     void Start()
@@ -62,6 +64,7 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
         if (unit == null)
             return;
 
+        capturingUnits.Add(unit);
         TeamScore[(int)unit.GetTeam()] += unit.Cost;
 
         if (CapturingTeam == ETeam.Neutral)
@@ -83,6 +86,7 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
         if (unit == null)
             return;
 
+        capturingUnits.Remove(unit);
         TeamScore[(int)unit.GetTeam()] -= unit.Cost;
         if (TeamScore[(int)unit.GetTeam()] == 0)
         {
@@ -123,6 +127,15 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
                     teamController.LoseTarget(BuildPoints);
             }
             GameServices.GetGameServices().RegisterUnit(newTeam, this);
+        }
+
+        for (int i = capturingUnits.Count - 1; i >= 0; i--)
+        {
+            Unit unit = capturingUnits[i];
+            if (unit.GetTeam() == newTeam)
+            {
+                unit.StopCapture();
+            }
         }
 
         ResetCapture();

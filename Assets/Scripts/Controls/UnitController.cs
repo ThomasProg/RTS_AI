@@ -48,6 +48,9 @@ public class UnitController : MonoBehaviour
     protected Action OnBuildPointsUpdated;
     protected Action OnCaptureTarget;
 
+    public Factory[] Factories => FactoryList.ToArray();
+    public Unit[] Units => UnitList.ToArray();
+    
     #region Unit methods
     protected void UnselectAllUnits()
     {
