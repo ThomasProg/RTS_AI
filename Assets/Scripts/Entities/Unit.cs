@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -206,7 +207,23 @@ public class Unit : BaseEntity
         if (!NavMeshAgent.isOnNavMesh)
             return;
 
-        NavMeshAgent.SetDestination(new Vector3(pos.x, 0f, pos.y));
+        // See : https://youtu.be/bqtqltqcQhw?t=329
+        bool isdestinationFound = false;
+        float turnFaction = 0.618033f;
+        float pow  = 0.5f;
+        float radius = 10;
+        
+        int maxIteration = 10;
+        for (int i = 0; i < maxIteration && !isdestinationFound; i++)
+        {
+            float dst = Mathf.Pow(i / (maxIteration - 1f), pow);
+            float angle = 2 * Mathf.PI * turnFaction * i;
+
+            float x = pos.x + radius * dst * Mathf.Cos(angle);
+            float y = pos.y + radius * dst * Mathf.Sin(angle);
+            isdestinationFound = NavMeshAgent.SetDestination(new Vector3(x, 0f, y));
+        }
+        
         NavMeshAgent.isStopped = false;
     }
 
