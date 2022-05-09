@@ -1,11 +1,42 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+
+public class PullTaskRunner : TaskRunner
+{
+    public readonly List<Task> tasks = new List<Task>();
+
+    public void ProcessNextTask()
+    {
+        if (currentTask != null)
+        {
+            currentTask.OnStop();
+            tasks.Remove(currentTask);
+        }
+
+
+        currentTask = tasks.Count == 0 ? null : tasks.First();
+        
+        if (IsRunningTask())
+        {
+            currentTask.taskRunner = this;
+            currentTask.OnStart();
+        }
+    }
+
+    public override void AssignNewTask(Task newTask)
+    {
+        if (tasks.Count == 0)
+            base.AssignNewTask(newTask);
+
+        tasks.Add(newTask);
+    }
+}
 
 public class TaskRunner
 {
-    Task currentTask;
-    
+    protected Task currentTask;
+
     public object blackboard;
 
     public bool IsRunningTask()
@@ -15,22 +46,23 @@ public class TaskRunner
 
     public void StopCurrentTask()
     {
-        if (currentTask != null)
+        if (IsRunningTask())
             currentTask.OnStop();
 
         currentTask.taskRunner = null;
         currentTask = null;
     }
 
-    public void AssignNewTask(Task newTask)
+    public virtual void AssignNewTask(Task newTask)
     {
-        if (currentTask != null)
+        if (IsRunningTask())
         {
             currentTask.OnEnd();
             currentTask.taskRunner = null;
         }
+
         currentTask = newTask;
-        if (currentTask != null)
+        if (IsRunningTask())
         {
             currentTask.taskRunner = this;
             currentTask.OnStart();
@@ -39,18 +71,28 @@ public class TaskRunner
 
     public void UpdateCurrentTask()
     {
-        currentTask.OnUpdate();
+        if (IsRunningTask())
+            currentTask.OnUpdate();
     }
 }
 
-public abstract class Task 
+public abstract class Task
 {
     public TaskRunner taskRunner;
 
     public abstract void OnStart();
-    public virtual void OnEnd() {}
-    public virtual void OnUpdate() {}
-    public virtual void OnStop() {}
+
+    public virtual void OnEnd()
+    {
+    }
+
+    public virtual void OnUpdate()
+    {
+    }
+
+    public virtual void OnStop()
+    {
+    }
 }
 
 public abstract class PredicateTask : Task
@@ -83,7 +125,7 @@ public abstract class InBetweenTask : Task
 
 public class ActionTask : Task
 {
-    public System.Action<TaskRunner> action;
+    public Action<TaskRunner> action;
 
     public override void OnStart()
     {

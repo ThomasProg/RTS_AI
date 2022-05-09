@@ -1,20 +1,20 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AI;
 public class Unit : BaseEntity
 {
     [SerializeField]
-    UnitDataScriptable UnitData = null;
+    public UnitDataScriptable UnitData = null;
 
-    Transform BulletSlot;
-    float LastActionDate = 0f;
-    BaseEntity EntityTarget = null;
-    TargetBuilding CaptureTarget = null;
-    TargetBuilding NextCaptureTarget = null;
+    public Transform BulletSlot;
+
+    private PullTaskRunner m_taskRunner = new PullTaskRunner();
 
     public Formation formation;
 
-    public bool IsIdle { get { return NextCaptureTarget == null && CaptureTarget == null && EntityTarget == null; }  }
     NavMeshAgent NavMeshAgent;
+    public bool IsIdle => !m_taskRunner.IsRunningTask();
+    
     public UnitDataScriptable GetUnitData { get { return UnitData; } }
     public int Cost { get { return UnitData.Cost; } }
     public int GetTypeId { get { return UnitData.TypeId; } }
@@ -30,9 +30,8 @@ public class Unit : BaseEntity
     }
     void Unit_OnDead()
     {
-        if (IsCapturing())
-            StopCapture();
-
+        m_taskRunner.StopCurrentTask();
+        
         if (GetUnitData.DeathFXPrefab)
         {
             GameObject fx = Instantiate(GetUnitData.DeathFXPrefab, transform);
@@ -64,28 +63,7 @@ public class Unit : BaseEntity
     }
     override protected void Update()
     {
-        // Attack / repair task debug test $$$ to be removed for AI implementation
-        if (EntityTarget != null)
-        {
-            if (EntityTarget.GetTeam() != GetTeam())
-                ComputeAttack();
-            else
-                ComputeRepairing();
-        }
-
-        if (NextCaptureTarget != null)
-        {
-            if (CanCapture(NextCaptureTarget))
-            {
-                StartCapture(NextCaptureTarget);
-                NextCaptureTarget = null;
-            }
-            else if (NextCaptureTarget.GetTeam() == GetTeam())
-            {
-                NextCaptureTarget = null;
-                SetTargetPos(transform.position);
-            }
-        }
+        m_taskRunner.UpdateCurrentTask();
 	}
     #endregion
 
@@ -107,194 +85,59 @@ public class Unit : BaseEntity
 
     #region Tasks methods : Moving, Capturing, Targeting, Attacking, Repairing ...
 
+
+    public void ProcessNextTask()
+    {
+        m_taskRunner.ProcessNextTask();
+    }
+
+    public void GoTo(Vector2 pos)
+    {
+        NavMeshAgent.SetDestination(new Vector3(pos.x, 0f, pos.y));
+        NavMeshAgent.isStopped = false;
+    }
+
+    public bool IsDestinationReached()
+    {
+        return !NavMeshAgent.pathPending && NavMeshAgent.remainingDistance <= NavMeshAgent.stoppingDistance &&
+               (!NavMeshAgent.hasPath || NavMeshAgent.velocity.sqrMagnitude == 0f);
+    }
+
+    public void StopMovement()
+    {
+        NavMeshAgent.isStopped = true;
+    }
+    
     // $$$ To be updated for AI implementation $$$
 
     // Moving Task
     public void SetTargetPos(Vector3 pos)
     {
-        if (EntityTarget != null)
-            EntityTarget = null;
-
-        if (CaptureTarget != null)
-            StopCapture();
-
-        if (NavMeshAgent)
-        {
-            NavMeshAgent.SetDestination(pos);
-            NavMeshAgent.isStopped = false;
-        }
+        m_taskRunner.AssignNewTask(new GoTo(this, new Vector2(pos.x, pos.z)));
     }
 
     // Targetting Task - attack
     public void SetAttackTarget(BaseEntity target)
     {
-        if (CanAttack(target) == false)
-            return;
-
-        if (CaptureTarget != null)
-            StopCapture();
-
         if (target.GetTeam() != GetTeam())
-            StartAttacking(target);
+            m_taskRunner.AssignNewTask(new Attack(this, target));
     }
 
     // Targetting Task - capture
     public void SetCaptureTarget(TargetBuilding target)
     {
-        if (target.GetTeam() == GetTeam())
-            return;
-
-        if (EntityTarget != null)
-            EntityTarget = null;
-
-        if (IsCapturing())
-            StopCapture();
-
-        SetTargetPos(target.transform.position);
-        NextCaptureTarget = target;
+        if (target.GetTeam() != GetTeam())
+        {
+            SetTargetPos(target.transform.position);
+            m_taskRunner.AssignNewTask(new CaptureTarget(this, target));
+        }
     }
 
     // Targetting Task - repairing
-    public void SetRepairTarget(BaseEntity entity)
+    public void SetRepairTarget(BaseEntity target)
     {
-        if (CanRepair(entity) == false)
-            return;
-
-        if (CaptureTarget != null)
-            StopCapture();
-
-        if (entity.GetTeam() == GetTeam())
-            StartRepairing(entity);
-    }
-    public bool CanAttack(BaseEntity target)
-    {
-        if (target == null)
-            return false;
-
-        // distance check
-        if ((target.transform.position - transform.position).sqrMagnitude > GetUnitData.AttackDistanceMax * GetUnitData.AttackDistanceMax)
-            return false;
-
-        return true;
-    }
-
-    // Attack Task
-    public void StartAttacking(BaseEntity target)
-    {
-        EntityTarget = target;
-    }
-    public void ComputeAttack()
-    {
-        if (CanAttack(EntityTarget) == false)
-            return;
-
-        if (NavMeshAgent)
-            NavMeshAgent.isStopped = true;
-
-        transform.LookAt(EntityTarget.transform);
-        // only keep Y axis
-        Vector3 eulerRotation = transform.eulerAngles;
-        eulerRotation.x = 0f;
-        eulerRotation.z = 0f;
-        transform.eulerAngles = eulerRotation;
-
-        if ((Time.time - LastActionDate) > UnitData.AttackFrequency)
-        {
-            LastActionDate = Time.time;
-            // visual only ?
-            if (UnitData.BulletPrefab)
-            {
-                GameObject newBullet = Instantiate(UnitData.BulletPrefab, BulletSlot);
-                newBullet.transform.parent = null;
-                newBullet.GetComponent<Bullet>().ShootToward(EntityTarget.transform.position - transform.position, this);
-            }
-            // apply damages
-            int damages = Mathf.FloorToInt(UnitData.DPS * UnitData.AttackFrequency);
-            EntityTarget.AddDamage(damages);
-        }
-    }
-    public bool CanCapture(TargetBuilding target)
-    {
-        if (target == null)
-            return false;
-
-        // distance check
-        if ((target.transform.position - transform.position).sqrMagnitude > GetUnitData.CaptureDistanceMax * GetUnitData.CaptureDistanceMax)
-            return false;
-
-        return true;
-    }
-
-    // Capture Task
-    public void StartCapture(TargetBuilding target)
-    {
-        if (CanCapture(target) == false)
-            return;
-
-        if (NavMeshAgent)
-            NavMeshAgent.isStopped = true;
-
-        CaptureTarget = target;
-        CaptureTarget.StartCapture(this);
-    }
-    public void StopCapture()
-    {
-        if (CaptureTarget == null)
-            return;
-
-        CaptureTarget.StopCapture(this);
-        CaptureTarget = null;
-    }
-
-    public bool IsCapturing()
-    {
-        return CaptureTarget != null;
-    }
-
-    // Repairing Task
-    public bool CanRepair(BaseEntity target)
-    {
-        if (GetUnitData.CanRepair == false || target == null)
-            return false;
-
-        // distance check
-        if ((target.transform.position - transform.position).sqrMagnitude > GetUnitData.RepairDistanceMax * GetUnitData.RepairDistanceMax)
-            return false;
-
-        return true;
-    }
-    public void StartRepairing(BaseEntity entity)
-    {
-        if (GetUnitData.CanRepair)
-        {
-            EntityTarget = entity;
-        }
-    }
-
-    // $$$ TODO : add repairing visual feedback
-    public void ComputeRepairing()
-    {
-        if (CanRepair(EntityTarget) == false)
-            return;
-
-        if (NavMeshAgent)
-            NavMeshAgent.isStopped = true;
-
-        transform.LookAt(EntityTarget.transform);
-        // only keep Y axis
-        Vector3 eulerRotation = transform.eulerAngles;
-        eulerRotation.x = 0f;
-        eulerRotation.z = 0f;
-        transform.eulerAngles = eulerRotation;
-
-        if ((Time.time - LastActionDate) > UnitData.RepairFrequency)
-        {
-            LastActionDate = Time.time;
-
-            // apply reparing
-            int amount = Mathf.FloorToInt(UnitData.RPS * UnitData.RepairFrequency);
-            EntityTarget.Repair(amount);
-        }
+        if (target.GetTeam() == GetTeam())
+            m_taskRunner.AssignNewTask(new Repair(this, target));
     }
     #endregion
 }
