@@ -25,4 +25,9 @@ public class UnitDataScriptable : EntityDataScriptable
     [Header("FX")]
     public GameObject BulletPrefab = null;
     public GameObject DeathFXPrefab = null;
+
+    [Header("AI")] 
+    public bool IsAutoAttack;
+    public bool IsAutoRepair;
+    public bool IsAutoCapture;
 }

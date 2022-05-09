@@ -145,11 +145,6 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
         return 6f;
     }
 
-    public Vector2 Get2DPosition()
-    {
-        return new Vector2(transform.position.x, transform.position.z);
-    }
-
     public void OnDrawGizmos()
     {
 #if UNITY_EDITOR

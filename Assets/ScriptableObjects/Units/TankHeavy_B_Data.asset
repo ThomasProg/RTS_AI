@@ -33,3 +33,9 @@ MonoBehaviour:
     type: 3}
   DeathFXPrefab: {fileID: 1685874166552172, guid: 2dc5347a44240ea4597cafb2d1d7c160,
     type: 3}
+  IsAutoAttack: 1
+  AutoAttackRadius: 50
+  IsAutoRepair: 1
+  AutoRepairRadius: 50
+  IsAutoCapture: 1
+  AutoCaptureRadius: 50

@@ -26,6 +26,12 @@ public class Repair : Task
 
     public override void OnUpdate()
     {
+        if (m_target == null)
+        {
+            OnEnd();
+            return;
+        }
+
         ComputeRepairing();
     }
 

@@ -17,7 +17,7 @@ public class CaptureTarget : Task
     {
         if (CanCapture())
         {
-            StartCapture();
+            m_target.StartCapture(m_unit);
         }
         else
         {
@@ -27,7 +27,7 @@ public class CaptureTarget : Task
 
     public override void OnStop()
     {
-        StopCapture();
+        m_target.StopCapture(m_unit);
     }
 
     public override void OnUpdate()
@@ -48,18 +48,5 @@ public class CaptureTarget : Task
         // distance check
         float sqrDist = (m_target.GetInfluencePosition() - m_unit.GetInfluencePosition()).sqrMagnitude;
         return sqrDist <= m_unit.GetUnitData.CaptureDistanceMax * m_unit.GetUnitData.CaptureDistanceMax && m_target.GetTeam() != m_unit.GetTeam();
-    }
-    
-    void StartCapture()
-    {
-        if (CanCapture() == false)
-            return;
-        
-        m_target.StartCapture(m_unit);
-    }
-    
-    void StopCapture()
-    {
-        m_target.StopCapture(m_unit);
     }
 }

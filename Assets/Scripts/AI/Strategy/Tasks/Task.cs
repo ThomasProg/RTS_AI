@@ -26,6 +26,14 @@ public class PullTaskRunner : TaskRunner
 
     public override void AssignNewTask(Task newTask)
     {
+        tasks.Clear();
+        StopCurrentTask();
+        tasks.Add(newTask);
+        base.AssignNewTask(newTask);
+    }
+    
+    public void AddNewTask(Task newTask)
+    {
         if (tasks.Count == 0)
             base.AssignNewTask(newTask);
 
@@ -47,10 +55,11 @@ public class TaskRunner
     public void StopCurrentTask()
     {
         if (IsRunningTask())
+        {
             currentTask.OnStop();
-
-        currentTask.taskRunner = null;
-        currentTask = null;
+            currentTask.taskRunner = null;
+            currentTask = null;
+        }
     }
 
     public virtual void AssignNewTask(Task newTask)
