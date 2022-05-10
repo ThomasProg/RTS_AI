@@ -7,10 +7,29 @@ using UnityEngine;
 
 public class Squad : IInfluencer
 {
-    public HashSet<Unit> Units = new HashSet<Unit>();
+    HashSet<Unit> Units = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
     TargetBuilding targetCapturePoint;
     Formation formation = new Formation();
+
+    SquadTactic tactic;
+    public SquadTactic Tactic
+    {
+        get => tactic;
+        set
+        {
+            if (tactic != value)
+            {
+                // remove squad from previous Tactic
+                tactic.squads.Remove(this);
+
+                tactic = value;
+
+                // add squad to new tactic
+                tactic.squads.Add(this);
+            }
+        }
+    }
 
 
     public bool IsEmpty => Units.Count == 0;

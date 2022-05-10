@@ -17,6 +17,7 @@ public sealed class AIController : UnitController
         base.Awake();
 
         strategyAI = GetComponent<StrategyAI>();
+        strategyAI.controller = this;
     }
 
     protected override void OnEnable()
@@ -30,19 +31,29 @@ public sealed class AIController : UnitController
     {
         base.Update();
 
-        if (!strategyAI.taskRunner.IsRunningTask())
+        strategyAI.blackboard = new StrategyAI.Blackboard
         {
-            StrategyAI.Blackboard blackboard = new StrategyAI.Blackboard
-            {
-                controller = this,
-                allyUnits = UnitList,
-                allyFactories = FactoryList,
-                nbBuildPoints = TotalBuildPoints,
-                allCapturePoints = allCapturePoints,
-                squadManager = strategyAI.squadManager
-            };
-            strategyAI.RunCaptureStrategy(blackboard);
-        }
+            controller = this,
+            allyUnits = UnitList,
+            allyFactories = FactoryList,
+            nbBuildPoints = TotalBuildPoints,
+            allCapturePoints = allCapturePoints,
+            squadManager = strategyAI.squadManager
+        };
+
+        //if (!strategyAI.taskRunner.IsRunningTask())
+        //{
+        //    //StrategyAI.Blackboard blackboard = new StrategyAI.Blackboard
+        //    //{
+        //    //    controller = this,
+        //    //    allyUnits = UnitList,
+        //    //    allyFactories = FactoryList,
+        //    //    nbBuildPoints = TotalBuildPoints,
+        //    //    allCapturePoints = allCapturePoints,
+        //    //    squadManager = strategyAI.squadManager
+        //    //};
+        //    //strategyAI.RunCaptureStrategy(blackboard);
+        //}
     }
 
     #endregion

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SquadManager : MonoBehaviour
 {
-    HashSet<Squad> squads = new HashSet<Squad>();
+    public HashSet<Squad> squads = new HashSet<Squad>();
 
     public void RegisterSquads(IEnumerable<Squad> newSquads)
     {
@@ -35,4 +35,38 @@ public class SquadManager : MonoBehaviour
         }
         return false;
     }
+
+
+    //public List<Tactic> alltacticsByEvaluationPriority = new List<Tactic>();
+    //public TaskRunner taskRunner = new TaskRunner();
+    //public List<Tactic> allTacticsByPriority;
+
+    //private void Update()
+    //{
+    //    if (taskRunner.IsRunningTask())
+    //        taskRunner.UpdateCurrentTask();
+    //    else
+    //    {
+    //        alltacticsByEvaluationPriority.Sort((Tactic a, Tactic b) => a.GetEvaluationFrequencyScore().CompareTo(b.GetEvaluationFrequencyScore()));
+
+    //        for (int i = 0; i < alltacticsByEvaluationPriority.Count && alltacticsByEvaluationPriority[i].GetEvaluationFrequencyScore() < 0f; i++)
+    //        {
+    //            alltacticsByEvaluationPriority[i].EvaluatePriority();
+    //            alltacticsByEvaluationPriority[i].lastEvaluationTime = Time.time;
+    //            // wait for seconds
+    //        }
+
+    //        // Sort by priority
+    //        allTacticsByPriority = new List<Tactic>(alltacticsByEvaluationPriority);
+    //        allTacticsByPriority.Sort((Tactic a, Tactic b) => a.priority.CompareTo(b.priority));
+
+    //        // Will try to assign enough units for priority tasks
+    //        foreach (Tactic tactic in allTacticsByPriority)
+    //        {
+    //            tactic.Process();
+    //        }
+
+    //        // TODO : do things with idle squads ?
+    //    }
+    //}
 }

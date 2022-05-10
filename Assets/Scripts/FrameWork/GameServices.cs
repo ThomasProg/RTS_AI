@@ -364,7 +364,7 @@ public class GameServices : MonoBehaviour
                 }));
                 
                 GUILayout.BeginVertical("box");
-                GUILayout.Label($"Squad {squadID} | Units = {squadObjective.current.Units.Count} | Strength = {squadObjective.current.GetStrength()}:");
+                GUILayout.Label($"Squad {squadID} | Units = {squadObjective.current.UnitList.Count} | Strength = {squadObjective.current.GetStrength()}:");
                 
                 GUILayout.BeginHorizontal("box");
 
