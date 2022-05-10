@@ -295,7 +295,8 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetCaptureTarget(targetCapturePoint);
+            unit.AddTaskGoTo(targetCapturePoint.transform.position);
+            unit.AddTaskCaptureTarget(targetCapturePoint);
         }
 
         this.targetCapturePoint = targetCapturePoint;

@@ -128,16 +128,7 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
             }
             GameServices.GetGameServices().RegisterUnit(newTeam, this);
         }
-
-        for (int i = capturingUnits.Count - 1; i >= 0; i--)
-        {
-            Unit unit = capturingUnits[i];
-            if (unit.GetTeam() == newTeam)
-            {
-                unit.StopCapture();
-            }
-        }
-
+        
         ResetCapture();
         OwningTeam = newTeam;
         BuildingMeshRenderer.material = newTeam == ETeam.Blue ? BlueTeamMaterial : RedTeamMaterial;
@@ -152,11 +143,6 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
     public virtual float GetInfluenceRadius()
     {
         return 6f;
-    }
-
-    public Vector2 Get2DPosition()
-    {
-        return new Vector2(transform.position.x, transform.position.z);
     }
 
     public void OnDrawGizmos()

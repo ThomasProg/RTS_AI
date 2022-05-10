@@ -163,7 +163,7 @@ public static class Statistic
             
             targetBuildingAnalysisDatas[i].target = targ;
             targetBuildingAnalysisDatas[i].sqrDistanceFromTeamBarycenter = (teamBarycenter - target2DPos).SqrMagnitude();
-            targetBuildingAnalysisDatas[i].balancing = GetBalancingInZone(targ.Get2DPosition(), influenceRadiusAnalysis);
+            targetBuildingAnalysisDatas[i].balancing = GetBalancingInZone(targ.GetInfluencePosition(), influenceRadiusAnalysis);
         }
 
         return targetBuildingAnalysisDatas;

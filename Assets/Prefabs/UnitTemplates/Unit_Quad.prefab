@@ -82,6 +82,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &3316022758082076100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,11 +191,11 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 30
@@ -292,6 +293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Team: 0
   UnitData: {fileID: 11400000, guid: bf00dbe58a21fca46b8e307a06af5050, type: 2}
+  BulletSlot: {fileID: 0}
 --- !u!65 &6593571166977932406
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -319,7 +321,7 @@ NavMeshAgent:
   m_Acceleration: 12
   avoidancePriority: 50
   m_AngularSpeed: 150
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -372,6 +374,8 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -419,6 +423,10 @@ PrefabInstance:
       value: unit_Quad_B
       objectReference: {fileID: 0}
     - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -431,6 +439,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0.70710677
       objectReference: {fileID: 0}
@@ -441,14 +453,6 @@ PrefabInstance:
     - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0.00000006181724
-      objectReference: {fileID: 0}
-    - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 454664, guid: d326448635d47ac498ce72a50b3667b1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
