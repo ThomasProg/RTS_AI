@@ -9,7 +9,8 @@ public class Squad : IInfluencer
 {
     HashSet<Unit> Units = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
-    Formation formation = new Formation();
+    TargetBuilding targetCapturePoint;
+    Formation formation;
 
     PointOfInterest _pointOfInterest;
 
@@ -344,7 +345,7 @@ public class Squad : IInfluencer
         foreach (Unit unit in Units)
         {
             unit.SetTaskGoTo(targetCapturePoint.transform.position);
-                unit.AddTaskCaptureTarget(targetCapturePoint);
+            unit.AddTaskCaptureTarget(targetCapturePoint);
         }
     }
 
@@ -367,7 +368,7 @@ public class Squad : IInfluencer
             {
                 rst |= unit.IsIdle;
             }
-
+    
             return rst;
         }
     }
