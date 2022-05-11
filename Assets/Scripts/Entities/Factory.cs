@@ -36,6 +36,7 @@ public sealed class Factory : BaseEntity
     public int AvailableUnitsCount { get { return Mathf.Min(MaxAvailableUnits, FactoryData.AvailableUnits.Length); } }
     public int AvailableFactoriesCount { get { return Mathf.Min(MaxAvailableFactories, FactoryData.AvailableFactories.Length); } }
     public Action<Unit> OnUnitBuilt;
+    public Action<Unit> OnUnitBuiltPersistent; // is not reset
     public Action<Factory> OnFactoryBuilt;
     public Action OnBuildCanceled;
     public bool IsBuildingUnit { get { return CurrentState == State.BuildingUnit; } }
@@ -109,7 +110,9 @@ public sealed class Factory : BaseEntity
             case State.BuildingUnit:
                 if (Time.time > EndBuildDate)
                 {
-                    OnUnitBuilt?.Invoke(BuildUnit());
+                    Unit newUnit = BuildUnit();
+                    OnUnitBuilt?.Invoke(newUnit);
+                    OnUnitBuiltPersistent?.Invoke(newUnit);
                     OnUnitBuilt = null; // remove registered methods
                     CurrentState = State.Available;
 

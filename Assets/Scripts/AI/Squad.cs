@@ -21,12 +21,14 @@ public class Squad : IInfluencer
             if (tactic != value)
             {
                 // remove squad from previous Tactic
-                tactic.squads.Remove(this);
+                if (tactic != null)
+                    tactic.RemoveSquad(this);
 
                 tactic = value;
 
                 // add squad to new tactic
-                tactic.squads.Add(this);
+                if (tactic != null)
+                    tactic.AddSquad(this);
             }
         }
     }
@@ -36,6 +38,12 @@ public class Squad : IInfluencer
 
     public Squad()
     {
+    }
+
+    public Squad(Unit squadUnit)
+    {
+        Units = new HashSet<Unit>();
+        Units.Add(squadUnit);
     }
 
     public Squad(HashSet<Unit> squadUnits)
@@ -149,7 +157,13 @@ public class Squad : IInfluencer
     {
         unitsToRemove.UnionWith(Units);
         Units.ExceptWith(unitsToRemove);
-        return new Squad(unitsToRemove);
+        return new Squad(unitsToRemove); // TODO : Register new squad ?
+    }
+
+    public Squad Split(int nbUnitsInNewSquad)
+    {
+        List<Unit> units = new List<Unit>(Units.Take(1));
+        return new Squad(units); // TODO : Register new squad ?
     }
 
     /// <summary>
@@ -295,7 +309,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.AddTaskGoTo(targetCapturePoint.transform.position);
+            unit.SetTaskGoTo(targetCapturePoint.transform.position);
             unit.AddTaskCaptureTarget(targetCapturePoint);
         }
 

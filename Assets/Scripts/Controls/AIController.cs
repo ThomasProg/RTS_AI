@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(StrategyAI))]
 public sealed class AIController : UnitController
 {
-    TargetBuilding[] allCapturePoints;
+    public TargetBuilding[] allCapturePoints;
 
     StrategyAI strategyAI;
 
@@ -25,21 +25,29 @@ public sealed class AIController : UnitController
         base.OnEnable();
 
         allCapturePoints = FindObjectsOfType(typeof(TargetBuilding)) as TargetBuilding[];
+
+        foreach (Factory factory in Factories)
+        {
+            factory.OnUnitBuiltPersistent += (Unit unit) =>
+            {
+                strategyAI.squadManager.RegisterSquad(new Squad(unit));
+            };
+        }
     }
 
     protected override void Update()
     {
         base.Update();
 
-        strategyAI.blackboard = new StrategyAI.Blackboard
-        {
-            controller = this,
-            allyUnits = UnitList,
-            allyFactories = FactoryList,
-            nbBuildPoints = TotalBuildPoints,
-            allCapturePoints = allCapturePoints,
-            squadManager = strategyAI.squadManager
-        };
+        //strategyAI.blackboard = new StrategyAI.Blackboard
+        //{
+        //    controller = this,
+        //    allyUnits = UnitList,
+        //    allyFactories = FactoryList,
+        //    nbBuildPoints = TotalBuildPoints,
+        //    allCapturePoints = allCapturePoints,
+        //    squadManager = strategyAI.squadManager
+        //};
 
         //if (!strategyAI.taskRunner.IsRunningTask())
         //{

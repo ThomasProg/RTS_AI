@@ -47,6 +47,11 @@ public class TaskRunner
 
     public object blackboard;
 
+    public bool IsTaskRunning(Task task)
+    {
+        return currentTask == task;
+    }
+
     public bool IsRunningTask()
     {
         return currentTask != null;
