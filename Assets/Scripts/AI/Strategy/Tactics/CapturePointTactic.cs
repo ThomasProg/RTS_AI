@@ -46,7 +46,7 @@ class CapturePointTactic : SquadTactic
 
     public override bool TryShrink(ref List<Squad> totalSquads)
     {
-        if (totalSquads.Count < 0)
+        if (totalSquads.Count <= 0)
             return false;
 
         List<Squad> newTotalSquads = new List<Squad>();
@@ -62,13 +62,23 @@ class CapturePointTactic : SquadTactic
             newTotalSquads.Add(squad);
             if (nbCurrentUnits >= nbRequiredUnits)
             {
-                //newSquad = newSquad.Split(nbRequiredUnits - nbCurrentUnits);
+                int nbUnitsToRemove = nbCurrentUnits - nbRequiredUnits;
+                if (nbUnitsToRemove == squad.UnitList.Count)
+                {
+                    newTotalSquads.Remove(squad);
+                }
+                else
+                {
+                    // TODO : Split
+                    //newSquad = squad.Split(nbUnitsToRemove);
+                }
+                nbCurrentUnits -= nbUnitsToRemove;
                 break;
             }
         }
 
         totalSquads = newTotalSquads;
 
-        return nbRequiredUnits >= nbCurrentUnits;
+        return nbRequiredUnits <= nbCurrentUnits;
     }
 }

@@ -78,7 +78,7 @@ public abstract class SquadTactic : Tactic
             foreach (Squad squad in allSquadsByDistance)
             {
                 // Wait for seconds
-                if (squad.Tactic == null || squad.Tactic.priority < tactic.priority)
+                if (squad.Tactic == null || squad.Tactic.priority <= tactic.priority)
                 {
                     tacticNewSquads.Add(squad);
                     if (tactic.TryShrink(ref tacticNewSquads))
