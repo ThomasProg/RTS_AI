@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class PullTaskRunner : TaskRunner
+public class PoolTaskRunner : TaskRunner
 {
     public readonly List<Task> tasks = new List<Task>();
 

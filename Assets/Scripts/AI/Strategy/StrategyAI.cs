@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,20 +9,23 @@ public class StrategyAI : MonoBehaviour
 {
     public class Blackboard
     {
-        public AIController controller;
-        public SquadManager squadManager;
+        public Blackboard(AIController controller, SquadManager squadManager)
+        {
+            this.controller = controller;
+            this.squadManager = squadManager;
+        }
 
-        public int nbUnits;
-        public int nbEnemyUnits;
-        public int nbBuildings;
-        public int nbEnemyBuildings;
+        private AIController controller;
+        private SquadManager squadManager;
 
-        public List<Unit> allyUnits;
-        public List<Factory> allyFactories;
-        public int nbBuildPoints;
+        public Unit[] AllyUnits => controller.Units;
+        public Factory[] AllyFactories => controller.Factories;
+        public int nbBuildPoints => controller.TotalBuildPoints;
 
-        public List<Squad> idleGroups;
-        public TargetBuilding[] allCapturePoints;
+        public TargetBuilding[] allCapturePoints => GameServices.GetTargetBuildings();
+
+        public TargetBuilding[] EnemyUnits => throw new NotImplementedException();
+        public TargetBuilding[] EnemySquads => throw new NotImplementedException();
     }
 
 
@@ -29,131 +33,67 @@ public class StrategyAI : MonoBehaviour
     UtilitySystem.UtilitySystem subjectif;
 
     public SquadManager squadManager;
-
     public AIController controller;
 
+    public Blackboard bb { get; private set; } = null;
+    
     private void Awake()
     {
         squadManager = GetComponent<SquadManager>();
-
-        TargetBuilding[] allBuildings = FindObjectsOfType(typeof(TargetBuilding)) as TargetBuilding[];
-
-        foreach (TargetBuilding targetBuilding in  allBuildings)
-        {
-            //squadTasks.Add(new );
-        }
+        bb = new Blackboard(controller, squadManager);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        AddTactic(new MakeUnitsTactic { stratAI = this });
-
         foreach (TargetBuilding targetBuilding in controller.allCapturePoints)
         {
-            AddTactic(new CapturePointTactic(targetBuilding) { stratAI = this, squadManager = squadManager } );
+            AddTactic(new CapturePointPoI(targetBuilding) {stratAI = this, squadManager = squadManager});
         }
-
-
     }
 
-    void AddTactic(Tactic tactic)
+    void AddTactic(PointOfInterest pointOfInterest)
     {
-        alltacticsByEvaluationPriority.Add(tactic);
+        AllPointOfInterests.Add(pointOfInterest);
     }
 
 
-    public TaskRunner taskRunner = new TaskRunner();
-    public List<Tactic> alltacticsByEvaluationPriority = new List<Tactic>();
-    public List<Tactic> allTacticsByPriority = new List<Tactic>();
+    public PoolTaskRunner poolTaskRunner = new PoolTaskRunner();
+    public List<PointOfInterest> AllPointOfInterests = new List<PointOfInterest>();
+    public List<PointOfInterest> AllPointOfInterestsByPriority = new List<PointOfInterest>();
 
     // Update is called once per frame
     void Update()
     {
-        if (taskRunner.IsRunningTask())
-            taskRunner.UpdateCurrentTask();
+        if (poolTaskRunner.IsRunningTask())
+            poolTaskRunner.UpdateCurrentTask();
         else
         {
-            alltacticsByEvaluationPriority.Sort((Tactic a, Tactic b) => a.GetEvaluationFrequencyScore().CompareTo(b.GetEvaluationFrequencyScore()));
-
-            for (int k = 0; k < alltacticsByEvaluationPriority.Count && alltacticsByEvaluationPriority[k].GetEvaluationFrequencyScore() < 0f; k++)
+            foreach (var poi in AllPointOfInterests)
             {
-                alltacticsByEvaluationPriority[k].EvaluatePriority();
-                alltacticsByEvaluationPriority[k].lastEvaluationTime = Time.time;
+                poi.EvaluatePriority(bb);
                 // wait for seconds
             }
 
             // Sort by priority
-            List<Tactic> oldAllTacticsByPriority = allTacticsByPriority;
-            allTacticsByPriority = new List<Tactic>(alltacticsByEvaluationPriority);
-            allTacticsByPriority.Sort((Tactic a, Tactic b) => -a.priority.CompareTo(b.priority));
+            List<PointOfInterest> oldAllTacticsByPriority = AllPointOfInterestsByPriority;
+            AllPointOfInterestsByPriority = new List<PointOfInterest>(AllPointOfInterests);
+            AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
+                -a.priority.CompareTo(b.priority));
 
             int i = 0;
-            while (i < allTacticsByPriority.Count && i < oldAllTacticsByPriority.Count && allTacticsByPriority[i] == oldAllTacticsByPriority[i])
+            while (i < AllPointOfInterestsByPriority.Count && i < oldAllTacticsByPriority.Count &&
+                   AllPointOfInterestsByPriority[i] == oldAllTacticsByPriority[i])
             {
                 i++;
             }
+            squadManager.QueryUnit(AllPointOfInterestsByPriority[0], bb);
+            List<Task> tasks = AllPointOfInterestsByPriority[0].GetProcessTasks(bb);
 
-            //// If not equal to before
-            //if (!(i == allTacticsByPriority.Count && i == oldAllTacticsByPriority.Count))
-            //{
-            //    taskRunner.StopCurrentTask();
-
-                InBetweenTask firstTask = allTacticsByPriority[0].GetProcessTask();
-                InBetweenTask lastTask = firstTask;
-                // Construct new plan
-                for (int j = 1; j < allTacticsByPriority.Count; j++)
-                {
-                    InBetweenTask next = allTacticsByPriority[j].GetProcessTask();
-                    lastTask.next = next;
-                    lastTask = next;
-                }
-                lastTask.next = null;
-
-                // Assign new plan
-                taskRunner.AssignNewTask(firstTask);
-            //}
-
-            // TODO : try to update the graph without changing the taskrunner's current node
-
-
-            //bool currentTacticFound = false;
-
-            //// if the tactics has changed order, stops current task, and process tasks from last change
-            //int i = 0;
-            //while (i < allTacticsByPriority.Count && i < oldAllTacticsByPriority.Count && allTacticsByPriority[i] == oldAllTacticsByPriority[i])
-            //{
-            //    if (taskRunner.IsTaskRunning(allTacticsByPriority[i].GetProcessTask()))
-            //        currentTacticFound = true;
-            //    i++;
-            //}
-
-            //if  (currentTacticFound)
-            //{
-
-            //}
-            //if (i < allTacticsByPriority.Count && i < oldAllTacticsByPriority.Count && allTacticsByPriority[i] != oldAllTacticsByPriority[i])
-            //{
-
-            //}
-
-            //// if has changed
-            //if (i < allTacticsByPriority.Count)
-            //{
-            //    // Stop previous task
-            //    taskRunner.StopCurrentTask();
-
-            //    Task firstTask = allTacticsByPriority[i].GetProcessTask();
-            //    i++;
-            //    Task lastTask = firstTask;
-            //    // Construct new plan
-            //    while (i < allTacticsByPriority.Count)
-            //    {
-            //        lastTask.next = allTacticsByPriority[i].GetProcessTask();
-            //    }
-            //    // Assign new plan
-            //    taskRunner.AssignNewTask(firstTask);
-            //}
+            foreach (var task in tasks)
+            {
+                poolTaskRunner.AddNewTask(task);
+            }
         }
     }
 }
