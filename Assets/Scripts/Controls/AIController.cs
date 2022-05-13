@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // $$$ TO DO :)
@@ -11,6 +13,14 @@ public sealed class AIController : UnitController
     StrategyAI strategyAI;
 
     #region MonoBehaviour methods
+
+    public override Squad[] Squads
+    {
+        get
+        {
+            return strategyAI.squadManager.squads.ToArray();
+        }
+    }
 
     protected override void Awake()
     {

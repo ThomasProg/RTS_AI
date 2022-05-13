@@ -73,6 +73,9 @@ public sealed class PlayerController : UnitController
     Action OnSelectAllPressed = null;
     Action [] OnCategoryPressed = new Action[9];
 
+    private int currentFrame = 0;
+    private Squad[] evaluatedSquads;
+
     GameObject GetTargetCursor()
     {
         if (TargetCursor == null)
@@ -101,6 +104,19 @@ public sealed class PlayerController : UnitController
     {
         SelectedFactory?.CancelCurrentBuild();
         PlayerMenuController.HideAllFactoryBuildQueue();
+    }
+    
+    public override Squad[] Squads
+    {
+        get
+        {
+            if (Time.frameCount != currentFrame)
+            {
+                currentFrame = Time.frameCount;
+                evaluatedSquads = Squad.MakeSquadsDependingOnDistance(Units, 10).ToArray();
+            }
+            return evaluatedSquads;
+        }
     }
 
     #region MonoBehaviour methods
