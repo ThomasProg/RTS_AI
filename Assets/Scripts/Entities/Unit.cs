@@ -9,7 +9,7 @@ public class Unit : BaseEntity
 
     public Transform BulletSlot;
 
-    private PullTaskRunner m_taskRunner = new PullTaskRunner();
+    private PoolTaskRunner m_taskRunner = new PoolTaskRunner();
 
     public Formation formation;
 

@@ -12,23 +12,23 @@ public class Squad : IInfluencer
     TargetBuilding targetCapturePoint;
     Formation formation = new Formation();
 
-    SquadTactic tactic;
-    public SquadTactic Tactic
+    PointOfInterest _pointOfInterest;
+    public PointOfInterest PointOfInterest
     {
-        get => tactic;
+        get => _pointOfInterest;
         set
         {
-            if (tactic != value)
+            if (_pointOfInterest != value)
             {
                 // remove squad from previous Tactic
-                if (tactic != null)
-                    tactic.RemoveSquad(this);
+                if (_pointOfInterest != null)
+                    _pointOfInterest.RemoveSquad(this);
 
-                tactic = value;
+                _pointOfInterest = value;
 
                 // add squad to new tactic
-                if (tactic != null)
-                    tactic.AddSquad(this);
+                if (_pointOfInterest != null)
+                    _pointOfInterest.AddSquad(this);
             }
         }
     }

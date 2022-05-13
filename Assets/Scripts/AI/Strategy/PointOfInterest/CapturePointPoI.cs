@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-class CapturePointTactic : SquadTactic
+class CapturePointPoI : PointOfInterest
 {
     public StrategyAI stratAI;
     public TargetBuilding targetBuilding;
 
-    public CapturePointTactic(TargetBuilding targetBuilding)
+    public CapturePointPoI(TargetBuilding targetBuilding)
     {
         this.targetBuilding = targetBuilding;
         position = targetBuilding.GetInfluencePosition();
@@ -25,7 +25,7 @@ class CapturePointTactic : SquadTactic
         base.RemoveSquad(squad);
     }
 
-    public override void EvaluatePriority()
+    public override void EvaluatePriority(StrategyAI.Blackboard blackboard)
     {
         // todo : change priority if enemies are close, etc
         if (targetBuilding.GetTeam() == stratAI.controller.GetTeam())
@@ -42,6 +42,12 @@ class CapturePointTactic : SquadTactic
         }
 
         priority += 1f / (stratAI.controller.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+    }
+
+    public override List<Task> GetProcessTasks(StrategyAI.Blackboard blackboard)
+    {
+        return new List<Task>(); 
+        // throw new System.NotImplementedException();
     }
 
     public override bool TryShrink(ref List<Squad> totalSquads)
