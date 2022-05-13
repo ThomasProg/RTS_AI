@@ -82,6 +82,16 @@ public class GameServices : MonoBehaviour
 #endif
 
     #region Static methods
+    public static AIController GetAIController()
+    {
+        return Instance.ControllersArray.OfType<AIController>().First();
+    }
+    
+    public static PlayerController GetPlayerController()
+    {
+        return Instance.ControllersArray.OfType<PlayerController>().First();
+    }
+
     public static GameServices GetGameServices()
     {
         return Instance;
