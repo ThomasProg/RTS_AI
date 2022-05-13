@@ -53,6 +53,16 @@ public class Squad : IInfluencer
     public Squad(HashSet<Unit> squadUnits)
     {
         Units = squadUnits;
+        NormalizeSquadSpeed();
+    }
+
+    public void NormalizeSquadSpeed()
+    {
+        float maxSpeed = GetSquadSpeed();
+        foreach (var unit in Units)
+        {
+            unit.SetSpeed(maxSpeed);
+        }
     }
 
     public Squad(List<Unit> squadUnits)
@@ -61,6 +71,8 @@ public class Squad : IInfluencer
         {
             Units.Add(unit);
         }
+
+        NormalizeSquadSpeed();
     }
 
     /// <summary>

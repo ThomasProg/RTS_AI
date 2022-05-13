@@ -86,6 +86,11 @@ namespace AI.Formations
                     unit.SetTargetPos(_formation.GetUnitsPosition(_formation.GetFormationCenterPosition())[unit]);
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                _squad.NormalizeSquadSpeed();
+            }
         }
 
         private void OnDrawGizmos()
