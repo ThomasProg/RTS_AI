@@ -235,6 +235,37 @@ public static class Statistic
             return allyStrength / (Mathf.Max(enemyStrength, 1) * Mathf.Sqrt(sqrtDistanceFromSquad));
         }
     }
+
+    public struct BalanceOfPower
+    {
+        public float playerStrength;
+        public float aiStrength;
+    }
+
+    public static BalanceOfPower EvaluateBalanceOfPower(Vector2 position, float radius)
+    {
+        BalanceOfPower rst = new BalanceOfPower();
+
+        rst.playerStrength = EvaluateSquadsStrengthInZone(GameServices.GetPlayerController().Squads, position, radius);
+        rst.aiStrength = EvaluateSquadsStrengthInZone(GameServices.GetEnemyController().Squads, position, radius);
+
+        return rst;
+    }
+    
+    public static float EvaluateSquadsStrengthInZone(IEnumerable squads, Vector2 position, float radius)
+    {
+        BalanceOfPower rst = new BalanceOfPower();
+        UnitController playerController = GameServices.GetPlayerController();
+
+        float strength = 0f;
+        foreach (Squad squad in squads)
+        {
+            if ((squad.GetAveragePosition() - position).sqrMagnitude + squad.GetSqrInfluenceRadius() < radius)
+                strength += squad.GetStrength();
+        }
+
+        return strength;
+    }
     
     public struct EnemySquadObjectiveEvaluation
     {
