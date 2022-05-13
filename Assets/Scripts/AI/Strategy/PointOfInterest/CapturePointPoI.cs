@@ -46,8 +46,8 @@ class CapturePointPoI : PointOfInterest
 
     public override List<Task> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
-        return new List<Task>(); 
-        // throw new System.NotImplementedException();
+        // return new List<Task>(); 
+        throw new System.NotImplementedException();
     }
 
     public override bool TryShrink(ref List<Squad> totalSquads)
