@@ -45,7 +45,7 @@ class CapturePointPoI : PointOfInterest
             EvaluateDefendingPriority(playerSquads);
         }
         // If player can attack a near target without and can win it, evaluate priority to attack this point
-        else if (playerController.Team == targetBuilding.GetTeam())
+        else if (stratAI.controller.Team == targetBuilding.GetTeam())
         {
             EvaluateAttackingPriority(aiSquads, playerSquads);
         }
@@ -90,21 +90,16 @@ class CapturePointPoI : PointOfInterest
     void EvaluateDefendingPriority(IEnumerable playerSquads)
     {
         // Get all enemy squads should attack this point
-        List<Statistic.POITargetByEnemySquad> enemySquadObjectives = 
-            Statistic.GetPOITargetByEnemySquad(targetBuilding, stratAI.controller.Team, 10f, 1.1f);
-        
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
-        enemySquadObjectives.RemoveAll((objectives =>
-        {
-            return objectives.priority < 0.5;
-        }));
-        
+        List<Statistic.POITargetByEnemySquad> enemySquadObjectives = 
+            Statistic.GetPOITargetByEnemySquad(this, stratAI.controller.Team, 10f, 1.1f, 0.5f);
+
         float distEnemiesToTarget = float.MinValue;
         float enemyStrength = 0f;
         foreach (Statistic.POITargetByEnemySquad enemySquadObjective in enemySquadObjectives)
         {
             float sqrDistSquadTarget =
-                (enemySquadObjective.enemy.GetAveragePosition() - enemySquadObjective.poi.GetInfluencePosition())
+                (enemySquadObjective.enemy.GetAveragePosition() - enemySquadObjective.poi.position)
                 .sqrMagnitude;
             if (distEnemiesToTarget < sqrDistSquadTarget)
             {
@@ -144,7 +139,7 @@ class CapturePointPoI : PointOfInterest
     
     public override List<Task> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
-        // return new List<Task>(); 
+        return new List<Task>(); 
         throw new System.NotImplementedException();
     }
 

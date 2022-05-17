@@ -49,12 +49,20 @@ public class GameServices : MonoBehaviour
     }
     
     [System.Serializable]
+    public struct POIDebugger
+    {
+        public bool displayPriorities;
+    }
+    
+    [System.Serializable]
     public struct DebugSettings
     {
         public TargetAnalysisDebug targetAnalysis;
         public BarycenterDebug barycenter;
         public AISquadDecisionPrevision aiSquadDecisionPrevision;
+        public POIDebugger poiDebugger;
     }
+    
 #endif
     
     [SerializeField, Tooltip("Generic material used for 3D models, in the following order : blue, red and green")]
@@ -290,6 +298,14 @@ public class GameServices : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (debug.poiDebugger.displayPriorities)
+        {
+            foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
+            {
+                Handles.Label( new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}");
+            }
+        }
+
         if (debug.aiSquadDecisionPrevision.display3MainObjectif)
         {
             List<Statistic.EnemySquadPotentialObjectives> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);

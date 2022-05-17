@@ -10,7 +10,7 @@ public sealed class AIController : UnitController
 {
     public TargetBuilding[] allCapturePoints;
 
-    StrategyAI strategyAI;
+    public StrategyAI strategyAI;
 
     #region MonoBehaviour methods
 
