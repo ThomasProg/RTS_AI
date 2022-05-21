@@ -68,6 +68,8 @@ public class StrategyAI : MonoBehaviour
     // Update is called once per frame
     IEnumerator UpdateInterests()
     {
+        yield return null;
+
         while (true)
         {
             foreach (var poi in AllPointOfInterests)
