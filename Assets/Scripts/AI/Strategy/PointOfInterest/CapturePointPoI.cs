@@ -93,7 +93,47 @@ public class CapturePointPoI : PointOfInterest
         List<Statistic.POITargetByEnemySquad> enemySquadObjectives = 
             Statistic.GetPOITargetByEnemySquad(this, stratAI.controller.Team, 10f, 1.1f, 0.5f);
 
-        priority += 1f / (stratAI.controller.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+        float distEnemiesToTarget = float.MinValue;
+        float enemyStrength = 0f;
+        foreach (Statistic.POITargetByEnemySquad enemySquadObjective in enemySquadObjectives)
+        {
+            float sqrDistSquadTarget =
+                (enemySquadObjective.enemy.GetAveragePosition() - enemySquadObjective.poi.position)
+                .sqrMagnitude;
+            if (distEnemiesToTarget < sqrDistSquadTarget)
+            {
+                distEnemiesToTarget = sqrDistSquadTarget;
+            }
+            
+            enemyStrength += enemySquadObjective.enemy.GetStrength();
+        }
+
+        float playerStrength =
+            Statistic.EvaluateSquadsStrengthInZone(playerSquads, targetBuilding.GetInfluencePosition(), distEnemiesToTarget);
+        
+        // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
+        if (enemyStrength > playerStrength)
+        {
+            if (targetBuilding.GetTeam() == ETeam.Neutral)
+            {
+                priority = 3f;
+            }
+            else // enemy team
+            {
+                priority = 6f;
+            }
+            
+            // Add a priority depending on distance from the first factory (AI need a safe place in priority)
+            priority += 1f / (stratAI.controller.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+        }
+        else
+        {
+            // We can defend this place so it's not a priority
+            priority = 0f;
+        }
+        
+        // Apply direct coefficient depending on AI personality
+        // TODO:
     }
 
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
