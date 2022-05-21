@@ -10,7 +10,7 @@ public abstract class PointOfInterest
     public Vector2 position;
 
     public abstract void EvaluatePriority(StrategyAI.Blackboard blackboard);
-    public abstract List<Task> GetProcessTasks(StrategyAI.Blackboard blackboard);
+    public abstract List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard);
     public abstract bool TryShrink(ref List<Squad> totalSquads);
     public virtual void AddSquad(Squad squad)
     {

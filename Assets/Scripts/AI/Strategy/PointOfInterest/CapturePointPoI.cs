@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-class CapturePointPoI : PointOfInterest
+public class CapturePointPoI : PointOfInterest
 {
     public StrategyAI stratAI;
     public TargetBuilding targetBuilding;
@@ -44,10 +44,12 @@ class CapturePointPoI : PointOfInterest
         priority += 1f / (stratAI.controller.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
     }
 
-    public override List<Task> GetProcessTasks(StrategyAI.Blackboard blackboard)
+    public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
-        // return new List<Task>(); 
-        throw new System.NotImplementedException();
+        List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
+        tasks.Add(new QueryUnitsTask() { pointOfInterest = this });
+        //tasks.Add(new CapturePointTask() { capturePointPoI = this });
+        return tasks;
     }
 
     public override bool TryShrink(ref List<Squad> totalSquads)

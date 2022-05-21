@@ -16,7 +16,7 @@ public class StrategyAI : MonoBehaviour
         }
 
         private AIController controller;
-        private SquadManager squadManager;
+        public SquadManager squadManager;
 
         public Unit[] AllyUnits => controller.Units;
         public Factory[] AllyFactories => controller.Factories;
@@ -41,6 +41,7 @@ public class StrategyAI : MonoBehaviour
     {
         squadManager = GetComponent<SquadManager>();
         bb = new Blackboard(controller, squadManager);
+        //priorityTaskRunner.blackboard = bb;
     }
 
     // Start is called before the first frame update
@@ -50,6 +51,8 @@ public class StrategyAI : MonoBehaviour
         {
             AddTactic(new CapturePointPoI(targetBuilding) {stratAI = this, squadManager = squadManager});
         }
+
+        StartCoroutine(UpdateInterests());
     }
 
     void AddTactic(PointOfInterest pointOfInterest)
@@ -58,42 +61,69 @@ public class StrategyAI : MonoBehaviour
     }
 
 
-    public PoolTaskRunner poolTaskRunner = new PoolTaskRunner();
+    //public PriorityTaskRunner priorityTaskRunner = new PriorityTaskRunner();
     public List<PointOfInterest> AllPointOfInterests = new List<PointOfInterest>();
     public List<PointOfInterest> AllPointOfInterestsByPriority = new List<PointOfInterest>();
 
     // Update is called once per frame
-    void Update()
+    IEnumerator UpdateInterests()
     {
-        if (poolTaskRunner.IsRunningTask())
-            poolTaskRunner.UpdateCurrentTask();
-        else
+        yield return null;
+
+        //if (priorityTaskRunner.IsRunningTask())
+        //    priorityTaskRunner.UpdateCurrentTask();
+        //else
+        //{
+        foreach (var poi in AllPointOfInterests)
         {
-            foreach (var poi in AllPointOfInterests)
-            {
-                poi.EvaluatePriority(bb);
-                // wait for seconds
-            }
-
-            // Sort by priority
-            List<PointOfInterest> oldAllTacticsByPriority = AllPointOfInterestsByPriority;
-            AllPointOfInterestsByPriority = new List<PointOfInterest>(AllPointOfInterests);
-            AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
-                -a.priority.CompareTo(b.priority));
-
-            int i = 0;
-            while (i < AllPointOfInterestsByPriority.Count && i < oldAllTacticsByPriority.Count &&
-                   AllPointOfInterestsByPriority[i] == oldAllTacticsByPriority[i])
-            {
-                i++;
-            }
-            squadManager.QueryUnit(AllPointOfInterestsByPriority[0], bb);
-            List<Task> tasks = AllPointOfInterestsByPriority[0].GetProcessTasks(bb);
-
-            foreach (var task in tasks)
-            {
-                poolTaskRunner.AddNewTask(task);
-            }
+            poi.EvaluatePriority(bb);
+            // wait for seconds
         }
+
+        // Sort by priority
+        List<PointOfInterest> oldAllTacticsByPriority = AllPointOfInterestsByPriority;
+        AllPointOfInterestsByPriority = new List<PointOfInterest>(AllPointOfInterests);
+        AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
+            -a.priority.CompareTo(b.priority));
+
+        //int i = 0;
+        //while (i < AllPointOfInterestsByPriority.Count && i < oldAllTacticsByPriority.Count &&
+        //        AllPointOfInterestsByPriority[i] == oldAllTacticsByPriority[i])
+        //{
+        //    i++;
+        //}
+
+        while (true)
+        {
+
+            foreach (PointOfInterest poi in AllPointOfInterestsByPriority)
+            {
+                List<IPOITask<StrategyAI.Blackboard>> tasks = poi.GetProcessTasks(bb);
+
+                foreach (var task in tasks)
+                {
+                    bool isFinished;
+                    IEnumerator enumerator = task.Execute(bb);
+
+                    do
+                    {
+                        isFinished = !enumerator.MoveNext();
+                        yield return null;
+                    } while (!isFinished && !(enumerator.Current is Wip));
+
+
+                    yield return null;
+                    if (!isFinished)
+                        break;
+                }
+                yield return null;
+            }
+
+            yield return null;
+        }
+
+
     }
+
+
 }

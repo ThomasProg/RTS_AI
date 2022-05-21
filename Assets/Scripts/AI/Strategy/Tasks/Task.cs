@@ -2,6 +2,54 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+
+public class Wip 
+{
+
+}
+
+public interface IPOITask<BLACKBOARD>
+{
+    public class WaitForSeconds
+    {
+        public WaitForSeconds(float nbSeconds)
+        {
+
+        }
+    }
+
+    System.Collections.IEnumerator Execute(BLACKBOARD blackboard);
+}
+
+// Tasks are added in the priority they should be executed
+public class PriorityTaskRunner : TaskRunner
+{
+    public readonly List<Task> tasks = new List<Task>();
+
+    public bool HasTasksRunning()
+    {
+        return tasks.Count != 0;
+    }
+
+    public void AddNewTask(Task newTask)
+    {
+        if (tasks.Count == 0)
+            base.AssignNewTask(newTask);
+
+        tasks.Add(newTask);
+    }
+
+    public void Update()
+    {
+        foreach (Task task in tasks)
+        {
+            StopCurrentTask();
+            AssignNewTask(task);
+            UpdateCurrentTask();
+        }
+    }
+}
+
 public class PoolTaskRunner : TaskRunner
 {
     public readonly List<Task> tasks = new List<Task>();
