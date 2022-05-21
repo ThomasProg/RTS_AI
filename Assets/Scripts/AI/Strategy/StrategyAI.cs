@@ -68,33 +68,19 @@ public class StrategyAI : MonoBehaviour
     // Update is called once per frame
     IEnumerator UpdateInterests()
     {
-        yield return null;
-
-        //if (priorityTaskRunner.IsRunningTask())
-        //    priorityTaskRunner.UpdateCurrentTask();
-        //else
-        //{
-        foreach (var poi in AllPointOfInterests)
-        {
-            poi.EvaluatePriority(bb);
-            // wait for seconds
-        }
-
-        // Sort by priority
-        List<PointOfInterest> oldAllTacticsByPriority = AllPointOfInterestsByPriority;
-        AllPointOfInterestsByPriority = new List<PointOfInterest>(AllPointOfInterests);
-        AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
-            -a.priority.CompareTo(b.priority));
-
-        //int i = 0;
-        //while (i < AllPointOfInterestsByPriority.Count && i < oldAllTacticsByPriority.Count &&
-        //        AllPointOfInterestsByPriority[i] == oldAllTacticsByPriority[i])
-        //{
-        //    i++;
-        //}
-
         while (true)
         {
+            foreach (var poi in AllPointOfInterests)
+            {
+                poi.EvaluatePriority(bb);
+                // wait for seconds
+            }
+
+            // Sort by priority
+            List<PointOfInterest> oldAllTacticsByPriority = AllPointOfInterestsByPriority;
+            AllPointOfInterestsByPriority = new List<PointOfInterest>(AllPointOfInterests);
+            AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
+                -a.priority.CompareTo(b.priority));
 
             foreach (PointOfInterest poi in AllPointOfInterestsByPriority)
             {
