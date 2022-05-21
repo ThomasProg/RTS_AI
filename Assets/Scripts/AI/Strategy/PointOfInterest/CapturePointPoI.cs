@@ -27,19 +27,71 @@ public class CapturePointPoI : PointOfInterest
 
     public override void EvaluatePriority(StrategyAI.Blackboard blackboard)
     {
-        // todo : change priority if enemies are close, etc
-        if (targetBuilding.GetTeam() == stratAI.controller.GetTeam())
+        PlayerController playerController = GameServices.GetPlayerController();
+        AIController aiController = GameServices.GetAIController();
+        Squad[] playerSquads = playerController.Squads;
+        Squad[] aiSquads = aiController.Squads;
+        
+        // These both functions are process following this steps:
+        // - Evaluate depending on enemy squad distance witch enemy is opposite. Depending on AI personality
+        // - Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
+        // - Apply coefficient to this result depending on distance from our base or enemy base. Depending on AI personality
+        // - Apply direct coefficient depending on AI personality
+        
+        // If ai target a point that it don't own, evaluate priority to defend this point
+        if (stratAI.controller.Team != targetBuilding.GetTeam())
         {
-            priority = -1f;
+            EvaluateDefendingPriority(playerSquads);
         }
-        else if (targetBuilding.GetTeam() == ETeam.Neutral)
+        // If player can attack a near target without and can win it, evaluate priority to attack this point
+        else if (stratAI.controller.Team == targetBuilding.GetTeam())
         {
-            priority = 3f;
+            EvaluateAttackingPriority(aiSquads, playerSquads);
         }
-        else // enemy team
+    }
+
+    void EvaluateAttackingPriority(IEnumerable enemySquad, IEnumerable playerSquads)
+    {
+        bool squadFound = false;
+        foreach (Squad squad in playerSquads)
         {
-            priority = 6f;
+            // TODO: Check if squad is occuped with highter priority task
+            
+            float squadToTargetSqrDist = (targetBuilding.GetInfluencePosition() - squad.GetAveragePosition()).sqrMagnitude;
+            float playerSquadStrength = Statistic.EvaluateSquadsStrengthInZone(new []{squad}, targetBuilding.GetInfluencePosition(), squadToTargetSqrDist);
+            float aiStrength = Statistic.EvaluateSquadsStrengthInZone(enemySquad, targetBuilding.GetInfluencePosition(), squadToTargetSqrDist);
+
+            if (playerSquadStrength > aiStrength)
+            {
+                if (targetBuilding.GetTeam() == ETeam.Neutral)
+                {
+                    priority = 3f;
+                }
+                else // enemy team
+                {
+                    priority = 6f;
+                }
+            
+                // Add a priority depending on distance from the first factory (AI need a safe place in priority)
+                priority += 1f / (GameServices.GetPlayerController().Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+                squadFound = true;
+                break;
+            }
         }
+        
+        if (!squadFound)
+            priority = 0f;
+        
+        // Apply direct coefficient depending on AI personality
+        // TODO:
+    }
+    
+    void EvaluateDefendingPriority(IEnumerable playerSquads)
+    {
+        // Get all enemy squads should attack this point
+        // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
+        List<Statistic.POITargetByEnemySquad> enemySquadObjectives = 
+            Statistic.GetPOITargetByEnemySquad(this, stratAI.controller.Team, 10f, 1.1f, 0.5f);
 
         priority += 1f / (stratAI.controller.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
     }

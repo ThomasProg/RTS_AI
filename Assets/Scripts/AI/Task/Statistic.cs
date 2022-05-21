@@ -1,10 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using InfluenceMapPackage;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public static class Statistic
 {
+    /// <summary>
+    /// Get barycenter of all unity in a specific team
+    /// </summary>
+    /// <param name="team"></param>
+    /// <returns></returns>
     public static Vector2 GetTeamBarycenter(ETeam team)
     {
         TerrainInfluenceMap influenceMap = GameServices.GetGameServices().GetInfluenceMap(team);
@@ -26,6 +35,10 @@ public static class Statistic
         return posSum / radiusSum;
     }
 
+    /// <summary>
+    /// Get the barycenter of all unity in the map (ally or enemy)
+    /// </summary>
+    /// <returns></returns>
     public static Vector2 GetGlobalBarycenter()
     {
         TerrainInfluenceMap influenceMapBlue = GameServices.GetGameServices().GetInfluenceMap(ETeam.Blue);
@@ -63,6 +76,10 @@ public static class Statistic
         public float occupationTeam2; // [0, 1] percentage of occupation
     }
 
+    /// <summary>
+    /// Get global balancing depending on the influence map
+    /// </summary>
+    /// <returns></returns>
     static public Balancing GetBalancing()
     {
         Balancing balancing = new Balancing();
@@ -96,6 +113,12 @@ public static class Statistic
         return balancing;
     }
     
+    /// <summary>
+    /// Return the balancing of power in a specific zone depending on the influence map
+    /// </summary>
+    /// <param name="center"></param>
+    /// <param name="radius"></param>
+    /// <returns></returns>
     static public Balancing GetBalancingInZone(Vector2 center, float radius)
     {
         Balancing balancing = new Balancing();
@@ -147,6 +170,12 @@ public static class Statistic
         public Balancing balancing;
     }
     
+    /// <summary>
+    /// Get the balance of power depending on the influence map arround all targetBuidling
+    /// </summary>
+    /// <param name="team"></param>
+    /// <param name="influenceRadiusAnalysis"></param>
+    /// <returns></returns>
     public static TargetBuildingAnalysisData[] GetTargetBuildingAnalysisData(ETeam team, float influenceRadiusAnalysis)
     {
         TargetBuilding[] targetBuildings = GameServices.GetTargetBuildings();
@@ -169,50 +198,94 @@ public static class Statistic
         return targetBuildingAnalysisDatas;
     }
 
-    public struct PointOfInterestEvaluation
+    public struct BalanceOfPower
     {
-        public Vector2 position;
-        public float sqrtDistanceFromGroup;
-        public float strength;
+        public float playerStrength;
+        public float aiStrength;
+    }
+
+    /// <summary>
+    /// Return the balance of power between squad on ai and player in a specific zone.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="radius"></param>
+    /// <returns></returns>
+    public static BalanceOfPower EvaluateBalanceOfPower(Vector2 position, float radius)
+    {
+        BalanceOfPower rst = new BalanceOfPower();
+
+        rst.playerStrength = EvaluateSquadsStrengthInZone(GameServices.GetPlayerController().Squads, position, radius);
+        rst.aiStrength = EvaluateSquadsStrengthInZone(GameServices.GetAIController().Squads, position, radius);
+
+        return rst;
     }
     
-    public static List<PointOfInterestEvaluation> EvaluatePointOfInterest(Vector2 groupPosition, ETeam team)
+    /// <summary>
+    /// Return the strength of a squad in a zone.
+    /// </summary>
+    /// <param name="squads"></param>
+    /// <param name="position"></param>
+    /// <param name="sqrRadius"></param>
+    /// <returns></returns>
+    public static float EvaluateSquadsStrengthInZone(IEnumerable squads, Vector2 position, float sqrRadius)
     {
-        UnitController controller = GameServices.GetControllerByTeam(team);
-        Unit[] units = controller.Units;
-        Factory[] factories = controller.Factories;
-        // TODO: Target buidling
-
-        List<PointOfInterestEvaluation> pointOfInterestEvaluations = new List<PointOfInterestEvaluation>();
-        
-        // Iterate on all building and evaluate unit around depending on distance from group.
-        foreach (Factory factory in factories)
+        float strength = 0f;
+        foreach (Squad squad in squads)
         {
-            PointOfInterestEvaluation pointOfInterestEvaluation = new PointOfInterestEvaluation();
-
-            pointOfInterestEvaluation.position = factory.GetInfluencePosition();
-            
-            float sqrDistGroupFactory = (factory.GetInfluencePosition() - groupPosition).sqrMagnitude;
-            pointOfInterestEvaluation.sqrtDistanceFromGroup = sqrDistGroupFactory;
-            
-            // Get units in radius factory/group radius
-            float strength = 0;
-            foreach (Unit unit in units)
-            {
-                float sqrDistUnityFactory = (factory.GetInfluencePosition() - unit.GetInfluencePosition()).sqrMagnitude;
-                strength += (sqrDistUnityFactory < sqrDistGroupFactory) ? unit.Cost : 0;
-            }
-
-            pointOfInterestEvaluation.strength = strength;
-            pointOfInterestEvaluations.Add(pointOfInterestEvaluation);
+            if ((squad.GetAveragePosition() - position).sqrMagnitude + squad.GetSqrInfluenceRadius() < sqrRadius)
+                strength += squad.GetStrength();
         }
 
-        // Iterate on groups
-        // TODO: get group and do same things 
-        
-        return pointOfInterestEvaluations;
+        return strength;
     }
 
+    public struct POITargetByEnemySquad
+    {
+        public PointOfInterest poi;
+        public Squad enemy;
+        public float priority; //[0, 1], 0 is very low priority, 1 very high priority
+    }
+    
+    /// <summary>
+    /// Get all enemy squad that target a POI. This function return an approximation of all squad that could attack this POI.
+    /// </summary>
+    /// <param name="poi"></param>
+    /// <param name="enemyTeam"></param>
+    /// <param name="groupDistance"></param>
+    /// <param name="radiusErrorCoef"></param>
+    /// <param name="objectifFilterPrirotiy">This value is used to filter priority of the current objectif</param>
+    /// <returns></returns>
+    public static List<POITargetByEnemySquad> GetPOITargetByEnemySquad(PointOfInterest poi, ETeam enemyTeam, float groupDistance, float radiusErrorCoef, float objectifFilterPrirotiy)
+    {
+        List<POITargetByEnemySquad> rst = new List<POITargetByEnemySquad>();
+        List<EnemySquadPotentialObjectives> enemySquadsObjectives = EvaluateEnemySquadObjective(enemyTeam, groupDistance, radiusErrorCoef);
+
+        foreach (EnemySquadPotentialObjectives enemySquadObjectives in enemySquadsObjectives)
+        {
+            float efficiencyTotal = 0f;
+            foreach (SquadObjective objective in enemySquadObjectives.objectives)
+            {
+                efficiencyTotal += objective.GetStrategyEffectivity();
+            }
+            
+            foreach (SquadObjective objective in enemySquadObjectives.objectives)
+            {
+                float priority = objective.GetStrategyEffectivity() / efficiencyTotal;
+                if (priority > objectifFilterPrirotiy)
+                {
+                    rst.Add(new POITargetByEnemySquad
+                    {
+                        poi = poi,
+                        enemy = enemySquadObjectives.current,
+                        priority = priority
+                    });
+                }
+            }
+        }
+
+        return rst;
+    }
+    
     public enum EObjectiveType
     {
         CaptureTargetBuilding,
@@ -229,20 +302,28 @@ public static class Statistic
         
         public float allyStrength;
         public float enemyStrength;
+        public float directionWeight; // Dot product between squad dir and objectif pos. This can be used to estimate priority of a squad in movement
 
         public float GetStrategyEffectivity()
         {
-            return allyStrength / (Mathf.Max(enemyStrength, 1) * Mathf.Sqrt(sqrtDistanceFromSquad));
+            return allyStrength / Mathf.Max(enemyStrength, 1) * directionWeight;
         }
     }
     
-    public struct EnemySquadObjectiveEvaluation
+    public struct EnemySquadPotentialObjectives
     {
         public Squad current;
         public List<SquadObjective> objectives;
     }
-    
-    public static List<EnemySquadObjectiveEvaluation> EvaluateEnemySquadObjective(ETeam enemyTeam, float groupDistance, float radiusErrorCoef)
+
+    /// <summary>
+    /// This function test all enemy to evaluate its squad objectif depending on POI in the map. It's an approximation
+    /// </summary>
+    /// <param name="enemyTeam"></param>
+    /// <param name="groupDistance">The distance used to evaluate squads</param>
+    /// <param name="radiusErrorCoef"></param>
+    /// <returns></returns>
+    public static List<EnemySquadPotentialObjectives> EvaluateEnemySquadObjective(ETeam enemyTeam, float groupDistance, float radiusErrorCoef)
     {
         UnitController controllerCurrent = GameServices.GetControllerByTeam(enemyTeam);
         UnitController controllerEnemy = GameServices.GetControllerByTeam(enemyTeam == ETeam.Blue ? ETeam.Red : ETeam.Blue);
@@ -255,38 +336,46 @@ public static class Statistic
         Factory[] factoriesCurrent = controllerCurrent.Factories;
         Factory[] factoriesEnemy = controllerEnemy.Factories;
 
-        List<EnemySquadObjectiveEvaluation> squadsObjective = new List<EnemySquadObjectiveEvaluation>();
+        List<EnemySquadPotentialObjectives> squadsObjective = new List<EnemySquadPotentialObjectives>();
         
         // Need to compare squad distance with enemy squad, building and target building. 
         foreach (Squad squad in squadsCurrent)
         {
-            EnemySquadObjectiveEvaluation squadObjective = new EnemySquadObjectiveEvaluation();
-            squadObjective.objectives = new List<SquadObjective>();
-            squadObjective.current = squad;
+            EnemySquadPotentialObjectives squadPotentialObjectives = new EnemySquadPotentialObjectives();
+            squadPotentialObjectives.objectives = new List<SquadObjective>();
+            squadPotentialObjectives.current = squad;
             
             float squadSqrInfluenceRadius = squad.GetSqrInfluenceRadius();
-            Vector2 squadPos = squad.GetAveragePosition();
 
-            ProcessObjective(radiusErrorCoef, targetBuildings, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.CaptureTargetBuilding);
-            ProcessObjective(radiusErrorCoef, factoriesCurrent, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.ProtectFactory);
-            ProcessObjective(radiusErrorCoef, factoriesEnemy, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.AttackFactory);
-            ProcessObjective(radiusErrorCoef, squadsEnemy, squadPos, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadObjective, EObjectiveType.AttackSquad);
+            ProcessObjective(radiusErrorCoef, targetBuildings, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.CaptureTargetBuilding);
+            ProcessObjective(radiusErrorCoef, factoriesCurrent, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.ProtectFactory);
+            ProcessObjective(radiusErrorCoef, factoriesEnemy, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.AttackFactory);
+            ProcessObjective(radiusErrorCoef, squadsEnemy, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.AttackSquad);
             
-            squadsObjective.Add(squadObjective);
+            squadsObjective.Add(squadPotentialObjectives);
         }
 
         return squadsObjective;
     }
 
-    private static void ProcessObjective<T>(float radiusErrorCoef, IEnumerable<T> influencers, Vector2 squadPos,
-        float squadSqrInfluenceRadius, List<Squad> squadsCurrent, List<Squad> squadsEnemy, ref EnemySquadObjectiveEvaluation squadObjective, EObjectiveType type) where T : IInfluencer
+    public static float CrossMagnitude(Vector2 value1, Vector2 value2)
     {
+        return value1.x * value2.y - value1.y * value2.x;
+    }
+    
+    internal static void ProcessObjective<T>(float radiusErrorCoef, IEnumerable<T> influencers, Squad squad,
+        float squadSqrInfluenceRadius, List<Squad> squadsCurrent, List<Squad> squadsEnemy, ref EnemySquadPotentialObjectives squadPotentialObjectives, EObjectiveType type) where T : IInfluencer
+    {
+        Vector2 squadPos = squad.GetAveragePosition();
+        Vector2 squadDir = squad.GetUnormalizedDirection().normalized;
+
         foreach (T influencer in influencers)
         {
             float squadCurrentDefendingPoint = 0f;
             float squadEnemyAttackingPoint = 0f;
+            Vector2 squadToInfluencer = (influencer.GetInfluencePosition() - squadPos);
             float sqrDistSquadTarget =
-                (influencer.GetInfluencePosition() - squadPos).sqrMagnitude + squadSqrInfluenceRadius;
+                squadToInfluencer.sqrMagnitude + squadSqrInfluenceRadius;
             sqrDistSquadTarget *= radiusErrorCoef; // multiply by error coef to scale the radius and anticipate squad movement
 
             foreach (Squad squadAlly in squadsCurrent)
@@ -309,8 +398,9 @@ public static class Statistic
             objective.type = type;
             objective.allyStrength = squadCurrentDefendingPoint;
             objective.enemyStrength = squadEnemyAttackingPoint;
+            objective.directionWeight = Vector2.Dot(squadDir, squadToInfluencer.normalized) / sqrDistSquadTarget;
 
-            squadObjective.objectives.Add(objective);
+            squadPotentialObjectives.objectives.Add(objective);
         }
     }
 }

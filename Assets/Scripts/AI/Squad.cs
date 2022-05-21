@@ -13,6 +13,11 @@ public class Squad : IInfluencer
     Formation formation = new Formation();
 
     PointOfInterest _pointOfInterest;
+
+    private int previousFramePosUpdated;
+    private Vector2 currentPosition;
+    private Vector2 previousPosition;
+    
     public PointOfInterest PointOfInterest
     {
         get => _pointOfInterest;
@@ -64,12 +69,25 @@ public class Squad : IInfluencer
     /// </summary>
     public Vector2 GetAveragePosition()
     {
+        if (previousFramePosUpdated == Time.frameCount)
+            return currentPosition;
+
+        previousFramePosUpdated = Time.frameCount;
+        previousPosition = currentPosition;
+        
         Vector2 averagePosition = Vector2.zero;
         foreach (Unit unit in Units)
         {
             averagePosition += unit.GetInfluencePosition();
         }
-        return averagePosition / Units.Count;
+
+        currentPosition = averagePosition / Units.Count;
+        return currentPosition;
+    }
+
+    public Vector2 GetUnormalizedDirection()
+    {
+        return currentPosition - previousPosition;
     }
 
     public float GetStrength()

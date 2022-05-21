@@ -4,7 +4,7 @@ using UnityEngine;
 
 // points system for units creation (Ex : light units = 1 pt, medium = 2pts, heavy = 3 pts)
 // max points can be increased by capturing TargetBuilding entities
-public class UnitController : MonoBehaviour
+public abstract class UnitController : MonoBehaviour
 {
     [SerializeField]
     public ETeam Team;
@@ -50,7 +50,12 @@ public class UnitController : MonoBehaviour
 
     public Factory[] Factories => FactoryList.ToArray();
     public Unit[] Units => UnitList.ToArray();
-    
+
+    public abstract Squad[] Squads
+    {
+        get;
+    }
+
     #region Unit methods
     protected void UnselectAllUnits()
     {

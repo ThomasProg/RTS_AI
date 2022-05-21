@@ -45,7 +45,7 @@ public class StrategyAI : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
         foreach (TargetBuilding targetBuilding in controller.allCapturePoints)
         {

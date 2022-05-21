@@ -49,12 +49,20 @@ public class GameServices : MonoBehaviour
     }
     
     [System.Serializable]
+    public struct POIDebugger
+    {
+        public bool displayPriorities;
+    }
+    
+    [System.Serializable]
     public struct DebugSettings
     {
         public TargetAnalysisDebug targetAnalysis;
         public BarycenterDebug barycenter;
         public AISquadDecisionPrevision aiSquadDecisionPrevision;
+        public POIDebugger poiDebugger;
     }
+    
 #endif
     
     [SerializeField, Tooltip("Generic material used for 3D models, in the following order : blue, red and green")]
@@ -82,6 +90,16 @@ public class GameServices : MonoBehaviour
 #endif
 
     #region Static methods
+    public static AIController GetAIController()
+    {
+        return Instance.ControllersArray.OfType<AIController>().First();
+    }
+    
+    public static PlayerController GetPlayerController()
+    {
+        return Instance.ControllersArray.OfType<PlayerController>().First();
+    }
+
     public static GameServices GetGameServices()
     {
         return Instance;
@@ -280,11 +298,19 @@ public class GameServices : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (debug.poiDebugger.displayPriorities)
+        {
+            foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
+            {
+                Handles.Label( new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}");
+            }
+        }
+
         if (debug.aiSquadDecisionPrevision.display3MainObjectif)
         {
-            List<Statistic.EnemySquadObjectiveEvaluation> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+            List<Statistic.EnemySquadPotentialObjectives> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
             
-            foreach (Statistic.EnemySquadObjectiveEvaluation squadObjective in squadsObjective)
+            foreach (Statistic.EnemySquadPotentialObjectives squadObjective in squadsObjective)
             {
                 squadObjective.objectives.Sort((delegate(Statistic.SquadObjective objective,
                     Statistic.SquadObjective objective1)
@@ -348,13 +374,13 @@ public class GameServices : MonoBehaviour
         }
         else if (debug.aiSquadDecisionPrevision.displayStatistic)
         {
-            List<Statistic.EnemySquadObjectiveEvaluation> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+            List<Statistic.EnemySquadPotentialObjectives> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
             
             GUILayout.BeginVertical("box");
             GUILayout.Label("AI squad decision prevision");
 
             int squadID = 0;
-            foreach (Statistic.EnemySquadObjectiveEvaluation squadObjective in squadsObjective)
+            foreach (Statistic.EnemySquadPotentialObjectives squadObjective in squadsObjective)
             {
                 squadObjective.objectives.Sort((delegate(Statistic.SquadObjective objective,
                     Statistic.SquadObjective objective1)
