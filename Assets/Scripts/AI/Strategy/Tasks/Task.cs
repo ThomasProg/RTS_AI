@@ -54,6 +54,12 @@ public class PoolTaskRunner : TaskRunner
 {
     public readonly List<Task> tasks = new List<Task>();
 
+    public void Clear()
+    {
+        StopCurrentTask();
+        tasks.Clear();
+    }
+
     public void ProcessNextTask()
     {
         if (currentTask != null)

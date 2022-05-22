@@ -44,7 +44,7 @@ public class Unit : BaseEntity
 
     void Unit_OnDead()
     {
-        m_taskRunner.StopCurrentTask();
+        Stop();
 
         if (GetUnitData.DeathFXPrefab)
         {
@@ -305,6 +305,12 @@ public class Unit : BaseEntity
         {
             m_taskRunner.AssignNewTask(new Repair(this, target));
         }
+    }
+
+    public void Stop()
+    {
+        StopMovement();
+        m_taskRunner.Clear();
     }
 
     #endregion

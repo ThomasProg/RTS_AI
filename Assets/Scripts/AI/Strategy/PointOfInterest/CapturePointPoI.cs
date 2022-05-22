@@ -12,6 +12,7 @@ public class CapturePointPoI : PointOfInterest
     {
         this.targetBuilding = targetBuilding;
         position = targetBuilding.GetInfluencePosition();
+        queryUnitsTask = new QueryUnitsTask() { pointOfInterest = this };
     }
 
     public override void AddSquad(Squad squad)
@@ -136,10 +137,12 @@ public class CapturePointPoI : PointOfInterest
         // TODO:
     }
 
+    QueryUnitsTask queryUnitsTask;
+
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        tasks.Add(new QueryUnitsTask() { pointOfInterest = this });
+        tasks.Add(queryUnitsTask);
         //tasks.Add(new CapturePointTask() { capturePointPoI = this });
         return tasks;
     }

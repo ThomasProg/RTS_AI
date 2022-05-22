@@ -323,6 +323,16 @@ public class Squad : IInfluencer
         return squads;
     }
 
+    public void Stop()
+    {
+        foreach (Unit unit in Units)
+        {
+            unit.Stop();
+        }
+
+        PointOfInterest = null;
+    }
+
     public void GoCapturePoint(TargetBuilding targetCapturePoint)
     {
         foreach (Unit unit in Units)

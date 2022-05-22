@@ -4,13 +4,7 @@ using UnityEngine;
 
 public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 {
-    struct UnitsSource
-    {
-        public Object unitsSource; // Squad or Factory
-        public float timeToGoAtLocation;
-    }
-
-
+    public List<Squad> squads = new List<Squad>();
     public PointOfInterest pointOfInterest;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
@@ -28,12 +22,25 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
         //    return lengthA.CompareTo(lengthB);
         //});
-        SortedList<float, System.Object> unitsSources = new SortedList<float, System.Object>();
+
+        // We can't delete or search items, but we can have multiple items with the same key
+        SortedList<float, System.Object> unitsSources = new SortedList<float, System.Object>(Comparer<float>.Create((float f1, float f2) => 
+        {
+            int result = f1.CompareTo(f2);
+
+            if (result == 0)
+                result = 1;
+
+            return result;
+        }));
+
         foreach (Squad squad in blackboard.squadManager.squads)
         {
-            if (squad.PointOfInterest == null || squad.PointOfInterest.priority < pointOfInterest.priority)
+            if (squad.PointOfInterest == null || squad.PointOfInterest == pointOfInterest || squad.PointOfInterest.priority <= pointOfInterest.priority)
             {
                 float time = (pointOfInterest.position - squad.GetAveragePosition()).magnitude / squad.GetSquadSpeed();
+                if (squad.PointOfInterest == pointOfInterest)
+                    time -= 30f;
                 unitsSources.Add(time, squad);
 
             }
@@ -45,6 +52,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             unitsSources.Add(time, factory);
         }
 
+        List<Squad> newSquads = new List<Squad>();
         float currentStrength = 0;
         float strengthRequired = 3;
         int nbUnitsBeingCreated = 0;
@@ -53,7 +61,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             switch (unitsSource)
             {
                 case Squad squad:
-                    squad.PointOfInterest = pointOfInterest;
+                    newSquads.Add(squad);
                     currentStrength += squad.GetStrength();
                     break;
 
@@ -64,11 +72,20 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     break;
             }
 
-            if (strengthRequired >= currentStrength)
+            if (currentStrength >= strengthRequired)
                 break;
         }
 
-        //yield return new WaitUntil();
+        //foreach (Squad squad in squads)
+        //{
+        //    if (!newSquads.Contains(squad))
+        //        squad.Stop();
+        //}
+        squads = newSquads;
+        foreach (Squad squad in squads)
+        {
+            squad.PointOfInterest = pointOfInterest;
+        }
 
         yield return null;
     }
