@@ -16,7 +16,6 @@ public class Squad : IInfluencer
 
     private int previousFramePosUpdated;
     private Vector2 currentPosition;
-    private Vector2 previousPosition;
     
     public PointOfInterest PointOfInterest
     {
@@ -73,8 +72,7 @@ public class Squad : IInfluencer
             return currentPosition;
 
         previousFramePosUpdated = Time.frameCount;
-        previousPosition = currentPosition;
-        
+      
         Vector2 averagePosition = Vector2.zero;
         foreach (Unit unit in Units)
         {
@@ -87,7 +85,12 @@ public class Squad : IInfluencer
 
     public Vector2 GetUnormalizedDirection()
     {
-        return currentPosition - previousPosition;
+        Vector2 groupDir = Vector2.zero;
+        foreach (Unit unit in Units)
+        {
+            groupDir += unit.GetDirection();
+        }
+        return groupDir;
     }
 
     public float GetStrength()
@@ -314,8 +317,7 @@ public class Squad : IInfluencer
         List<Squad> squads = new List<Squad>();
         foreach (Unit unit in units)
         {
-            Squad squad = new Squad(new HashSet<Unit>());
-            squad.Units.Add(unit);
+            Squad squad = new Squad(new HashSet<Unit>{unit});
             squads.Add(squad);
         }
 

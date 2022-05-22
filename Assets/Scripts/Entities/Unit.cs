@@ -13,7 +13,7 @@ public class Unit : BaseEntity
 
     public Formation formation;
 
-    NavMeshAgent NavMeshAgent;
+    NavMeshAgent navMeshAgent;
     public bool IsIdle => !m_taskRunner.IsRunningTask();
 
     public UnitDataScriptable GetUnitData
@@ -35,7 +35,7 @@ public class Unit : BaseEntity
     {
         if (IsInitialized)
             return;
-
+        
         base.Init(_team);
 
         HP = UnitData.MaxHP;
@@ -55,19 +55,25 @@ public class Unit : BaseEntity
         Destroy(gameObject);
     }
 
+    public Vector2 GetDirection()
+    {
+        Vector3 velocity = navMeshAgent.velocity;
+        return new Vector2(velocity.x, velocity.z);
+    }
+
     #region MonoBehaviour methods
 
     override protected void Awake()
     {
         base.Awake();
 
-        NavMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
         BulletSlot = transform.Find("BulletSlot");
 
         // fill NavMeshAgent parameters
-        NavMeshAgent.speed = GetUnitData.Speed;
-        NavMeshAgent.angularSpeed = GetUnitData.AngularSpeed;
-        NavMeshAgent.acceleration = GetUnitData.Acceleration;
+        navMeshAgent.speed = GetUnitData.Speed;
+        navMeshAgent.angularSpeed = GetUnitData.AngularSpeed;
+        navMeshAgent.acceleration = GetUnitData.Acceleration;
     }
 
     override protected void Start()
@@ -204,7 +210,7 @@ public class Unit : BaseEntity
 
     public void GoTo(Vector2 pos)
     {
-        if (!NavMeshAgent.isOnNavMesh)
+        if (!navMeshAgent.isOnNavMesh)
             return;
 
         // See : https://youtu.be/bqtqltqcQhw?t=329
@@ -221,21 +227,21 @@ public class Unit : BaseEntity
 
             float x = pos.x + radius * dst * Mathf.Cos(angle);
             float y = pos.y + radius * dst * Mathf.Sin(angle);
-            isdestinationFound = NavMeshAgent.SetDestination(new Vector3(x, 0f, y));
+            isdestinationFound = navMeshAgent.SetDestination(new Vector3(x, 0f, y));
         }
         
-        NavMeshAgent.isStopped = false;
+        navMeshAgent.isStopped = false;
     }
 
     public bool IsDestinationReached()
     {
-        return NavMeshAgent.isOnNavMesh && !NavMeshAgent.pathPending && NavMeshAgent.remainingDistance <= NavMeshAgent.stoppingDistance &&
-               (!NavMeshAgent.hasPath || NavMeshAgent.velocity.sqrMagnitude == 0f);
+        return navMeshAgent.isOnNavMesh && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance &&
+               (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f);
     }
 
     public void StopMovement()
     {
-        NavMeshAgent.isStopped = true;
+        navMeshAgent.isStopped = true;
     }
 
     // $$$ To be updated for AI implementation $$$

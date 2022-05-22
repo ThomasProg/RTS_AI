@@ -306,7 +306,8 @@ public static class Statistic
 
         public float GetStrategyEffectivity()
         {
-            return allyStrength / Mathf.Max(enemyStrength, 1) * directionWeight;
+            // Add coefficient to direction to give him more or less importance in the equation
+            return allyStrength / (Mathf.Max(enemyStrength, 1) * sqrtDistanceFromSquad) + directionWeight * 0.001f;
         }
     }
     
@@ -358,11 +359,6 @@ public static class Statistic
         return squadsObjective;
     }
 
-    public static float CrossMagnitude(Vector2 value1, Vector2 value2)
-    {
-        return value1.x * value2.y - value1.y * value2.x;
-    }
-    
     internal static void ProcessObjective<T>(float radiusErrorCoef, IEnumerable<T> influencers, Squad squad,
         float squadSqrInfluenceRadius, List<Squad> squadsCurrent, List<Squad> squadsEnemy, ref EnemySquadPotentialObjectives squadPotentialObjectives, EObjectiveType type) where T : IInfluencer
     {
@@ -398,7 +394,7 @@ public static class Statistic
             objective.type = type;
             objective.allyStrength = squadCurrentDefendingPoint;
             objective.enemyStrength = squadEnemyAttackingPoint;
-            objective.directionWeight = Vector2.Dot(squadDir, squadToInfluencer.normalized) / sqrDistSquadTarget;
+            objective.directionWeight = Vector2.Dot(squadDir, squadToInfluencer.normalized); // 1 if in direction, 0 if perpendicular -1 if in opposition
 
             squadPotentialObjectives.objectives.Add(objective);
         }

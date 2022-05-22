@@ -298,50 +298,58 @@ public class GameServices : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (debug.poiDebugger.displayPriorities)
+        if (Instance != null)
         {
-            foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
+            if (debug.poiDebugger.displayPriorities)
             {
-                Handles.Label( new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}");
-            }
-        }
-
-        if (debug.aiSquadDecisionPrevision.display3MainObjectif)
-        {
-            List<Statistic.EnemySquadPotentialObjectives> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
-            
-            foreach (Statistic.EnemySquadPotentialObjectives squadObjective in squadsObjective)
-            {
-                squadObjective.objectives.Sort((delegate(Statistic.SquadObjective objective,
-                    Statistic.SquadObjective objective1)
+                foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
                 {
-                    return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
-                    
-                }));
-                
-                
-                Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
-
-                float efficiencyTotal = 0f;
-                for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
-                {
-                    efficiencyTotal += squadObjective.objectives[i].GetStrategyEffectivity();
+                    Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}");
                 }
+            }
 
-                // display the 3 main objectives
-                float thickness = 4f;
-                for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+            if (debug.aiSquadDecisionPrevision.display3MainObjectif)
+            {
+                List<Statistic.EnemySquadPotentialObjectives> squadsObjective =
+                    Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+
+                foreach (Statistic.EnemySquadPotentialObjectives squadObjective in squadsObjective)
                 {
-                    Statistic.SquadObjective lastObjective = squadObjective.objectives[i];
-                    Color color = lastObjective.type == Statistic.EObjectiveType.ProtectFactory
-                        ? Color.blue
-                        : Color.red;
-                    Vector3 p1 = new Vector3(influencePosition.x, 1f, influencePosition.y);
-                    Vector3 p2 = new Vector3(lastObjective.position.x, 1f, lastObjective.position.y);
-                    Handles.DrawBezier(p1, p2, p1, p2, color,null, thickness);
-                    thickness -= 1;
+                    squadObjective.objectives.Sort(delegate(Statistic.SquadObjective objective,
+                        Statistic.SquadObjective objective1)
+                    {
+                        return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
+                    });
 
-                    Handles.Label( (p2 + p1) / 2f, $"{lastObjective.GetStrategyEffectivity() / efficiencyTotal * 100f}%");
+                    Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
+                    float influenceRadius = Mathf.Sqrt(squadObjective.current.GetInfluenceRadius());
+                    
+                    float efficiencyTotal = 0f;
+                    for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+                    {
+                        efficiencyTotal += squadObjective.objectives[i].GetStrategyEffectivity();
+                    }
+
+                    // display the 3 main objectives
+                    float thickness = 4f;
+                    for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+                    {
+                        Statistic.SquadObjective lastObjective = squadObjective.objectives[i];
+                        Color color = lastObjective.type == Statistic.EObjectiveType.ProtectFactory
+                            ? Color.blue
+                            : Color.red;
+                        Vector3 p1 = new Vector3(influencePosition.x, 1f, influencePosition.y);
+                        Vector3 p2 = new Vector3(lastObjective.position.x, 1f, lastObjective.position.y);
+                        Handles.DrawBezier(p1, p2, p1, p2, color, null, thickness);
+                        thickness -= 1;
+                        
+                        Gizmos.color = Color.blue;
+                        
+                        Gizmos.DrawWireSphere(p1, influenceRadius);
+                        
+                        Handles.Label((p2 + p1) / 2f,
+                            $"{lastObjective.GetStrategyEffectivity() / efficiencyTotal * 100f}%");
+                    }
                 }
             }
         }
