@@ -51,6 +51,16 @@ public class StrategyAI : MonoBehaviour
         {
             AddTactic(new CapturePointPoI(targetBuilding) {stratAI = this, squadManager = squadManager});
         }
+        
+        foreach (Factory factory in GameServices.GetPlayerController().Factories)
+        {
+            AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
+        }
+        
+        foreach (Factory factory in controller.Factories)
+        {
+            AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
+        }
 
         StartCoroutine(UpdateInterests());
     }
