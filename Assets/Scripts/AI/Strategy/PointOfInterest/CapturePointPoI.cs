@@ -47,7 +47,7 @@ public class CapturePointPoI : PointOfInterest
         // If player can attack a near target without and can win it, evaluate priority to attack this point
         else if (stratAI.controller.Team == targetBuilding.GetTeam())
         {
-            EvaluatedefendThisPointPriority(aiSquads, playerSquads);
+            EvaluatedefendThisPointPriority(aiSquads, playerSquads, playerController);
         }
     }
     
@@ -88,9 +88,17 @@ public class CapturePointPoI : PointOfInterest
                 priority = 6f;
             }
             
-            // Add a priority depending on distance from the first factory (AI need a safe place in priority)
+            // Add a priority depending on distance from the factories
             if (stratAI.controller.Factories.Length > 0)
-                priority += 1f / (stratAI.controller.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+            {
+                float sqrtDistToNearestFactory = float.MaxValue;
+                foreach (Factory factory in stratAI.controller.Factories)
+                {
+                    sqrtDistToNearestFactory = Mathf.Min(sqrtDistToNearestFactory, (factory.GetInfluencePosition() - position).sqrMagnitude);
+                }
+
+                priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
+            }
         }
         else
         {
@@ -103,16 +111,24 @@ public class CapturePointPoI : PointOfInterest
                 priority = 6f;
             }
             
-            // Add a priority depending on distance from the first factory
+            // Add a priority depending on distance from the first factories
             if (playerController.Factories.Length > 0)
-                priority += 1f / (playerController.Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+            {
+                float sqrtDistToNearestFactory = float.MaxValue;
+                foreach (Factory factory in playerController.Factories)
+                {
+                    sqrtDistToNearestFactory = Mathf.Min(sqrtDistToNearestFactory, (factory.GetInfluencePosition() - position).sqrMagnitude);
+                }
+
+                priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
+            }
         }
         
         // Apply direct coefficient depending on AI personality
         // TODO:
     }
 
-    void EvaluatedefendThisPointPriority(IEnumerable enemySquad, IEnumerable playerSquads)
+    void EvaluatedefendThisPointPriority(IEnumerable enemySquad, IEnumerable playerSquads, PlayerController playerController)
     {
         bool squadFound = false;
         foreach (Squad squad in playerSquads)
@@ -134,8 +150,17 @@ public class CapturePointPoI : PointOfInterest
                     priority = 6f;
                 }
             
-                // Add a priority depending on distance from the first factory (AI need a safe place in priority)
-                priority += 1f / (GameServices.GetPlayerController().Factories[0].GetInfluencePosition() - position).SqrMagnitude();
+                // Add a priority depending on distance from the factories
+                if (playerController.Factories.Length > 0)
+                {
+                    float sqrtDistToNearestFactory = float.MaxValue;
+                    foreach (Factory factory in playerController.Factories)
+                    {
+                        sqrtDistToNearestFactory = Mathf.Min(sqrtDistToNearestFactory, (factory.GetInfluencePosition() - position).sqrMagnitude);
+                    }
+
+                    priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
+                }
                 squadFound = true;
                 break;
             }
