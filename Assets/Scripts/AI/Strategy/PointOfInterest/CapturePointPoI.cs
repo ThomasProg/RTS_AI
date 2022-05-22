@@ -47,7 +47,7 @@ public class CapturePointPoI : PointOfInterest
         // If player can attack a near target without and can win it, evaluate priority to attack this point
         else if (stratAI.controller.Team == targetBuilding.GetTeam())
         {
-            EvaluatedefendThisPointPriority(aiSquads, playerSquads, playerController);
+            EvaluateDefendThisPointPriority(aiSquads);
         }
     }
     
@@ -122,52 +122,66 @@ public class CapturePointPoI : PointOfInterest
 
                 priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
             }
+            priority += playerStrength == 0 ? 1 : aiStrength / playerStrength;
         }
         
         // Apply direct coefficient depending on AI personality
         // TODO:
     }
 
-    void EvaluatedefendThisPointPriority(IEnumerable enemySquad, IEnumerable playerSquads, PlayerController playerController)
+    void EvaluateDefendThisPointPriority(IEnumerable aiSquads)
     {
-        bool squadFound = false;
-        foreach (Squad squad in playerSquads)
+        // Get all enemy squads should attack this point
+        // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
+        List<Statistic.POITargetByEnemySquad> playerSquadObjectives = 
+            Statistic.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
+
+        float distPlayerUnitsToTarget = float.MinValue;
+        float playerStrength = 0f;
+        foreach (Statistic.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
         {
-            // TODO: Check if squad is occuped with highter priority task
-            
-            float squadToTargetSqrDist = (targetBuilding.GetInfluencePosition() - squad.GetAveragePosition()).sqrMagnitude;
-            float playerSquadStrength = Statistic.EvaluateSquadsStrengthInZone(new []{squad}, targetBuilding.GetInfluencePosition(), squadToTargetSqrDist);
-            float aiStrength = Statistic.EvaluateSquadsStrengthInZone(enemySquad, targetBuilding.GetInfluencePosition(), squadToTargetSqrDist);
-
-            if (playerSquadStrength > aiStrength)
+            float sqrDistSquadTarget =
+                (playerSquadObjective.enemy.GetAveragePosition() - playerSquadObjective.poi.position)
+                .sqrMagnitude;
+            if (distPlayerUnitsToTarget < sqrDistSquadTarget)
             {
-                if (targetBuilding.GetTeam() == ETeam.Neutral)
-                {
-                    priority = 3f;
-                }
-                else // enemy team
-                {
-                    priority = 6f;
-                }
+                distPlayerUnitsToTarget = sqrDistSquadTarget;
+            }
             
-                // Add a priority depending on distance from the factories
-                if (playerController.Factories.Length > 0)
-                {
-                    float sqrtDistToNearestFactory = float.MaxValue;
-                    foreach (Factory factory in playerController.Factories)
-                    {
-                        sqrtDistToNearestFactory = Mathf.Min(sqrtDistToNearestFactory, (factory.GetInfluencePosition() - position).sqrMagnitude);
-                    }
+            playerStrength += playerSquadObjective.enemy.GetStrength();
+        }
 
-                    priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
+        float aiStrength =
+            Statistic.EvaluateSquadsStrengthInZone(aiSquads, targetBuilding.GetInfluencePosition(), distPlayerUnitsToTarget);
+        
+        // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
+        if (playerStrength > aiStrength)
+        {
+            if (targetBuilding.GetTeam() == ETeam.Neutral)
+            {
+                priority = 3f;
+            }
+            else // enemy ally
+            {
+                priority = 6f;
+            }
+            
+            // Add a priority depending on distance from the factories
+            if (stratAI.controller.Factories.Length > 0)
+            {
+                float sqrtDistToNearestFactory = float.MaxValue;
+                foreach (Factory factory in stratAI.controller.Factories)
+                {
+                    sqrtDistToNearestFactory = Mathf.Min(sqrtDistToNearestFactory, (factory.GetInfluencePosition() - position).sqrMagnitude);
                 }
-                squadFound = true;
-                break;
+
+                priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
             }
         }
-        
-        if (!squadFound)
+        else
+        {
             priority = 0f;
+        }
         
         // Apply direct coefficient depending on AI personality
         // TODO:
