@@ -7,6 +7,8 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     public List<Squad> squads = new List<Squad>();
     public PointOfInterest pointOfInterest;
 
+    public float strengthRequired = 3;
+
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
         //yield return new WaitForSeconds(2f);
@@ -54,7 +56,6 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
         List<Squad> newSquads = new List<Squad>();
         float currentStrength = 0;
-        float strengthRequired = 3;
         int nbUnitsBeingCreated = 0;
         foreach (System.Object unitsSource in unitsSources.Values)
         {
