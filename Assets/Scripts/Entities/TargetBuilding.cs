@@ -69,7 +69,6 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
 
         if (CapturingTeam == ETeam.Neutral)
         {
-            if (TeamScore[(int)GameServices.GetOpponent(unit.GetTeam())] == 0)
             {
                 CapturingTeam = unit.GetTeam();
                 GaugeImage.color = GameServices.GetTeamColor(CapturingTeam);
