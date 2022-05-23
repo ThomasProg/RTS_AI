@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 {
@@ -38,7 +39,13 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
         foreach (Factory factory in blackboard.AllyFactories)
         {
-            float time = (pointOfInterest.position - new Vector2(factory.transform.position.x, factory.transform.position.z)).magnitude;
+            Transform transform = factory.transform;
+            Vector3 position = transform.position;
+            
+            UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
+            float pathLenght = GameUtility.GetPathLength(factory.GetInfluencePosition(), GameUtility.ToVec2(position));
+
+            float time = pathLenght + data.Cost;
             unitsSources.Add(time, factory);
         }
 
