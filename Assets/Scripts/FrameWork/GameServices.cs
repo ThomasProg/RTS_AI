@@ -48,6 +48,13 @@ public class GameServices : MonoBehaviour
         public bool display3MainObjectif;
     }
     
+        
+    [System.Serializable]
+    public struct TimeScaleDebugger
+    {
+        public bool displayTimeScale;
+    }
+    
     [System.Serializable]
     public struct POIDebugger
     {
@@ -61,6 +68,7 @@ public class GameServices : MonoBehaviour
         public BarycenterDebug barycenter;
         public AISquadDecisionPrevision aiSquadDecisionPrevision;
         public POIDebugger poiDebugger;
+        public TimeScaleDebugger timeScaleDebugger;
     }
     
 #endif
@@ -358,6 +366,15 @@ public class GameServices : MonoBehaviour
     private void OnGUI()
     {
 #if UNITY_EDITOR
+        if (debug.timeScaleDebugger.displayTimeScale)
+        {
+
+            GUILayout.BeginHorizontal("box");
+            GUILayout.Label("Time scale");
+            Time.timeScale = GUILayout.HorizontalSlider(Time.timeScale, 0f, 10f, GUILayout.Width(Screen.width / 6f));
+            GUILayout.EndHorizontal();
+        }
+        
         if (debug.targetAnalysis.drawTargetStatistic)
         {
             
