@@ -453,15 +453,15 @@ public sealed class PlayerController : UnitController
             ISelectable selectedEntity = col.transform.GetComponent<ISelectable>();
             if (selectedEntity.GetTeam() == GetTeam())
             {
-                if (selectedEntity is Unit)
+                if (selectedEntity is Unit unit)
                 {
-                    SelectUnit((selectedEntity as Unit));
+                    SelectUnit(unit);
                 }
-                else if (selectedEntity is Factory)
+                else if (selectedEntity is Factory factory)
                 {
                     // Select only one factory at a time
                     if (SelectedFactory == null)
-                        SelectFactory(selectedEntity as Factory);
+                        SelectFactory(factory);
                 }
             }
         }
