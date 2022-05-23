@@ -98,7 +98,7 @@ public class Squad : IInfluencer
         float strength = 0;
         foreach (Unit unit in Units)
         {
-            strength += unit.Cost;
+            strength += unit.GetStrength();
         }
 
         return strength;
@@ -135,6 +135,11 @@ public class Squad : IInfluencer
     public float GetSquadSpeed()
     {
         return Units.Select(unit => unit.GetUnitData.Speed).Min();
+    }
+
+    public void Remove(Unit unit)
+    {
+        Units.Remove(unit);
     }
 
     /// <summary>

@@ -31,6 +31,11 @@ public class Unit : BaseEntity
         get { return UnitData.TypeId; }
     }
 
+    public float GetStrength()
+    {
+        return Cost;
+    }
+
     override public void Init(ETeam _team)
     {
         if (IsInitialized)
