@@ -85,6 +85,8 @@ public class SquadPoI : PointOfInterest
             priority += playerStrength == 0 ? 1 : aiStrength / playerStrength;
         }
         
+        strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
+        
         // Apply direct coefficient depending on AI personality
         // TODO:
     }
@@ -124,6 +126,8 @@ public class SquadPoI : PointOfInterest
         {
             priority = 0f;
         }
+        
+        strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
 
         // Apply direct coefficient depending on AI personality
         // TODO:
@@ -134,7 +138,7 @@ public class SquadPoI : PointOfInterest
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        queryUnitsTask.strengthRequired = 2 + priority;
+        queryUnitsTask.strengthRequired = Mathf.Ceil(Mathf.Max(strengthRequired, 1f)); // [1.. strengthRequired + 1]
         tasks.Add(queryUnitsTask);
         //tasks.Add(new CapturePointTask() { capturePointPoI = this });
         return tasks;

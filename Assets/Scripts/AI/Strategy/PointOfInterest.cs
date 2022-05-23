@@ -4,7 +4,10 @@ using UnityEngine;
 
 public abstract class PointOfInterest
 {
+    public float strengthRequiredAdditionalCoef = 1.5f; // 150%
+    
     public float priority = 0f;
+    public float strengthRequired;
     public SquadManager squadManager;
     public List<Squad> squads = new List<Squad>();
     public Vector2 position;
