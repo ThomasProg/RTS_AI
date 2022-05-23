@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 {
-    public List<Squad> squads = new List<Squad>();
     public PointOfInterest pointOfInterest;
 
     public float strengthRequired = 3;
@@ -70,8 +69,8 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         //    if (!newSquads.Contains(squad))
         //        squad.Stop();
         //}
-        squads = newSquads;
-        foreach (Squad squad in squads)
+        //squads = newSquads;
+        foreach (Squad squad in newSquads)
         {
             squad.PointOfInterest = pointOfInterest;
         }

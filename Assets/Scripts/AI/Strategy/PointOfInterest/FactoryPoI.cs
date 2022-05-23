@@ -13,8 +13,6 @@ public class FactoryPoI : PointOfInterest
     {
         this.factory = factory;
         position = factory.GetInfluencePosition();
-        queryUnitsTask = new QueryUnitsTask() { pointOfInterest = this };
-        destroyFactoryTask = new DestroyFactoryTask() { factoryPoI = this };
     }
 
     public override void AddSquad(Squad squad)
@@ -131,15 +129,11 @@ public class FactoryPoI : PointOfInterest
         // TODO:
     }
 
-    QueryUnitsTask queryUnitsTask;
-    DestroyFactoryTask destroyFactoryTask;
-
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        //queryUnitsTask.strengthRequired = 2 + priority;
-        tasks.Add(queryUnitsTask);
-        tasks.Add(destroyFactoryTask);
+        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = 2 + priority });
+        tasks.Add(new DestroyFactoryTask() { factoryPoI = this });
         return tasks;
     }
 }
