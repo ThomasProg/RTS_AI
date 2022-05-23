@@ -55,12 +55,12 @@ public class FactoryPoI : PointOfInterest
     {
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
-        List<Statistic.POITargetByEnemySquad> playerSquadObjectives = 
-            Statistic.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
+        List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
-        foreach (Statistic.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
+        foreach (GameUtility.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
         {
             float sqrDistSquadTarget =
                 (playerSquadObjective.enemy.GetAveragePosition() - playerSquadObjective.poi.position)
@@ -74,7 +74,7 @@ public class FactoryPoI : PointOfInterest
         }
 
         float aiStrength =
-            Statistic.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget);
+            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget);
         
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
@@ -98,12 +98,12 @@ public class FactoryPoI : PointOfInterest
     {
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
-        List<Statistic.POITargetByEnemySquad> playerSquadObjectives = 
-            Statistic.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
+        List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
-        foreach (Statistic.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
+        foreach (GameUtility.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
         {
             float sqrDistSquadTarget =
                 (playerSquadObjective.enemy.GetAveragePosition() - playerSquadObjective.poi.position)
@@ -117,7 +117,7 @@ public class FactoryPoI : PointOfInterest
         }
 
         float aiStrength =
-            Statistic.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget);
+            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget);
         
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)

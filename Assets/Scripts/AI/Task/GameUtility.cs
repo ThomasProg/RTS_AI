@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Numerics;
 using InfluenceMapPackage;
 using UnityEngine;
+using UnityEngine.AI;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
-public static class Statistic
+public static class GameUtility
 {
     /// <summary>
     /// Get barycenter of all unity in a specific team
@@ -398,5 +399,44 @@ public static class Statistic
 
             squadPotentialObjectives.objectives.Add(objective);
         }
+    }
+    
+    public static NavMeshPath GetPath(Vector3 fromPos, Vector3 toPos, int passableMask = NavMesh.AllAreas)
+    {
+        NavMeshPath path = new NavMeshPath();
+        if ( NavMesh.CalculatePath( fromPos, toPos, passableMask, path ) == false )
+            return path;
+       
+        return null;
+    }
+       
+    public static float GetPathLength( NavMeshPath path )
+    {
+        float lng = 0.0f;
+       
+        if (( path.status != NavMeshPathStatus.PathInvalid ) && ( path.corners.Length > 1 ))
+        {
+            for ( int i = 1; i < path.corners.Length; ++i )
+            {
+                lng += Vector3.Distance( path.corners[i-1], path.corners[i] );
+            }
+        }
+       
+        return lng;
+    }
+
+    public static Vector2 ToVec2(Vector3 vec)
+    {
+        return new Vector2(vec.x, vec.z);
+    }
+    
+    public static Vector3 ToVec3(Vector2 vec)
+    {
+        return new Vector3(vec.x, 0f, vec.y);
+    }
+    
+    public static float GetPathLength(Vector2 fromPos, Vector2 toPos, int passableMask = NavMesh.AllAreas)
+    {
+        return GetPathLength(GetPath(ToVec3(fromPos), ToVec3(toPos), passableMask));
     }
 }
