@@ -356,7 +356,22 @@ public class Squad : IInfluencer
             unit.AddTaskAttackTarget(attackedEntity);
         }
     }
-    
+
+    public bool IsPartiallyIdle
+    {
+        get
+        {
+            bool rst = false;
+
+            foreach (Unit unit in Units)
+            {
+                rst |= unit.IsIdle;
+            }
+
+            return rst;
+        }
+    }
+
     public bool IsIdle
     {
         get

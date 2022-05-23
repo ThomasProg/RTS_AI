@@ -20,7 +20,7 @@ public class SquadManager : MonoBehaviour
         squads.Add(squad);
         foreach (Unit unit in squad.UnitList)
         {
-            squadsOfUnits.Add(unit, squad);
+            squadsOfUnits[unit] = squad;
         }
     }
 

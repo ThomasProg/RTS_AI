@@ -47,7 +47,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
             float pathLenght = GameUtility.GetPathLength(factory.GetInfluencePosition(), GameUtility.ToVec2(position));
 
-            float time = pathLenght + data.Cost;
+            //float time = pathLenght + data.Cost;
+
+            float time = (pointOfInterest.position - new Vector2(factory.transform.position.x, factory.transform.position.z)).magnitude;
             unitsSources.Add(time, factory);
         }
 
@@ -97,12 +99,17 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             squad.Remove(unit);
         }
 
-        List<Squad> newSquads = Squad.MakeSquadsDependingOnDistance(newUnits, 0);
+        List<Squad> newSquads = Squad.MakeSquadsDependingOnDistance(newUnits, 1000);
 
         blackboard.squadManager.RegisterSquads(newSquads);
 
         foreach (Squad squad in newSquads)
         {
+            if (squad.IsPartiallyIdle)
+            {
+                squad.Stop();
+            }
+
             squad.PointOfInterest = pointOfInterest;
         }
 
