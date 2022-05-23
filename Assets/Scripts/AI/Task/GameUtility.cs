@@ -445,4 +445,11 @@ public static class GameUtility
     {
         return GetPathLength(GetPath(ToVec3(fromPos), ToVec3(toPos), passableMask));
     }
+
+    public static Color GetGoldenRatioColorWithIndex(int index, float s = 0.8f, float v = 0.95f)
+    {
+        // use golden ratio
+        const float golden_ratio_conjugate = 0.381966f;
+        return Color.HSVToRGB((index * golden_ratio_conjugate) % 1 , 0.8f, 0.95f);
+    }
 }

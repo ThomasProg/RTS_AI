@@ -322,7 +322,7 @@ public class GameServices : MonoBehaviour
                 for (int index = 0; index < squads.Length; index++)
                 {
                     Squad squad = squads[index];
-                    Handles.color = debug.aiSquadDebug.useDifferentColors ? Color.HSVToRGB(index / (float)squads.Length, 1f, 1f)  : Color.blue;
+                    Handles.color = debug.aiSquadDebug.useDifferentColors ? GameUtility.GetGoldenRatioColorWithIndex(index)  /*Color.HSVToRGB(index / (float)squads.Length, 1f, 1f)*/  : Color.blue;
 
                     Vector3 center = GameUtility.ToVec3(squad.GetAveragePosition());
                     float radius = Mathf.Sqrt(squad.GetInfluenceRadius());
