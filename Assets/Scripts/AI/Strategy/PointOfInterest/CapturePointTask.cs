@@ -2,21 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//public class CapturePointTask : IPOITask
-//{
-//    public CapturePointPoI capturePointPoI;
+public class CapturePointTask : IPOITask<StrategyAI.Blackboard>
+{
+    public CapturePointPoI capturePointPoI;
 
-//    public IEnumerator Execute()
-//    {
-//        StrategyAI.Blackboard bb = (StrategyAI.Blackboard)taskRunner.blackboard;
+    public IEnumerator Execute(StrategyAI.Blackboard blackboard)
+    {
+        foreach (Squad squad in capturePointPoI.squads)
+        {
+            if (!squad.IsGoingToCapturePoint(capturePointPoI.targetBuilding))
+                squad.GoCapturePoint(capturePointPoI.targetBuilding);
+        }
 
-
-//    }
-
-//    public override void OnStart()
-//    {
-//        StrategyAI.Blackboard bb = (StrategyAI.Blackboard) taskRunner.blackboard;
-
-//        taskRunner.AssignNewTask(null);
-//    }
-//}
+        yield return null;
+    }
+}

@@ -350,4 +350,13 @@ public class Squad : IInfluencer
     {
         return targetCapturePoint == capturePoint;
     }
+
+    public void AttackTarget(BaseEntity attackedEntity)
+    {
+        foreach (Unit unit in Units)
+        {
+            unit.SetTaskGoTo(attackedEntity.transform.position);
+            unit.AddTaskAttackTarget(attackedEntity);
+        }
+    }
 }
