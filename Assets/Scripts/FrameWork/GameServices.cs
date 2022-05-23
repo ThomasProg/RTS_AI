@@ -5,6 +5,7 @@ using InfluenceMapPackage;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = System.Random;
 
 public enum ETeam
 {
@@ -48,7 +49,14 @@ public class GameServices : MonoBehaviour
         public bool display3MainObjectif;
     }
     
-        
+    [System.Serializable]
+    public struct AISquadDebug
+    {
+        public bool displayAISquad;
+        public bool useDifferentColors;
+        [HideInInspector] public Color[] colorBuffer;
+    }
+    
     [System.Serializable]
     public struct TimeScaleDebugger
     {
@@ -69,6 +77,7 @@ public class GameServices : MonoBehaviour
         public AISquadDecisionPrevision aiSquadDecisionPrevision;
         public POIDebugger poiDebugger;
         public TimeScaleDebugger timeScaleDebugger;
+        public AISquadDebug aiSquadDebug;
     }
     
 #endif
@@ -226,6 +235,17 @@ public class GameServices : MonoBehaviour
     {
         Instance = this;
 
+#if UNITY_EDITOR
+        Color[] color = new Color[100];
+
+        for (int i = 0; i < color.Length; i++)
+        {
+            color[i] = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        }
+        
+        debug.aiSquadDebug.colorBuffer = color;
+#endif
+        
         // Retrieve controllers from scene for each team
         ControllersArray = new UnitController[2];
         foreach (UnitController controller in FindObjectsOfType<UnitController>())
@@ -308,6 +328,17 @@ public class GameServices : MonoBehaviour
     {
         if (Instance != null)
         {
+            if (debug.aiSquadDebug.displayAISquad)
+            {
+                var squads = GetAIController().Squads;
+                for (int index = 0; index < squads.Length; index++)
+                {
+                    Squad squad = squads[index];
+                    Gizmos.color = debug.aiSquadDebug.useDifferentColors ? debug.aiSquadDebug.colorBuffer[index] : Color.blue;
+                    Gizmos.DrawWireSphere(GameUtility.ToVec3(squad.GetAveragePosition()), Mathf.Sqrt(squad.GetInfluenceRadius()));
+                }
+            }
+            
             if (debug.poiDebugger.displayPriorities)
             {
                 foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
