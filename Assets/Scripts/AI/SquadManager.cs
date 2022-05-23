@@ -32,17 +32,4 @@ public class SquadManager : MonoBehaviour
             squadsOfUnits.Remove(unit);
         }
     }
-
-    public bool IsSquadGoingToCapturePoint(TargetBuilding capturePoint)
-    {
-        foreach (Squad squad in squads)
-        {
-            if (squad.IsGoingToCapturePoint(capturePoint))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

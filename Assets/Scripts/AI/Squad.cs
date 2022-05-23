@@ -9,7 +9,6 @@ public class Squad : IInfluencer
 {
     HashSet<Unit> Units = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
-    TargetBuilding targetCapturePoint;
     Formation formation = new Formation();
 
     PointOfInterest _pointOfInterest;
@@ -345,15 +344,8 @@ public class Squad : IInfluencer
         foreach (Unit unit in Units)
         {
             unit.SetTaskGoTo(targetCapturePoint.transform.position);
-            unit.AddTaskCaptureTarget(targetCapturePoint);
+                unit.AddTaskCaptureTarget(targetCapturePoint);
         }
-
-        this.targetCapturePoint = targetCapturePoint;
-    }
-
-    public bool IsGoingToCapturePoint(TargetBuilding capturePoint)
-    {
-        return targetCapturePoint == capturePoint;
     }
 
     public void AttackTarget(BaseEntity attackedEntity)
@@ -362,6 +354,21 @@ public class Squad : IInfluencer
         {
             unit.SetTaskGoTo(attackedEntity.transform.position);
             unit.AddTaskAttackTarget(attackedEntity);
+        }
+    }
+    
+    public bool IsIdle
+    {
+        get
+        {
+            bool rst = true;
+            
+            foreach (Unit unit in Units)
+            {
+                rst &= unit.IsIdle;
+            }
+
+            return rst;
         }
     }
 

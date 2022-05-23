@@ -5,6 +5,7 @@ using InfluenceMapPackage;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = System.Random;
 
 public enum ETeam
 {
@@ -48,7 +49,14 @@ public class GameServices : MonoBehaviour
         public bool display3MainObjectif;
     }
     
-        
+    [System.Serializable]
+    public struct AISquadDebug
+    {
+        public bool displayAISquad;
+        public bool useDifferentColors;
+        [HideInInspector] public Color[] colorBuffer;
+    }
+    
     [System.Serializable]
     public struct TimeScaleDebugger
     {
@@ -69,6 +77,7 @@ public class GameServices : MonoBehaviour
         public AISquadDecisionPrevision aiSquadDecisionPrevision;
         public POIDebugger poiDebugger;
         public TimeScaleDebugger timeScaleDebugger;
+        public AISquadDebug aiSquadDebug;
     }
     
 #endif
@@ -226,6 +235,17 @@ public class GameServices : MonoBehaviour
     {
         Instance = this;
 
+#if UNITY_EDITOR
+        Color[] color = new Color[100];
+
+        for (int i = 0; i < color.Length; i++)
+        {
+            color[i] = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        }
+        
+        debug.aiSquadDebug.colorBuffer = color;
+#endif
+        
         // Retrieve controllers from scene for each team
         ControllersArray = new UnitController[2];
         foreach (UnitController controller in FindObjectsOfType<UnitController>())
@@ -291,9 +311,9 @@ public class GameServices : MonoBehaviour
         
         if (debug.barycenter.drawBarycenters)
         {
-            Vector2 globalBarycenter = Statistic.GetGlobalBarycenter();
-            Vector2 blueBarycenter = Statistic.GetTeamBarycenter(ETeam.Blue);
-            Vector2 redBarycenter = Statistic.GetTeamBarycenter(ETeam.Red);
+            Vector2 globalBarycenter = GameUtility.GetGlobalBarycenter();
+            Vector2 blueBarycenter = GameUtility.GetTeamBarycenter(ETeam.Blue);
+            Vector2 redBarycenter = GameUtility.GetTeamBarycenter(ETeam.Red);
             debug.barycenter.globalBarycenterInstance.transform.position = new Vector3(globalBarycenter.x,
                 debug.barycenter.globalBarycenterInstance.transform.position.y, globalBarycenter.y);
             debug.barycenter.blueBarycenterInstance.transform.position = new Vector3(blueBarycenter.x,
@@ -308,6 +328,17 @@ public class GameServices : MonoBehaviour
     {
         if (Instance != null)
         {
+            if (debug.aiSquadDebug.displayAISquad)
+            {
+                var squads = GetAIController().Squads;
+                for (int index = 0; index < squads.Length; index++)
+                {
+                    Squad squad = squads[index];
+                    Gizmos.color = debug.aiSquadDebug.useDifferentColors ? debug.aiSquadDebug.colorBuffer[index] : Color.blue;
+                    Gizmos.DrawWireSphere(GameUtility.ToVec3(squad.GetAveragePosition()), Mathf.Sqrt(squad.GetInfluenceRadius()));
+                }
+            }
+            
             if (debug.poiDebugger.displayPriorities)
             {
                 foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
@@ -318,13 +349,13 @@ public class GameServices : MonoBehaviour
 
             if (debug.aiSquadDecisionPrevision.display3MainObjectif)
             {
-                List<Statistic.EnemySquadPotentialObjectives> squadsObjective =
-                    Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+                List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
+                    GameUtility.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
 
-                foreach (Statistic.EnemySquadPotentialObjectives squadObjective in squadsObjective)
+                foreach (GameUtility.EnemySquadPotentialObjectives squadObjective in squadsObjective)
                 {
-                    squadObjective.objectives.Sort(delegate(Statistic.SquadObjective objective,
-                        Statistic.SquadObjective objective1)
+                    squadObjective.objectives.Sort(delegate(GameUtility.SquadObjective objective,
+                        GameUtility.SquadObjective objective1)
                     {
                         return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
                     });
@@ -342,8 +373,8 @@ public class GameServices : MonoBehaviour
                     float thickness = 4f;
                     for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
                     {
-                        Statistic.SquadObjective lastObjective = squadObjective.objectives[i];
-                        Color color = lastObjective.type == Statistic.EObjectiveType.ProtectFactory
+                        GameUtility.SquadObjective lastObjective = squadObjective.objectives[i];
+                        Color color = lastObjective.type == GameUtility.EObjectiveType.ProtectFactory
                             ? Color.blue
                             : Color.red;
                         Vector3 p1 = new Vector3(influencePosition.x, 1f, influencePosition.y);
@@ -378,12 +409,12 @@ public class GameServices : MonoBehaviour
         if (debug.targetAnalysis.drawTargetStatistic)
         {
             
-            Statistic.TargetBuildingAnalysisData[] targetBuildingAnalysisData = Statistic.GetTargetBuildingAnalysisData(playerController.GetTeam(), debug.targetAnalysis.targetStatisticRadius);
+            GameUtility.TargetBuildingAnalysisData[] targetBuildingAnalysisData = GameUtility.GetTargetBuildingAnalysisData(playerController.GetTeam(), debug.targetAnalysis.targetStatisticRadius);
             
             GUILayout.BeginVertical("box");
             GUILayout.Label("Target building analysis");
 
-            foreach (Statistic.TargetBuildingAnalysisData buildingAnalysisData in targetBuildingAnalysisData)
+            foreach (GameUtility.TargetBuildingAnalysisData buildingAnalysisData in targetBuildingAnalysisData)
             {
                 GUILayout.BeginHorizontal("box");
                 
@@ -399,16 +430,16 @@ public class GameServices : MonoBehaviour
         }
         else if (debug.aiSquadDecisionPrevision.displayStatistic)
         {
-            List<Statistic.EnemySquadPotentialObjectives> squadsObjective = Statistic.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
+            List<GameUtility.EnemySquadPotentialObjectives> squadsObjective = GameUtility.EvaluateEnemySquadObjective(ETeam.Blue, 50f, 1.1f);
             
             GUILayout.BeginVertical("box");
             GUILayout.Label("AI squad decision prevision");
 
             int squadID = 0;
-            foreach (Statistic.EnemySquadPotentialObjectives squadObjective in squadsObjective)
+            foreach (GameUtility.EnemySquadPotentialObjectives squadObjective in squadsObjective)
             {
-                squadObjective.objectives.Sort((delegate(Statistic.SquadObjective objective,
-                    Statistic.SquadObjective objective1)
+                squadObjective.objectives.Sort((delegate(GameUtility.SquadObjective objective,
+                    GameUtility.SquadObjective objective1)
                 {
                     return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
                     
@@ -419,7 +450,7 @@ public class GameServices : MonoBehaviour
                 
                 GUILayout.BeginHorizontal("box");
 
-                Statistic.SquadObjective lastObjective = squadObjective.objectives.Last();
+                GameUtility.SquadObjective lastObjective = squadObjective.objectives.Last();
                 GUILayout.Label($"Main objective: {lastObjective.type.ToString()} | Enemy stregth {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
 
                 GUILayout.EndHorizontal();
@@ -428,7 +459,7 @@ public class GameServices : MonoBehaviour
                 ++squadID;
 
                 Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
-                Debug.DrawLine(new Vector3(influencePosition.x, 10f, influencePosition.y), new Vector3(lastObjective.position.x, 10f, lastObjective.position.y), lastObjective.type == Statistic.EObjectiveType.ProtectFactory ? Color.blue : Color.red);
+                Debug.DrawLine(new Vector3(influencePosition.x, 10f, influencePosition.y), new Vector3(lastObjective.position.x, 10f, lastObjective.position.y), lastObjective.type == GameUtility.EObjectiveType.ProtectFactory ? Color.blue : Color.red);
             }
             
             GUILayout.EndVertical();

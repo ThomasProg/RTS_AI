@@ -10,7 +10,7 @@ public class CapturePointTask : IPOITask<StrategyAI.Blackboard>
     {
         foreach (Squad squad in capturePointPoI.squads)
         {
-            if (!squad.IsGoingToCapturePoint(capturePointPoI.targetBuilding))
+            if (squad.IsIdle)
                 squad.GoCapturePoint(capturePointPoI.targetBuilding);
         }
 

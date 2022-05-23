@@ -11,7 +11,8 @@ public class DestroyFactoryTask : IPOITask<StrategyAI.Blackboard>
     {
         foreach (Squad squad in factoryPoI.squads)
         {
-            squad.AttackTarget(factoryPoI.factory);
+            if (squad.IsIdle)
+                squad.AttackTarget(factoryPoI.factory);
         }
 
         yield return null;
