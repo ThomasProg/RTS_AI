@@ -89,7 +89,6 @@ public class StrategyAI : MonoBehaviour
             }
 
             // Sort by priority
-            List<PointOfInterest> oldAllTacticsByPriority = AllPointOfInterestsByPriority;
             AllPointOfInterestsByPriority = new List<PointOfInterest>(AllPointOfInterests);
             AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
                 -a.priority.CompareTo(b.priority));
@@ -106,15 +105,12 @@ public class StrategyAI : MonoBehaviour
                     do
                     {
                         isFinished = !enumerator.MoveNext();
-                        yield return null;
                     } while (!isFinished && !(enumerator.Current is Wip));
 
 
-                    yield return null;
                     if (!isFinished)
                         break;
                 }
-                yield return null;
             }
 
             yield return null;

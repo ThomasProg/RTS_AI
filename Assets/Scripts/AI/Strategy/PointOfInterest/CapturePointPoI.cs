@@ -197,42 +197,4 @@ public class CapturePointPoI : PointOfInterest
         //tasks.Add(new CapturePointTask() { capturePointPoI = this });
         return tasks;
     }
-
-    public override bool TryShrink(ref List<Squad> totalSquads)
-    {
-        if (totalSquads.Count <= 0)
-            return false;
-
-        List<Squad> newTotalSquads = new List<Squad>();
-
-        //Squad newSquad = null;
-
-        int nbRequiredUnits = 5;
-
-        int nbCurrentUnits = 0;
-        foreach (Squad squad in totalSquads)
-        {
-            nbCurrentUnits += squad.UnitList.Count;
-            newTotalSquads.Add(squad);
-            if (nbCurrentUnits >= nbRequiredUnits)
-            {
-                int nbUnitsToRemove = nbCurrentUnits - nbRequiredUnits;
-                if (nbUnitsToRemove == squad.UnitList.Count)
-                {
-                    newTotalSquads.Remove(squad);
-                }
-                else
-                {
-                    // TODO : Split
-                    //newSquad = squad.Split(nbUnitsToRemove);
-                }
-                nbCurrentUnits -= nbUnitsToRemove;
-                break;
-            }
-        }
-
-        totalSquads = newTotalSquads;
-
-        return nbRequiredUnits <= nbCurrentUnits;
-    }
 }
