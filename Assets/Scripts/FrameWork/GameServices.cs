@@ -224,8 +224,8 @@ public class GameServices : MonoBehaviour
         {
             ControllersArray[(int)controller.GetTeam()] = controller;
 
-            if (controller is PlayerController)
-                playerController = controller as PlayerController;
+            if (controller is PlayerController pController)
+                this.playerController = pController;
         }
 
         // Store TargetBuildings

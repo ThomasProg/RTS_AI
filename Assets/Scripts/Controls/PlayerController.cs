@@ -453,15 +453,18 @@ public sealed class PlayerController : UnitController
             ISelectable selectedEntity = col.transform.GetComponent<ISelectable>();
             if (selectedEntity.GetTeam() == GetTeam())
             {
-                if (selectedEntity is Unit)
+                switch (selectedEntity)
                 {
-                    SelectUnit((selectedEntity as Unit));
-                }
-                else if (selectedEntity is Factory)
-                {
-                    // Select only one factory at a time
-                    if (SelectedFactory == null)
-                        SelectFactory(selectedEntity as Factory);
+                    case Factory factory:
+                        // Select only one factory at a time
+                        if (SelectedFactory == null)
+                            SelectFactory(factory);
+                        break;
+                    case Unit unit:
+                        SelectUnit(unit);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(selectedEntity));
                 }
             }
         }

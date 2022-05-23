@@ -27,13 +27,15 @@ public class StrategyAI : MonoBehaviour
         public TargetBuilding[] EnemyUnits => throw new NotImplementedException();
         public TargetBuilding[] EnemySquads => throw new NotImplementedException();
     }
-
-
+    
     UtilitySystem.UtilitySystem objectif;
     UtilitySystem.UtilitySystem subjectif;
 
     public SquadManager squadManager;
     public AIController controller;
+    protected List<Squad> playerSquad = new List<Squad>();
+
+    private Squad[] PlayerSquad => playerSquad.ToArray();
 
     public Blackboard bb { get; private set; } = null;
     
@@ -51,18 +53,21 @@ public class StrategyAI : MonoBehaviour
         {
             AddTactic(new CapturePointPoI(targetBuilding) {stratAI = this, squadManager = squadManager});
         }
-        
-        foreach (Factory factory in GameServices.GetPlayerController().Factories)
-        {
-            AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
-        }
-        
+
         foreach (Factory factory in controller.Factories)
         {
             AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
         }
 
+        foreach (Factory factory in GameServices.GetPlayerController().Factories)
+        {
+            AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
+        }
+
         StartCoroutine(UpdateInterests());
+        
+        GameServices.GetPlayerController().OnCreateFactory += factory =>  AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager}); 
+        controller.OnCreateFactory += factory =>  AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager}); 
     }
 
     void AddTactic(PointOfInterest pointOfInterest)
@@ -82,6 +87,23 @@ public class StrategyAI : MonoBehaviour
 
         while (true)
         {
+            // Update player squads
+            {
+                ETeam playerTeam = GameServices.GetPlayerController().Team;
+                //Remove previous player squad
+                AllPointOfInterests.RemoveAll(interest =>
+                    interest is SquadPoI squadPoI && squadPoI.squad.GetTeam() == playerTeam);
+                
+                // Add new player squad 
+                playerSquad = Squad.MakeSquadsDependingOnDistance(GameServices.GetPlayerController().Units, 50f);
+                
+                // Add squad to PoI list
+                foreach (Squad squad in playerSquad)
+                {
+                    AddTactic(new SquadPoI(squad) {stratAI = this, squadManager = squadManager});
+                }
+            }
+
             foreach (var poi in AllPointOfInterests)
             {
                 poi.EvaluatePriority(bb);

@@ -359,4 +359,9 @@ public class Squad : IInfluencer
             unit.AddTaskAttackTarget(attackedEntity);
         }
     }
+
+    public ETeam GetTeam()
+    {
+        return Units.First().GetTeam();
+    }
 }

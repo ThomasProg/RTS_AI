@@ -47,6 +47,7 @@ public abstract class UnitController : MonoBehaviour
     // events
     protected Action OnBuildPointsUpdated;
     protected Action OnCaptureTarget;
+    public Action<Factory> OnCreateFactory;
 
     public Factory[] Factories => FactoryList.ToArray();
     public Unit[] Units => UnitList.ToArray();
@@ -148,6 +149,7 @@ public abstract class UnitController : MonoBehaviour
             FactoryList.Remove(factory);
         };
         FactoryList.Add(factory);
+        OnCreateFactory?.Invoke(factory);
     }
     virtual protected void SelectFactory(Factory factory)
     {
