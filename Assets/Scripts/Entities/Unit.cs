@@ -102,7 +102,8 @@ public class Unit : BaseEntity
             if (UnitData.IsAutoAttack)
             {
                 Unit[] opponentUnits = GameServices.GetControllerByTeam(GameServices.GetOpponent(GetTeam())).Units;
-                Unit target = null;
+                Factory[] opponentFactories = GameServices.GetControllerByTeam(GameServices.GetOpponent(GetTeam())).Factories;
+                BaseEntity target = null;
                 float targetDistance = float.MaxValue;
 
                 foreach (Unit unit in opponentUnits)
@@ -113,6 +114,17 @@ public class Unit : BaseEntity
                     {
                         targetDistance = sqrtDist;
                         target = unit;
+                    }
+                }
+                
+                foreach (Factory factory in opponentFactories)
+                {
+                    float sqrtDist = (factory.GetInfluencePosition() - GetInfluencePosition()).sqrMagnitude - factory.Size * factory.Size;
+                    if (sqrtDist < UnitData.AttackDistanceMax * UnitData.AttackDistanceMax &&
+                        (target == null || sqrtDist < targetDistance))
+                    {
+                        targetDistance = sqrtDist;
+                        target = factory;
                     }
                 }
 

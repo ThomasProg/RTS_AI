@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
+ [RequireComponent(typeof(BoxCollider))]
 public sealed class Factory : BaseEntity
 {
     [SerializeField]
@@ -19,6 +21,8 @@ public sealed class Factory : BaseEntity
     const int MaxAvailableFactories = 3;
 
     UnitController Controller = null;
+
+    private BoxCollider m_Collider;
 
     [SerializeField]
     int MaxBuildingQueueSize = 5;
@@ -40,6 +44,8 @@ public sealed class Factory : BaseEntity
     public Action<Factory> OnFactoryBuilt;
     public Action OnBuildCanceled;
     public bool IsBuildingUnit { get { return CurrentState == State.BuildingUnit; } }
+
+    public float Size => Mathf.Max(m_Collider.size.x, m_Collider.size.z); 
 
     #region MonoBehaviour methods
     protected override void Awake()
@@ -80,6 +86,8 @@ public sealed class Factory : BaseEntity
             string path = "Prefabs/Factories/" + templateFactoryPrefab.name + "_" + Team.ToString();
             FactoryPrefabs[i] = Resources.Load<GameObject>(path);
         }
+
+        m_Collider = GetComponent<BoxCollider>();
     }
     protected override void Start()
     {
