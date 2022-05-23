@@ -350,4 +350,9 @@ public class Squad : IInfluencer
     {
         return targetCapturePoint == capturePoint;
     }
+
+    public ETeam GetTeam()
+    {
+        return Units.First().GetTeam();
+    }
 }
