@@ -39,13 +39,18 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
         foreach (Factory factory in blackboard.AllyFactories)
         {
-            Transform transform = factory.transform;
-            Vector3 position = transform.position;
-            
             UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
-            float pathLenght = GameUtility.GetPathLength(factory.GetInfluencePosition(), GameUtility.ToVec2(position));
+            Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
 
-            float time = pathLenght + data.Cost;
+            if (pointOfInterest is FactoryPoI poifactory)
+            {
+                if (poifactory.factory == factory)
+                    continue;
+            }
+
+            float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size *  factoryToPoI);
+
+            float time = pathLength + data.Cost;
             unitsSources.Add(time, factory);
         }
 

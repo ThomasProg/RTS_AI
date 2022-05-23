@@ -404,7 +404,7 @@ public static class GameUtility
     public static NavMeshPath GetPath(Vector3 fromPos, Vector3 toPos, int passableMask = NavMesh.AllAreas)
     {
         NavMeshPath path = new NavMeshPath();
-        if ( NavMesh.CalculatePath( fromPos, toPos, passableMask, path ) == false )
+        if (NavMesh.CalculatePath(fromPos, toPos, passableMask, path))
             return path;
        
         return null;
@@ -412,6 +412,12 @@ public static class GameUtility
        
     public static float GetPathLength( NavMeshPath path )
     {
+        if (path == null)
+        {
+            Debug.LogWarning("Target is not accessible. Max value returned");
+            return float.MaxValue;
+        }
+
         float lng = 0.0f;
        
         if (( path.status != NavMeshPathStatus.PathInvalid ) && ( path.corners.Length > 1 ))
