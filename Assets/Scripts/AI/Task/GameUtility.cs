@@ -450,6 +450,6 @@ public static class GameUtility
     {
         // use golden ratio
         const float golden_ratio_conjugate = 0.381966f;
-        return Color.HSVToRGB((index * golden_ratio_conjugate) % 1 , 0.8f, 0.95f);
+        return Color.HSVToRGB((index * golden_ratio_conjugate) % 1 , s, v);
     }
 }
