@@ -4,23 +4,32 @@ using UnityEngine;
 
 public class SquadManager : MonoBehaviour
 {
-    public HashSet<Squad> squads = new HashSet<Squad>();
+    public readonly HashSet<Squad> squads = new HashSet<Squad>();
+    public readonly Dictionary<Unit, Squad> squadsOfUnits = new Dictionary<Unit, Squad>();
 
     public void RegisterSquads(IEnumerable<Squad> newSquads)
     {
         foreach (Squad squad in newSquads)
         {
-            squads.Add(squad);
+            RegisterSquad(squad);
         }
     }
 
     public void RegisterSquad(Squad squad)
     {
         squads.Add(squad);
+        foreach (Unit unit in squad.UnitList)
+        {
+            squadsOfUnits[unit] = squad;
+        }
     }
 
     public void UnregisterSquad(Squad squad)
     {
         squads.Remove(squad);
+        foreach (Unit unit in squad.UnitList)
+        {
+            squadsOfUnits.Remove(unit);
+        }
     }
 }

@@ -7,9 +7,10 @@ using UnityEngine;
 
 public class Squad : IInfluencer
 {
-    HashSet<Unit> Units = new HashSet<Unit>();
+    public HashSet<Unit> Units { get; private set; } = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
-    Formation formation = new Formation();
+    TargetBuilding targetCapturePoint;
+    Formation formation;
 
     PointOfInterest _pointOfInterest;
 
@@ -52,6 +53,16 @@ public class Squad : IInfluencer
     public Squad(HashSet<Unit> squadUnits)
     {
         Units = squadUnits;
+        NormalizeSquadSpeed();
+    }
+
+    public void NormalizeSquadSpeed()
+    {
+        float maxSpeed = GetSquadSpeed();
+        foreach (var unit in Units)
+        {
+            unit.SetSpeed(maxSpeed);
+        }
     }
 
     public Squad(List<Unit> squadUnits)
@@ -60,6 +71,8 @@ public class Squad : IInfluencer
         {
             Units.Add(unit);
         }
+
+        NormalizeSquadSpeed();
     }
 
     /// <summary>
@@ -97,7 +110,7 @@ public class Squad : IInfluencer
         float strength = 0;
         foreach (Unit unit in Units)
         {
-            strength += unit.Cost;
+            strength += unit.GetStrength();
         }
 
         return strength;
@@ -134,6 +147,11 @@ public class Squad : IInfluencer
     public float GetSquadSpeed()
     {
         return Units.Select(unit => unit.GetUnitData.Speed).Min();
+    }
+
+    public void Remove(Unit unit)
+    {
+        Units.Remove(unit);
     }
 
     /// <summary>
@@ -339,7 +357,7 @@ public class Squad : IInfluencer
         foreach (Unit unit in Units)
         {
             unit.SetTaskGoTo(targetCapturePoint.transform.position);
-                unit.AddTaskCaptureTarget(targetCapturePoint);
+            unit.AddTaskCaptureTarget(targetCapturePoint);
         }
     }
 
@@ -351,7 +369,22 @@ public class Squad : IInfluencer
             unit.AddTaskAttackTarget(attackedEntity);
         }
     }
+
+    public bool IsPartiallyIdle
+    {
+        get
+        {
+            bool rst = false;
+
+            foreach (Unit unit in Units)
+            {
+                rst |= unit.IsIdle;
+            }
     
+            return rst;
+        }
+    }
+
     public bool IsIdle
     {
         get

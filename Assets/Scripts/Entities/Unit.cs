@@ -31,11 +31,16 @@ public class Unit : BaseEntity
         get { return UnitData.TypeId; }
     }
 
+    public float GetStrength()
+    {
+        return Cost;
+    }
+
     override public void Init(ETeam _team)
     {
         if (IsInitialized)
             return;
-        
+
         base.Init(_team);
 
         HP = UnitData.MaxHP;
@@ -61,8 +66,19 @@ public class Unit : BaseEntity
         return new Vector2(velocity.x, velocity.z);
     }
 
-    #region MonoBehaviour methods
 
+    public void SetSpeed(float speed)
+    {
+        if (navMeshAgent != null) navMeshAgent.speed = speed;
+    }
+
+    public void ResetSpeed()
+    {
+        if (navMeshAgent != null) navMeshAgent.speed = 0;
+    }
+
+    #region MonoBehaviour methods
+    
     override protected void Awake()
     {
         base.Awake();
@@ -200,16 +216,19 @@ public class Unit : BaseEntity
         return HP < GetUnitData.MaxHP;
     }
 
+
     override public void Repair(int amount)
     {
         HP = Mathf.Min(HP + amount, GetUnitData.MaxHP);
         base.Repair(amount);
     }
 
+
     override public void FullRepair()
     {
         Repair(GetUnitData.MaxHP);
     }
+
 
     #endregion
 
@@ -330,6 +349,7 @@ public class Unit : BaseEntity
         StopMovement();
         m_taskRunner.Clear();
     }
+
 
     #endregion
 }

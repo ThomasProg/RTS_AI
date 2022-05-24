@@ -12,14 +12,11 @@ public class CapturePointPoI : PointOfInterest
     {
         this.targetBuilding = targetBuilding;
         position = targetBuilding.GetInfluencePosition();
-        queryUnitsTask = new QueryUnitsTask() { pointOfInterest = this };
-        capturePointTask = new CapturePointTask() { capturePointPoI = this };
     }
 
     public override void AddSquad(Squad squad)
     {
         base.AddSquad(squad);
-        //squad.GoCapturePoint(targetBuilding);
     }
 
     public override void RemoveSquad(Squad squad)
@@ -190,16 +187,12 @@ public class CapturePointPoI : PointOfInterest
         // Apply direct coefficient depending on AI personality
         // TODO:
     }
-    
-    QueryUnitsTask queryUnitsTask;
-    CapturePointTask capturePointTask;
 
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        queryUnitsTask.strengthRequired = Mathf.Ceil(Mathf.Max(strengthRequired, 1f)); // [1.. strengthRequired + 1]
-        tasks.Add(queryUnitsTask);
-        tasks.Add(capturePointTask);
+        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(Mathf.Max(strengthRequired, 1f)) });  // Strength : [1.. strengthRequired + 1]
+        tasks.Add(new CapturePointTask() { capturePointPoI = this });
         return tasks;
     }
 }

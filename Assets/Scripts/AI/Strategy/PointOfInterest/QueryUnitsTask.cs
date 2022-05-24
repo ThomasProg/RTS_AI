@@ -5,7 +5,6 @@ using UnityEngine.AI;
 
 public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 {
-    public List<Squad> squads = new List<Squad>();
     public PointOfInterest pointOfInterest;
 
     public float strengthRequired = 3;
@@ -32,8 +31,11 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                 float time = (pointOfInterest.position - squad.GetAveragePosition()).magnitude / squad.GetSquadSpeed();
                 if (squad.PointOfInterest == pointOfInterest)
                     time -= persistency;
-                unitsSources.Add(time, squad);
 
+                foreach (Unit unit in squad.UnitList)
+                {
+                    unitsSources.Add(time, unit);
+                }
             }
         }
 
@@ -53,16 +55,21 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             unitsSources.Add(time, factory);
         }
 
-        List<Squad> newSquads = new List<Squad>();
+        //List<Squad> newSquads = new List<Squad>();
+        List<Unit> newUnits = new List<Unit>();
         float currentStrength = 0;
         int nbUnitsBeingCreated = 0;
         foreach (System.Object unitsSource in unitsSources.Values)
         {
             switch (unitsSource)
             {
-                case Squad squad:
-                    newSquads.Add(squad);
-                    currentStrength += squad.GetStrength();
+                //case Squad squad:
+                //    newSquads.Add(squad);
+                //    currentStrength += squad.GetStrength();
+                //    break;
+                case Unit unit:
+                    newUnits.Add(unit);
+                    currentStrength += unit.GetStrength();
                     break;
 
                 case Factory factory:
@@ -81,9 +88,30 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         //    if (!newSquads.Contains(squad))
         //        squad.Stop();
         //}
-        squads = newSquads;
-        foreach (Squad squad in squads)
+        //squads = newSquads;
+        //foreach (Squad squad in newSquads)
+        //{
+        //    squad.PointOfInterest = pointOfInterest;
+        //}
+        foreach (Unit unit in newUnits)
         {
+            Squad squad = blackboard.squadManager.squadsOfUnits[unit];
+            if (squad.UnitList.Count == 1)
+                blackboard.squadManager.UnregisterSquad(squad);
+            squad.Remove(unit);
+        }
+
+        List<Squad> newSquads = Squad.MakeSquadsDependingOnDistance(newUnits, 1000);
+
+        blackboard.squadManager.RegisterSquads(newSquads);
+
+        foreach (Squad squad in newSquads)
+        {
+            if (squad.IsPartiallyIdle)
+            {
+                squad.Stop();
+            }
+
             squad.PointOfInterest = pointOfInterest;
         }
 

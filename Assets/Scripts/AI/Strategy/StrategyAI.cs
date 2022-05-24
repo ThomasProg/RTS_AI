@@ -137,7 +137,7 @@ public class StrategyAI : MonoBehaviour
                 }
             }
 
-            yield return null;
+            yield return new WaitForSeconds(3f);
         }
 
 
