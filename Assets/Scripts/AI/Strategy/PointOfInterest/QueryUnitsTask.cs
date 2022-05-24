@@ -66,7 +66,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     break;
 
                 case Factory factory:
-                    factory.RequestUnitBuild(0);
+                    factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
                     currentStrength += 1;
                     nbUnitsBeingCreated++;
                     break;
@@ -90,4 +90,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         yield return null;
     }
 
+    int EvaluateUnitToBuild(Factory factory, PointOfInterest poi)
+    {
+        // TODO:
+        return 0;
+    }
 }
