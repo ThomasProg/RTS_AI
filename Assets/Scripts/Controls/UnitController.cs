@@ -133,7 +133,7 @@ public abstract class UnitController : MonoBehaviour
     #endregion
 
     #region Factory methods
-    void AddFactory(Factory factory)
+    protected void AddFactory(Factory factory)
     {
         if (factory == null)
         {
@@ -173,6 +173,7 @@ public abstract class UnitController : MonoBehaviour
 
         return SelectedFactory.RequestUnitBuild(unitMenuIndex);
     }
+    
     protected bool RequestFactoryBuild(int factoryIndex, Vector3 buildPos)
     {
         if (SelectedFactory == null)
