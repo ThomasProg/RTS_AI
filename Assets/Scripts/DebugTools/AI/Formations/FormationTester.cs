@@ -65,25 +65,28 @@ namespace AI.Formations
             _formation.Rotation = transform.rotation.eulerAngles.y;
             _formation.Scale = transform.localScale.x;
             
+            Vector3 squadAveragePosition3D = GameUtility.ToVec3(_squad.GetAveragePosition());
+
             if (Input.GetKeyDown(KeyCode.Z))
             {
 
+                
                 foreach (var unit in _squad.Units)
                 {
-                    unit.SetTargetPos(_formation.GetUnitsPosition(_squad.GetAveragePosition3D())[unit]);
+                    unit.AddTaskGoTo(_formation.GetUnitsPosition(squadAveragePosition3D)[unit]);
                 }
             }
 
             if (Input.GetKeyDown(KeyCode.X))
             {
-                Vector3 diff = _formation.GetFormationCenterPosition() - _squad.GetAveragePosition3D();
+                Vector3 diff = _formation.GetFormationCenterPosition() - squadAveragePosition3D;
                 float sign = (diff.z < 0f) ? -1f : 1f;
 
                 transform.rotation = Quaternion.LookRotation(-diff);
 
                 foreach (var unit in _squad.Units)
                 {
-                    unit.SetTargetPos(_formation.GetUnitsPosition(_formation.GetFormationCenterPosition())[unit]);
+                    unit.AddTaskGoTo(_formation.GetUnitsPosition(_formation.GetFormationCenterPosition())[unit]);
                 }
             }
 
@@ -95,16 +98,15 @@ namespace AI.Formations
 
         private void OnDrawGizmos()
         {
-            Vector2 squadAverage2d = _squad.GetAveragePosition();
-            Vector3 squadAverage = new Vector3(squadAverage2d.x, 0, squadAverage2d.y);
+            Vector3 squadAveragePosition3D = GameUtility.ToVec3(_squad.GetAveragePosition());
 
             Gizmos.color = Color.green;
-            foreach (var position in _formation.GetUnitsPosition(_squad.GetAveragePosition3D()).Values)
+            foreach (var position in _formation.GetUnitsPosition(squadAveragePosition3D).Values)
             {
-                Gizmos.DrawSphere(squadAverage, 0.5f);
+                Gizmos.DrawSphere(squadAveragePosition3D, 0.5f);
                 Gizmos.DrawWireSphere(position, 0.5f);
 
-                Gizmos.DrawLine(position, squadAverage);
+                Gizmos.DrawLine(position, squadAveragePosition3D);
             }
 
             Gizmos.color = Color.red;

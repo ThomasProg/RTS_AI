@@ -69,12 +69,12 @@ public class Unit : BaseEntity
 
     public void SetSpeed(float speed)
     {
-        navMeshAgent.speed = speed;
+        if (navMeshAgent != null) navMeshAgent.speed = speed;
     }
 
     public void ResetSpeed()
     {
-        navMeshAgent.speed = 0;
+        if (navMeshAgent != null) navMeshAgent.speed = 0;
     }
 
     #region MonoBehaviour methods

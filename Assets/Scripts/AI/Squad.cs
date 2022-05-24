@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Squad : IInfluencer
 {
-    HashSet<Unit> Units = new HashSet<Unit>();
+    public HashSet<Unit> Units { get; private set; } = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
     TargetBuilding targetCapturePoint;
     Formation formation;

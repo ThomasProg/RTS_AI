@@ -210,7 +210,14 @@ public class GameServices : MonoBehaviour
     /// <param name="team"></param>
     public void RegisterUnit(ETeam team, IInfluencer unit)
     {
-        m_teamInfluenceMap[(int)team].RegisterEntity(unit);
+        if (m_teamInfluenceMap[(int)team] != null)
+        {
+            m_teamInfluenceMap[(int)team].RegisterEntity(unit);
+        }
+        else
+        {
+            Debug.LogWarning($"Influence map {(int)team} does not exist");
+        }
     }
 
     /// <summary>
@@ -226,7 +233,7 @@ public class GameServices : MonoBehaviour
     /// <param name="team"></param>
     public void UnregisterUnit(ETeam team, IInfluencer unit)
     {
-        m_teamInfluenceMap[(int)team].UnregisterEntity(unit);
+        m_teamInfluenceMap[(int) team]?.UnregisterEntity(unit);
     }
 
     #region MonoBehaviour methods
