@@ -41,15 +41,17 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
         foreach (Factory factory in blackboard.AllyFactories)
         {
-            Transform transform = factory.transform;
-            Vector3 position = transform.position;
-            
             UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
-            float pathLenght = GameUtility.GetPathLength(factory.GetInfluencePosition(), GameUtility.ToVec2(position));
+            Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
 
-            //float time = pathLenght + data.Cost;
+            if (pointOfInterest is FactoryPoI)
+            {
+                unitsSources.Add(0f, factory);
+            }
 
-            float time = (pointOfInterest.position - new Vector2(factory.transform.position.x, factory.transform.position.z)).magnitude;
+            float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size *  factoryToPoI);
+
+            float time = pathLength + data.Cost;
             unitsSources.Add(time, factory);
         }
 
@@ -71,7 +73,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     break;
 
                 case Factory factory:
-                    factory.RequestUnitBuild(0);
+                    factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
                     currentStrength += 1;
                     nbUnitsBeingCreated++;
                     break;
@@ -116,4 +118,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         yield return null;
     }
 
+    int EvaluateUnitToBuild(Factory factory, PointOfInterest poi)
+    {
+        // TODO:
+        return 0;
+    }
 }

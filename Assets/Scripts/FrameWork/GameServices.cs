@@ -54,7 +54,6 @@ public class GameServices : MonoBehaviour
     {
         public bool displayAISquad;
         public bool useDifferentColors;
-        [HideInInspector] public Color[] colorBuffer;
     }
     
     [System.Serializable]
@@ -230,22 +229,11 @@ public class GameServices : MonoBehaviour
         m_teamInfluenceMap[(int)team].UnregisterEntity(unit);
     }
 
-#region MonoBehaviour methods
+    #region MonoBehaviour methods
     void OnEnable()
     {
         Instance = this;
 
-#if UNITY_EDITOR
-        Color[] color = new Color[100];
-
-        for (int i = 0; i < color.Length; i++)
-        {
-            color[i] = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-        }
-        
-        debug.aiSquadDebug.colorBuffer = color;
-#endif
-        
         // Retrieve controllers from scene for each team
         ControllersArray = new UnitController[2];
         foreach (UnitController controller in FindObjectsOfType<UnitController>())
@@ -323,7 +311,7 @@ public class GameServices : MonoBehaviour
         }
 #endif
     }
-
+    
     private void OnDrawGizmos()
     {
         if (Instance != null)
@@ -334,8 +322,12 @@ public class GameServices : MonoBehaviour
                 for (int index = 0; index < squads.Length; index++)
                 {
                     Squad squad = squads[index];
-                    Gizmos.color = debug.aiSquadDebug.useDifferentColors ? debug.aiSquadDebug.colorBuffer[index] : Color.blue;
-                    Gizmos.DrawWireSphere(GameUtility.ToVec3(squad.GetAveragePosition()), Mathf.Sqrt(squad.GetInfluenceRadius()));
+                    Handles.color = debug.aiSquadDebug.useDifferentColors ? GameUtility.GetGoldenRatioColorWithIndex(index)  /*Color.HSVToRGB(index / (float)squads.Length, 1f, 1f)*/  : Color.blue;
+
+                    Vector3 center = GameUtility.ToVec3(squad.GetAveragePosition());
+                    float radius = Mathf.Sqrt(squad.GetInfluenceRadius());
+                    
+                    Handles.DrawWireDisc(center, Vector3.up, radius, 2f);
                 }
             }
             
@@ -381,13 +373,12 @@ public class GameServices : MonoBehaviour
                         Vector3 p2 = new Vector3(lastObjective.position.x, 1f, lastObjective.position.y);
                         Handles.DrawBezier(p1, p2, p1, p2, color, null, thickness);
                         thickness -= 1;
-                        
-                        Gizmos.color = Color.blue;
-                        
-                        Gizmos.DrawWireSphere(p1, influenceRadius);
-                        
+
                         Handles.Label((p2 + p1) / 2f,
                             $"{lastObjective.GetStrategyEffectivity() / efficiencyTotal * 100f}%");
+                        
+                        Handles.color = Color.blue;
+                        Handles.DrawWireDisc(p1, Vector3.up, influenceRadius, 2f);
                     }
                 }
             }
@@ -442,7 +433,6 @@ public class GameServices : MonoBehaviour
                     GameUtility.SquadObjective objective1)
                 {
                     return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
-                    
                 }));
                 
                 GUILayout.BeginVertical("box");
