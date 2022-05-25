@@ -45,6 +45,30 @@ public sealed class AIController : UnitController
         }
     }
 
+    public bool RequestFactoryBuild(Factory master, int factoryIndex, Vector3 buildPos)
+    {
+        if (master == null)
+            return false;
+
+        int cost = master.GetFactoryCost(factoryIndex);
+        if (TotalBuildPoints < cost)
+            return false;
+
+        // Check if positon is valid
+        if (master.CanPositionFactory(factoryIndex, buildPos) == false)
+            return false;
+
+        Factory newFactory = master.StartBuildFactory(factoryIndex, buildPos);
+        if (newFactory != null)
+        {
+            AddFactory(newFactory);
+            TotalBuildPoints -= cost;
+
+            return true;
+        }
+        return false;
+    }
+    
     protected override void Update()
     {
         base.Update();

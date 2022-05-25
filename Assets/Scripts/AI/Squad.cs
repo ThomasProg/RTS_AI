@@ -7,9 +7,10 @@ using UnityEngine;
 
 public class Squad : IInfluencer
 {
-    HashSet<Unit> Units = new HashSet<Unit>();
+    public HashSet<Unit> Units { get; private set; } = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
-    Formation formation = new Formation();
+    TargetBuilding targetCapturePoint;
+    Formation formation;
 
     PointOfInterest _pointOfInterest;
 
@@ -52,6 +53,16 @@ public class Squad : IInfluencer
     public Squad(HashSet<Unit> squadUnits)
     {
         Units = squadUnits;
+        NormalizeSquadSpeed();
+    }
+
+    public void NormalizeSquadSpeed()
+    {
+        float maxSpeed = GetSquadSpeed();
+        foreach (var unit in Units)
+        {
+            unit.SetSpeed(maxSpeed);
+        }
     }
 
     public Squad(List<Unit> squadUnits)
@@ -60,6 +71,8 @@ public class Squad : IInfluencer
         {
             Units.Add(unit);
         }
+
+        NormalizeSquadSpeed();
     }
 
     /// <summary>
@@ -344,7 +357,7 @@ public class Squad : IInfluencer
         foreach (Unit unit in Units)
         {
             unit.SetTaskGoTo(targetCapturePoint.transform.position);
-                unit.AddTaskCaptureTarget(targetCapturePoint);
+            unit.AddTaskCaptureTarget(targetCapturePoint);
         }
     }
 
@@ -367,7 +380,7 @@ public class Squad : IInfluencer
             {
                 rst |= unit.IsIdle;
             }
-
+    
             return rst;
         }
     }
