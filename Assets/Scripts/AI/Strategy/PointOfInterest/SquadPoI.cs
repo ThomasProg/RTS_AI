@@ -28,9 +28,7 @@ public class SquadPoI : PointOfInterest
 
     public override void EvaluatePriority(StrategyAI.Blackboard blackboard)
     {
-        PlayerController playerController = GameServices.GetPlayerController();
         AIController aiController = GameServices.GetAIController();
-        Squad[] playerSquads = playerController.Squads;
         Squad[] aiSquads = aiController.Squads;
         
         // These both functions are process following this steps:

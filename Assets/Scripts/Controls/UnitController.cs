@@ -52,11 +52,6 @@ public abstract class UnitController : MonoBehaviour
     public Factory[] Factories => FactoryList.ToArray();
     public Unit[] Units => UnitList.ToArray();
 
-    public abstract Squad[] Squads
-    {
-        get;
-    }
-
     #region Unit methods
     protected void UnselectAllUnits()
     {

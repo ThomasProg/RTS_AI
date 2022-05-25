@@ -28,7 +28,6 @@ public class CapturePointPoI : PointOfInterest
     {
         PlayerController playerController = GameServices.GetPlayerController();
         AIController aiController = GameServices.GetAIController();
-        Squad[] playerSquads = playerController.Squads;
         Squad[] aiSquads = aiController.Squads;
         
         // These both functions are process following this steps:

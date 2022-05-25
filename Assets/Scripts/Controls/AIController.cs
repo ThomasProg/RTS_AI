@@ -11,10 +11,27 @@ public sealed class AIController : UnitController
     public TargetBuilding[] allCapturePoints;
 
     public StrategyAI strategyAI;
+    private Squad[] playerSquadsEvaluated;
+    private int currentFrame = 0;
+
+
 
     #region MonoBehaviour methods
 
-    public override Squad[] Squads
+    public Squad[] PlayerSquads
+    {
+        get
+        {
+            if (Time.frameCount != currentFrame)
+            {
+                currentFrame = Time.frameCount;
+                playerSquadsEvaluated = Squad.MakeSquadsDependingOnDistance(Units, 10).ToArray();
+            }
+            return playerSquadsEvaluated;
+        }
+    }
+    
+    public Squad[] Squads
     {
         get
         {

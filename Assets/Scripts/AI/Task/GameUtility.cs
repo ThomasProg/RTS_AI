@@ -215,8 +215,9 @@ public static class GameUtility
     {
         BalanceOfPower rst = new BalanceOfPower();
 
-        rst.playerStrength = EvaluateSquadsStrengthInZone(GameServices.GetPlayerController().Squads, position, radius);
-        rst.aiStrength = EvaluateSquadsStrengthInZone(GameServices.GetAIController().Squads, position, radius);
+        AIController aiController = GameServices.GetAIController();
+        rst.playerStrength = EvaluateSquadsStrengthInZone(aiController.PlayerSquads, position, radius);
+        rst.aiStrength = EvaluateSquadsStrengthInZone(aiController.Squads, position, radius);
 
         return rst;
     }
