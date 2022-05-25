@@ -79,6 +79,31 @@ public class StrategyAI : MonoBehaviour
     public List<PointOfInterest> AllPointOfInterests = new List<PointOfInterest>();
     public List<PointOfInterest> AllPointOfInterestsByPriority = new List<PointOfInterest>();
 
+    // Return the nb of seconds to wait
+    WaitForSeconds RunTasks(List<List<IEnumerator>> tasksEnumerators)
+    {
+        for (int i = 0; i < tasksEnumerators.Count; i++)
+        {
+            for (int j = 0; j < tasksEnumerators[i].Count; j++)
+            {
+                IEnumerator enumerator = tasksEnumerators[i][j];
+
+                bool isFinished = !enumerator.MoveNext();
+                object obj = enumerator.Current;
+
+                if (obj is WaitForSeconds waitForSeconds)
+                    return waitForSeconds;
+
+                if (!isFinished)
+                    break;
+            }
+        }
+
+        return null;
+    }
+
+
+
     // Update is called once per frame
     IEnumerator UpdateInterests()
     {
@@ -111,27 +136,24 @@ public class StrategyAI : MonoBehaviour
             AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
                 -a.priority.CompareTo(b.priority));
 
-            foreach (PointOfInterest poi in AllPointOfInterestsByPriority)
+            List<List<IPOITask<StrategyAI.Blackboard>>> tasks = new List<List<IPOITask<StrategyAI.Blackboard>>>(AllPointOfInterestsByPriority.Count);
+            List<List<IEnumerator>> tasksEnumerators = new List<List<IEnumerator>>(AllPointOfInterestsByPriority.Count);
+            for (int i = 0; i < AllPointOfInterestsByPriority.Count; i++)
             {
-                List<IPOITask<StrategyAI.Blackboard>> tasks = poi.GetProcessTasks(bb);
-
-                foreach (var task in tasks)
+                tasks.Add(AllPointOfInterestsByPriority[i].GetProcessTasks(bb));
+                tasksEnumerators.Add(new List<IEnumerator>(tasks[i].Count));
+                for (int j = 0; j < tasks[i].Count; j++)
                 {
-                    bool isFinished;
-                    IEnumerator enumerator = task.Execute(bb);
-
-                    do
-                    {
-                        isFinished = !enumerator.MoveNext();
-                    } while (!isFinished && !(enumerator.Current is Wip));
-
-
-                    if (!isFinished)
-                        break;
+                    tasksEnumerators[i].Add(tasks[i][j].Execute(bb));
                 }
             }
 
-            yield return new WaitForSeconds(3f);
+            // TODO : loop until a certain amount of time without reevaluatioon priorities
+            {
+                WaitForSeconds waitForSeconds = RunTasks(tasksEnumerators);
+
+                yield return waitForSeconds;
+            }
         }
 
 
