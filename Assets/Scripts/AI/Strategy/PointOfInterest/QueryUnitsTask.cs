@@ -115,7 +115,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             squad.PointOfInterest = pointOfInterest;
         }
 
-        yield return null;
+        //if (nbUnitsBeingCreated != 0)
+        //    yield return new WaitForSeconds(3f);
+        
+        yield break;
     }
 
     int EvaluateUnitToBuild(Factory factory, PointOfInterest poi)

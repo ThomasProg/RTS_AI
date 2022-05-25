@@ -2,22 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
-public class Wip 
-{
-
-}
-
 public interface IPOITask<BLACKBOARD>
 {
-    public class WaitForSeconds
-    {
-        public WaitForSeconds(float nbSeconds)
-        {
-
-        }
-    }
-
+    // After running this task, if you want to execute the following task of the POI, just yield break;
+    // After running this task, if you don't want to execute the following task of the POI, just yield return null;
+    // After running this task, if you want to wait for some delay, just return new WaitForSeconds(time);
+    // It will simulate the task taking time ; don't wait for too long or it will cause issues (other tasks won't be executed during that time)
     System.Collections.IEnumerator Execute(BLACKBOARD blackboard);
 }
 
