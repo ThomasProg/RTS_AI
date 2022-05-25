@@ -33,6 +33,8 @@ public class StrategyAI : MonoBehaviour
 
     public SquadManager squadManager;
     public AIController controller;
+
+    float priorityEvaluationDelay = 5;
     
     public Blackboard bb { get; private set; } = null;
     
@@ -148,7 +150,10 @@ public class StrategyAI : MonoBehaviour
                 }
             }
 
+            float lastPriorityUpdate = Time.time;
+
             // TODO : loop until a certain amount of time without reevaluatioon priorities
+            while (lastPriorityUpdate + priorityEvaluationDelay > Time.time)
             {
                 WaitForSeconds waitForSeconds = RunTasks(tasksEnumerators);
 
