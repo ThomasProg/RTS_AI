@@ -14,6 +14,8 @@ public class Squad : IInfluencer
 
     PointOfInterest _pointOfInterest;
 
+    public Action<Squad> OnSquadEmpty;
+
     private int previousFramePosUpdated;
     private Vector2 currentPosition;
     
@@ -37,6 +39,20 @@ public class Squad : IInfluencer
         }
     }
 
+    public void AddUnit(Unit unit)
+    {
+        Units.Add(unit);
+        unit.OnDeadEvent += unitToRemove => RemoveUnit(unitToRemove as Unit);
+    }
+
+    public void RemoveUnit(Unit unit)
+    {
+        Units.Remove(unit);
+        unit.OnDeadEvent -= unitToRemove => RemoveUnit(unitToRemove as Unit);
+        
+        if (Units.Count == 0)
+            OnSquadEmpty?.Invoke(this);
+    }
 
     public bool IsEmpty => Units.Count == 0;
 
@@ -47,12 +63,18 @@ public class Squad : IInfluencer
     public Squad(Unit squadUnit)
     {
         Units = new HashSet<Unit>();
-        Units.Add(squadUnit);
+        AddUnit(squadUnit);
     }
 
     public Squad(HashSet<Unit> squadUnits)
     {
         Units = squadUnits;
+        
+        foreach (Unit unit in Units)
+        {
+            unit.OnDeadEvent += unitToRemove => RemoveUnit(unitToRemove as Unit);
+        }
+        
         NormalizeSquadSpeed();
     }
 
@@ -69,7 +91,7 @@ public class Squad : IInfluencer
     {
         foreach (var unit in squadUnits)
         {
-            Units.Add(unit);
+            AddUnit(unit);
         }
 
         NormalizeSquadSpeed();
@@ -149,11 +171,6 @@ public class Squad : IInfluencer
         return Units.Select(unit => unit.GetUnitData.Speed).Min();
     }
 
-    public void Remove(Unit unit)
-    {
-        Units.Remove(unit);
-    }
-
     /// <summary>
     /// Merge the squads together
     /// </summary>
@@ -176,7 +193,7 @@ public class Squad : IInfluencer
         {
             if (predicate(this, unit) && !Units.Contains(unit))
             {
-                Units.Add(unit);
+                AddUnit(unit);
             }
         }
 

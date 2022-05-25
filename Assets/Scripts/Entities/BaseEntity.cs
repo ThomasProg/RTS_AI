@@ -14,7 +14,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     protected Text HPText = null;
     protected bool IsInitialized = false;
 
-    public Action OnDeadEvent;
+    public Action<BaseEntity> OnDeadEvent;
     public bool IsSelected { get; protected set; }
     public bool IsAlive { get; protected set; }
     virtual public void Init(ETeam _team)
@@ -62,7 +62,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
         if (HP <= 0)
         {
             IsAlive = false;
-            OnDeadEvent?.Invoke();
+            OnDeadEvent?.Invoke(this);
             Debug.Log("Entity " + gameObject.name + " died");
         }
     }

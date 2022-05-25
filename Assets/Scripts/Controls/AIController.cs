@@ -25,7 +25,7 @@ public sealed class AIController : UnitController
             if (Time.frameCount != currentFrame)
             {
                 currentFrame = Time.frameCount;
-                playerSquadsEvaluated = Squad.MakeSquadsDependingOnDistance(Units, 10).ToArray();
+                playerSquadsEvaluated = Squad.MakeSquadsDependingOnDistance(GameServices.GetPlayerController().Units, 10).ToArray();
             }
             return playerSquadsEvaluated;
         }

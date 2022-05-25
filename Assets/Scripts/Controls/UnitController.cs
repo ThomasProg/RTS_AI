@@ -105,7 +105,7 @@ public abstract class UnitController : MonoBehaviour
     }
     virtual public void AddUnit(Unit unit)
     {
-        unit.OnDeadEvent += () =>
+        unit.OnDeadEvent += (BaseEntity entity) =>
         {
             TotalBuildPoints += unit.Cost;
             if (unit.IsSelected)
@@ -136,7 +136,7 @@ public abstract class UnitController : MonoBehaviour
             return;
         }
 
-        factory.OnDeadEvent += () =>
+        factory.OnDeadEvent += (BaseEntity entity) =>
         {
             TotalBuildPoints += factory.Cost;
             if (factory.IsSelected)

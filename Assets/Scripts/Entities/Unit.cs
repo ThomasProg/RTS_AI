@@ -47,7 +47,7 @@ public class Unit : BaseEntity
         OnDeadEvent += Unit_OnDead;
     }
 
-    void Unit_OnDead()
+    void Unit_OnDead(BaseEntity entity)
     {
         Stop();
 

@@ -137,7 +137,7 @@ public sealed class Factory : BaseEntity
         }
     }
     #endregion
-    void Factory_OnDead()
+    void Factory_OnDead(BaseEntity entity)
     {
         if (FactoryData.DeathFXPrefab)
         {

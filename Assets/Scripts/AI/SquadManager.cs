@@ -17,7 +17,9 @@ public class SquadManager : MonoBehaviour
 
     public void RegisterSquad(Squad squad)
     {
+        squad.OnSquadEmpty += UnregisterSquad;
         squads.Add(squad);
+
         foreach (Unit unit in squad.UnitList)
         {
             squadsOfUnits[unit] = squad;
@@ -26,7 +28,9 @@ public class SquadManager : MonoBehaviour
 
     public void UnregisterSquad(Squad squad)
     {
+        squad.OnSquadEmpty -= UnregisterSquad;
         squads.Remove(squad);
+
         foreach (Unit unit in squad.UnitList)
         {
             squadsOfUnits.Remove(unit);

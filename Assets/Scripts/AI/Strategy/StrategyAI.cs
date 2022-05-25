@@ -33,10 +33,7 @@ public class StrategyAI : MonoBehaviour
 
     public SquadManager squadManager;
     public AIController controller;
-    protected List<Squad> playerSquad = new List<Squad>();
-
-    private Squad[] PlayerSquad => playerSquad.ToArray();
-
+    
     public Blackboard bb { get; private set; } = null;
     
     private void Awake()
@@ -95,12 +92,9 @@ public class StrategyAI : MonoBehaviour
                 //Remove previous player squad
                 AllPointOfInterests.RemoveAll(interest =>
                     interest is SquadPoI squadPoI && squadPoI.squad.GetTeam() == playerTeam);
-                
-                // Add new player squad 
-                playerSquad = Squad.MakeSquadsDependingOnDistance(GameServices.GetPlayerController().Units, 50f);
-                
+
                 // Add squad to PoI list
-                foreach (Squad squad in playerSquad)
+                foreach (Squad squad in controller.PlayerSquads)
                 {
                     AddTactic(new SquadPoI(squad) {stratAI = this, squadManager = squadManager});
                 }
