@@ -91,21 +91,11 @@ public class StrategyAI : MonoBehaviour
             {
                 IEnumerator enumerator = tasksEnumerators[i][j];
 
-                bool isFinished;
+                bool isFinished = !enumerator.MoveNext();
+                object obj = enumerator.Current;
 
-                do
-                {
-                    isFinished = !enumerator.MoveNext();
-                    object obj = enumerator.Current;
-
-                    if (obj is WaitForSeconds waitForSeconds)
-                        return waitForSeconds;
-
-                    // TODO : 
-                    // If Success : continue to loop
-                    // If WaitForSeconds : return and wait for seconds
-                    // If blocking : continue to execute next tasks
-                } while (!isFinished);
+                if (obj is WaitForSeconds waitForSeconds)
+                    return waitForSeconds;
 
                 if (!isFinished)
                     break;
@@ -164,9 +154,12 @@ public class StrategyAI : MonoBehaviour
                 }
             }
 
-            WaitForSeconds waitForSeconds = RunTasks(tasksEnumerators);
+            // TODO : loop until a certain amount of time without reevaluatioon priorities
+            {
+                WaitForSeconds waitForSeconds = RunTasks(tasksEnumerators);
 
-            yield return waitForSeconds;
+                yield return waitForSeconds;
+            }
         }
 
 

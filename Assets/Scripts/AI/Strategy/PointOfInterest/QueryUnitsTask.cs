@@ -44,9 +44,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
             Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
 
-            if (pointOfInterest is FactoryPoI)
+            if (pointOfInterest is FactoryPoI factoryPoI && factory == factoryPoI.factory)
             {
                 unitsSources.Add(0f, factory);
+                continue;
             }
 
             float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size *  factoryToPoI);
@@ -115,9 +116,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             squad.PointOfInterest = pointOfInterest;
         }
 
-        //if (nbUnitsBeingCreated != 0)
-        //    yield return new WaitForSeconds(3f);
-        
+        if (nbUnitsBeingCreated != 0)
+            yield return new WaitForSeconds(3f);
+
         yield break;
     }
 
