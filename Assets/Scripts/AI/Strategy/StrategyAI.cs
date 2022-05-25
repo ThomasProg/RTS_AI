@@ -43,6 +43,20 @@ public class StrategyAI : MonoBehaviour
         //priorityTaskRunner.blackboard = bb;
     }
 
+    void CreateFactoryPoI(Factory factory)
+    {
+        FactoryPoI factoryPoI = new FactoryPoI(factory) {stratAI = this, squadManager = squadManager};
+        AddTactic(factoryPoI);
+        factory.OnDeadEvent += current => AllPointOfInterests.Remove(factoryPoI);
+    }
+    
+    void CreateSqaudPoI(Squad squad)
+    {
+        SquadPoI newSquadPoI = new SquadPoI(squad) {stratAI = this, squadManager = squadManager};
+        AddTactic(newSquadPoI);
+        squad.OnSquadEmpty += current => AllPointOfInterests.Remove(newSquadPoI);
+    }
+
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -53,20 +67,20 @@ public class StrategyAI : MonoBehaviour
 
         foreach (Factory factory in controller.Factories)
         {
-            AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
+            CreateFactoryPoI(factory);
         }
 
         foreach (Factory factory in GameServices.GetPlayerController().Factories)
         {
-            AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager});
+            CreateFactoryPoI(factory);
         }
         
         AddTactic(new ConstructFactoryPoI() {stratAI = this, squadManager = squadManager});
         
         StartCoroutine(UpdateInterests());
         
-        GameServices.GetPlayerController().OnCreateFactory += factory =>  AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager}); 
-        controller.OnCreateFactory += factory =>  AddTactic(new FactoryPoI(factory) {stratAI = this, squadManager = squadManager}); 
+        GameServices.GetPlayerController().OnCreateFactory += CreateFactoryPoI;
+        controller.OnCreateFactory += CreateFactoryPoI;; 
     }
 
     void AddTactic(PointOfInterest pointOfInterest)
@@ -121,7 +135,7 @@ public class StrategyAI : MonoBehaviour
                 // Add squad to PoI list
                 foreach (Squad squad in controller.PlayerSquads)
                 {
-                    AddTactic(new SquadPoI(squad) {stratAI = this, squadManager = squadManager});
+                    CreateSqaudPoI(squad);
                 }
             }
 
