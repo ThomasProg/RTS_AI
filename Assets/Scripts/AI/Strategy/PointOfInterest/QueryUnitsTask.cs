@@ -43,10 +43,11 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         {
             UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
             Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
-
+            
+            // If we wan't create unit from factory that is the PoI, path is egale to 0 (and GetPathLength will be invalid)
             if (pointOfInterest is FactoryPoI)
             {
-                unitsSources.Add(0f, factory);
+                unitsSources.Add(data.Cost, factory);
                 continue;
             }
 
@@ -99,7 +100,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             Squad squad = blackboard.squadManager.squadsOfUnits[unit];
             if (squad.UnitList.Count == 1)
                 blackboard.squadManager.UnregisterSquad(squad);
-            squad.Remove(unit);
+            squad.RemoveUnit(unit);
         }
 
         List<Squad> newSquads = Squad.MakeSquadsDependingOnDistance(newUnits, 1000);
