@@ -47,6 +47,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             if (pointOfInterest is FactoryPoI)
             {
                 unitsSources.Add(0f, factory);
+                continue;
             }
 
             float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size *  factoryToPoI);
