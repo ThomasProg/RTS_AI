@@ -19,8 +19,8 @@ MonoBehaviour:
   MaxHP: 200
   DPS: 60
   AttackFrequency: 2
-  AttackDistanceMax: 40
-  CaptureDistanceMax: 20
+  AttackDistanceMax: 50
+  CaptureDistanceMax: 30
   CanRepair: 0
   RPS: 10
   RepairFrequency: 1
@@ -34,8 +34,5 @@ MonoBehaviour:
   DeathFXPrefab: {fileID: 1685874166552172, guid: 2dc5347a44240ea4597cafb2d1d7c160,
     type: 3}
   IsAutoAttack: 1
-  AutoAttackRadius: 50
   IsAutoRepair: 1
-  AutoRepairRadius: 50
   IsAutoCapture: 1
-  AutoCaptureRadius: 50
