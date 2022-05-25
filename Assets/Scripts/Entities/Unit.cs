@@ -347,6 +347,7 @@ public class Unit : BaseEntity
     public void Stop()
     {
         StopMovement();
+        m_taskRunner.StopCurrentTask();
         m_taskRunner.Clear();
     }
 

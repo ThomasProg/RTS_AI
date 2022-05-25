@@ -70,8 +70,8 @@ public class PoolTaskRunner : TaskRunner
 
     public override void AssignNewTask(Task newTask)
     {
-        tasks.Clear();
         StopCurrentTask();
+        tasks.Clear();
         tasks.Add(newTask);
         base.AssignNewTask(newTask);
     }

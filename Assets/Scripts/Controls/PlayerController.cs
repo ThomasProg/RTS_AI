@@ -587,7 +587,10 @@ public sealed class PlayerController : UnitController
             {
                 // Direct call to capturing task $$$ to be improved by AI behaviour
                 foreach (Unit unit in SelectedUnitList)
-                    unit.SetTaskCaptureTarget(target);
+                {
+                    unit.SetTaskGoTo(GameUtility.ToVec3(target.GetInfluencePosition()));
+                    unit.AddTaskCaptureTarget(target);
+                }
             }
         }
         // Set unit move target
