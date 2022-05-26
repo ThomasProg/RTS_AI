@@ -34,7 +34,7 @@ public class StrategyAI : MonoBehaviour
     public SquadManager squadManager;
     public AIController controller;
 
-    float priorityEvaluationDelay = 400000;
+    float priorityEvaluationDelay = 5;
     
     public Blackboard bb { get; private set; } = null;
     
@@ -186,7 +186,7 @@ public class StrategyAI : MonoBehaviour
                 if (!enumerator.MoveNext())
                     break;
 
-                yield return enumerator;
+                yield return enumerator.Current;
             }
         }
 

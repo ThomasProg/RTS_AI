@@ -14,6 +14,6 @@ public class CapturePointTask : IPOITask<StrategyAI.Blackboard>
                 squad.GoCapturePoint(capturePointPoI.targetBuilding);
         }
 
-        yield return null;
+        yield break;
     }
 }
