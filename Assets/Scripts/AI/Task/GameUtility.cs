@@ -413,12 +413,6 @@ public static class GameUtility
        
     public static float GetPathLength( NavMeshPath path )
     {
-        if (path == null)
-        {
-            Debug.LogWarning("Target is not accessible. Max value returned");
-            return float.MaxValue;
-        }
-
         float lng = 0.0f;
        
         if (( path.status != NavMeshPathStatus.PathInvalid ) && ( path.corners.Length > 1 ))
@@ -444,7 +438,10 @@ public static class GameUtility
     
     public static float GetPathLength(Vector2 fromPos, Vector2 toPos, int passableMask = NavMesh.AllAreas)
     {
-        return GetPathLength(GetPath(ToVec3(fromPos), ToVec3(toPos), passableMask));
+        NavMeshPath path = GetPath(ToVec3(fromPos), ToVec3(toPos), passableMask);
+        if (path == null)
+            return (toPos - fromPos).magnitude;
+        return GetPathLength(path);
     }
 
     public static Color GetGoldenRatioColorWithIndex(int index, float s = 0.8f, float v = 0.95f)
