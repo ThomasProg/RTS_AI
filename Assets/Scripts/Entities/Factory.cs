@@ -137,6 +137,12 @@ public sealed class Factory : BaseEntity
         }
     }
     #endregion
+
+    public override void Init(ETeam _team)
+    {
+        base.Init(_team);
+        Controller = GameServices.GetControllerByTeam(Team);
+    }
     void Factory_OnDead(BaseEntity entity)
     {
         if (FactoryData.DeathFXPrefab)

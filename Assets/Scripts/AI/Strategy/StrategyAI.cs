@@ -34,7 +34,7 @@ public class StrategyAI : MonoBehaviour
     public SquadManager squadManager;
     public AIController controller;
 
-    float priorityEvaluationDelay = 5;
+    float priorityEvaluationDelay = 400000;
     
     public Blackboard bb { get; private set; } = null;
     
@@ -82,26 +82,37 @@ public class StrategyAI : MonoBehaviour
     public List<PointOfInterest> AllPointOfInterestsByPriority = new List<PointOfInterest>();
 
     // Return the nb of seconds to wait
-    WaitForSeconds RunTasks(List<List<IEnumerator>> tasksEnumerators)
+    IEnumerator RunTasks(List<List<IEnumerator>> tasksEnumerators)
     {
-        for (int i = 0; i < tasksEnumerators.Count; i++)
+        while (true)
         {
-            for (int j = 0; j < tasksEnumerators[i].Count; j++)
+            for (int i = 0; i < tasksEnumerators.Count; i++)
             {
-                IEnumerator enumerator = tasksEnumerators[i][j];
+                for (int j = 0; j < tasksEnumerators[i].Count; j++)
+                {
+                    IEnumerator enumerator = tasksEnumerators[i][j];
 
-                bool isFinished = !enumerator.MoveNext();
-                object obj = enumerator.Current;
+                    bool isFinished = !enumerator.MoveNext();
+                    object obj = enumerator.Current;
 
-                if (obj is WaitForSeconds waitForSeconds)
-                    return waitForSeconds;
+                    if (!isFinished)
+                    {
+                        //if (obj is WaitForSeconds waitForSeconds)
+                        //{
+                        //    yield return obj;
+                        //    //yield break;
+                        //}
 
-                if (!isFinished)
-                    break;
+                        yield return null;
+                        break;
+                    }
+                }
+
+                yield return null;
             }
-        }
 
-        return null;
+            yield return null;
+        }
     }
 
 
@@ -109,7 +120,7 @@ public class StrategyAI : MonoBehaviour
     // Update is called once per frame
     IEnumerator UpdateInterests()
     {
-        yield return null;
+        yield return null; // Keep to run after start
 
         while (true)
         {
@@ -152,12 +163,16 @@ public class StrategyAI : MonoBehaviour
 
             float lastPriorityUpdate = Time.time;
 
+            IEnumerator enumerator = RunTasks(tasksEnumerators);
+
             // TODO : loop until a certain amount of time without reevaluatioon priorities
             while (lastPriorityUpdate + priorityEvaluationDelay > Time.time)
             {
-                WaitForSeconds waitForSeconds = RunTasks(tasksEnumerators);
+                //yield return RunTasks(tasksEnumerators);
+                if (!enumerator.MoveNext())
+                    break;
 
-                yield return waitForSeconds;
+                yield return enumerator;
             }
         }
 

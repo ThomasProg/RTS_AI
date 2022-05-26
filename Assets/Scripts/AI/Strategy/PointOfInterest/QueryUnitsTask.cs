@@ -78,7 +78,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                         break;
 
                     case Factory factory:
-                        factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
+                        //factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
+                        //Queue<PointOfInterest> queue = blackboard.squadManager.newUnitsPoI[factory];
+                        blackboard.squadManager.RequestUnit(factory, EvaluateUnitToBuild(factory, pointOfInterest), pointOfInterest);
+
                         currentStrength += 1;
                         nbUnitsBeingCreated++;
                         break;

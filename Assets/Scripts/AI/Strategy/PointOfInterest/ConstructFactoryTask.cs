@@ -11,6 +11,6 @@ public class ConstructFactoryTask : IPOITask<StrategyAI.Blackboard>
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
         GameServices.GetAIController().RequestFactoryBuild(master, idFactoryToBuild, GameUtility.ToVec3(position));
-        yield return null;
+        yield break;
     }
 }

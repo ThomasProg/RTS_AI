@@ -55,10 +55,7 @@ public sealed class AIController : UnitController
 
         foreach (Factory factory in Factories)
         {
-            factory.OnUnitBuiltPersistent += (Unit unit) =>
-            {
-                strategyAI.squadManager.RegisterSquad(new Squad(unit));
-            };
+            strategyAI.squadManager.LinkToAI(factory);
         }
     }
 
@@ -80,6 +77,7 @@ public sealed class AIController : UnitController
         {
             AddFactory(newFactory);
             TotalBuildPoints -= cost;
+            strategyAI.squadManager.LinkToAI(newFactory);
 
             return true;
         }
