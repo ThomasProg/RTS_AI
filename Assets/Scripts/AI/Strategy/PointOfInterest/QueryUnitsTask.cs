@@ -54,7 +54,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     continue;
                 }
 
-                float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size * factoryToPoI);
+                float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size * factoryToPoI) / data.Speed;
 
                 float time = pathLength + data.Cost;
                 unitsSources.Add(time, factory);
