@@ -212,10 +212,16 @@ public sealed class Factory : BaseEntity
         }
         return counter;
     }
+
+    public bool CanRequestUnit(int unitCost)
+    {
+        return Controller.TotalBuildPoints >= unitCost && BuildingQueue.Count < MaxBuildingQueueSize;
+    }
+    
     public bool RequestUnitBuild(int unitMenuIndex)
     {
         int cost = GetUnitCost(unitMenuIndex);
-        if (Controller.TotalBuildPoints < cost || BuildingQueue.Count >= MaxBuildingQueueSize)
+        if (!CanRequestUnit(cost))
             return false;
 
         Controller.TotalBuildPoints -= cost;

@@ -44,52 +44,69 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
             foreach (Factory factory in blackboard.AllyFactories)
             {
-                UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
-                Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
-
-                // If we wan't create unit from factory that is the PoI, path is egale to 0 (and GetPathLength will be invalid)
-                if (pointOfInterest is FactoryPoI factoryPoI && factory == factoryPoI.factory)
+                int unitMenuIndex = EvaluateUnitToBuild(factory, pointOfInterest);
+                int cost = factory.GetUnitCost(unitMenuIndex);
+                if (factory.CanRequestUnit(cost))
                 {
-                    unitsSources.Add(0f, factory);
-                    continue;
+                    UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
+                    Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
+
+                    // If we wan't create unit from factory that is the PoI, path is egale to 0 (and GetPathLength will be invalid)
+                    if (pointOfInterest is FactoryPoI factoryPoI && factory == factoryPoI.factory)
+                    {
+                        unitsSources.Add(0f, factory);
+                        continue;
+                    }
+
+                    float pathLength =
+                        GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI,
+                            pointOfInterest.position - factory.Size * factoryToPoI) / data.Speed;
+
+                    float time = pathLength + data.Cost;
+                    unitsSources.Add(time, factory);
                 }
-
-                float pathLength = GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI, pointOfInterest.position - factory.Size * factoryToPoI) / data.Speed;
-
-                float time = pathLength + data.Cost;
-                unitsSources.Add(time, factory);
             }
 
             //List<Squad> newSquads = new List<Squad>();
             List<Unit> newUnits = new List<Unit>();
             float currentStrength = 0;
             nbUnitsBeingCreated = 0;
-            foreach (System.Object unitsSource in unitsSources.Values)
+
+            if (unitsSources.Values.Count > 0)
             {
-                switch (unitsSource)
+                foreach (System.Object unitsSource in unitsSources.Values)
                 {
-                    //case Squad squad:
-                    //    newSquads.Add(squad);
-                    //    currentStrength += squad.GetStrength();
-                    //    break;
-                    case Unit unit:
-                        newUnits.Add(unit);
-                        currentStrength += unit.GetStrength();
-                        break;
+                    switch (unitsSource)
+                    {
+                        //case Squad squad:
+                        //    newSquads.Add(squad);
+                        //    currentStrength += squad.GetStrength();
+                        //    break;
+                        case Unit unit:
+                            newUnits.Add(unit);
+                            currentStrength += unit.GetStrength();
+                            break;
 
-                    case Factory factory:
-                        //factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
-                        //Queue<PointOfInterest> queue = blackboard.squadManager.newUnitsPoI[factory];
-                        blackboard.squadManager.RequestUnit(factory, EvaluateUnitToBuild(factory, pointOfInterest), pointOfInterest);
+                        case Factory factory:
+                            //factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
+                            //Queue<PointOfInterest> queue = blackboard.squadManager.newUnitsPoI[factory];
+                            blackboard.squadManager.RequestUnit(factory, EvaluateUnitToBuild(factory, pointOfInterest),
+                                pointOfInterest);
 
-                        currentStrength += 1;
-                        nbUnitsBeingCreated++;
-                        break;
+                            currentStrength += 1;
+                            nbUnitsBeingCreated++;
+                            break;
+                    }
                 }
 
                 if (currentStrength >= strengthRequired)
                     break;
             }
+            else
+            {
+                // TODO: What the squads have to do if we have no solution to counter the power of the enemy.
+            }
+
 
             //foreach (Squad squad in squads)
             //{
