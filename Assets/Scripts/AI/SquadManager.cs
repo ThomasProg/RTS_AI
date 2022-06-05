@@ -47,18 +47,10 @@ public class SquadManager : MonoBehaviour
             newUnitsPoI.Add(factory, queue);
         }
 
-
-            
-            
-        if (queue.Contains(poi))
+        if (!queue.Contains(poi))
         {
-            return;
-        }
-        else
-        {
-            factory.RequestUnitBuild(unitBuildID);
-            queue.Enqueue(poi);
-            return;
+            if (factory.RequestUnitBuild(unitBuildID))
+                queue.Enqueue(poi);
         }
     }
 

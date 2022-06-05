@@ -53,7 +53,7 @@ public class ConstructFactoryPoI : PointOfInterest
         if (EvaluateFactoryBuildPosition(out position, factoryToBuildID))
         {
             // More a squad is farthest from factory and more money we have, more we wan't to create factory
-            priority = costRatio > 1f ? costRatio * Mathf.Sqrt(sqrtDistfarthestSquad) : 0;
+            priority = costRatio > 1.5f ? costRatio * Mathf.Sqrt(sqrtDistfarthestSquad) : 0;
         }
         else
         {
