@@ -76,6 +76,11 @@ public class CapturePointPoI : PointOfInterest
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
         {
+            priority = 0;
+
+        }
+        else
+        {
             if (targetBuilding.GetTeam() == ETeam.Neutral)
             {
                 priority = 3f;
@@ -95,37 +100,19 @@ public class CapturePointPoI : PointOfInterest
                 }
 
                 priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
-            }
-        }
-        else
-        {
-            if (targetBuilding.GetTeam() == ETeam.Neutral)
-            {
-                priority = 3f;
-            }
-            else // enemy team
-            {
-                priority = 6f;
-            }
-            
-            // Add a priority depending on distance from the first factories
-            if (playerController.Factories.Length > 0)
-            {
-                float sqrtDistToNearestFactory = float.MaxValue;
-                foreach (Factory factory in playerController.Factories)
+                
+                if (targetBuilding.GetTeam() == ETeam.Neutral)
                 {
-                    sqrtDistToNearestFactory = Mathf.Min(sqrtDistToNearestFactory, (factory.GetInfluencePosition() - position).sqrMagnitude);
+                    priority *= stratAI.subjectiveUtilitySystem.GetUtility("Capture").Value;
                 }
-
-                priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
+                else // enemy team
+                {
+                    priority *= stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value;
+                }
             }
-            priority += playerStrength == 0 ? 1 : aiStrength / playerStrength;
         }
 
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
-
-        // Apply direct coefficient depending on AI personality
-        priority += stratAI.subjectiveUtilitySystem.GetUtility("Capture").Value;
     }
 
     void EvaluateDefendThisPointPriority(IEnumerable aiSquads)
@@ -175,6 +162,7 @@ public class CapturePointPoI : PointOfInterest
                 }
 
                 priority += 1f / Mathf.Sqrt(sqrtDistToNearestFactory);
+                priority *= stratAI.subjectiveUtilitySystem.GetUtility("Protect").Value;
             }
         }
         else
@@ -183,8 +171,6 @@ public class CapturePointPoI : PointOfInterest
         }
         
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
-        // Apply direct coefficient depending on AI personality
-        priority += stratAI.subjectiveUtilitySystem.GetUtility("Capture").Value;
     }
 
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
