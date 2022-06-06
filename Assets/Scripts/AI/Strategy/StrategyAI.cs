@@ -37,7 +37,7 @@ public class StrategyAI : MonoBehaviour
     public SquadManager squadManager;
     public AIController controller;
 
-    float priorityEvaluationDelay = 5;
+    float priorityEvaluationDelay = 10;
 
     public Blackboard bb { get; private set; } = null;
 
@@ -131,17 +131,26 @@ public class StrategyAI : MonoBehaviour
                 {
                     IEnumerator enumerator = tasksEnumerators[i][j];
 
-                    bool isFinished = !enumerator.MoveNext();
-                    object obj = enumerator.Current;
+                    bool isFinished;
+                    object obj;
+
+                    do
+                    {
+                        isFinished = !enumerator.MoveNext();
+                        obj = enumerator.Current;
+
+                        if (!isFinished && obj is WaitForSeconds waitForSeconds)
+                        {
+                            yield return obj;
+                            //yield break;
+                        }
+                        else
+                            break;
+                    } while (true);
+
 
                     if (!isFinished)
                     {
-                        //if (obj is WaitForSeconds waitForSeconds)
-                        //{
-                        //    yield return obj;
-                        //    //yield break;
-                        //}
-
                         yield return obj;
                         break;
                     }
@@ -200,6 +209,8 @@ public class StrategyAI : MonoBehaviour
                     tasksEnumerators[i].Add(tasks[i][j].Execute(bb));
                 }
             }
+
+            //Debug.Log(Time.time + " : ========== Reevaluation ==========");
 
             float lastPriorityUpdate = Time.time;
 

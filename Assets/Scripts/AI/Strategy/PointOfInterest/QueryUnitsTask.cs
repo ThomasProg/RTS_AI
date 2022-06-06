@@ -12,13 +12,16 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     // Removed from the travel time of a unit if the unit was already on this point of interest 
     public float persistency = 0f;
 
-    public float timeToLeadSquadToPoI = 0.1f;
+    public float timeToLeadSquadToPoI = 0.0f;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
         int nbUnitsBeingCreated;
         do
         {
+
+            //Debug.Log(Time.time + " : ========== Query Units ==========");
+
             // We can't delete or search items, but we can have multiple items with the same key
             SortedList<float, System.Object> unitsSources = new SortedList<float, System.Object>(Comparer<float>.Create((float f1, float f2) =>
             {
@@ -74,7 +77,13 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                         GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI,
                             pointOfInterest.position - factory.Size * factoryToPoI) / data.Speed;
 
-                    float time = pathLength + data.Cost;
+                    float previousUnitsBuildDuration = 0f;
+                    for (int i = 0; i < factory.GetQueuedCount(0); i++) // TODO : Do that for each unit
+                    {
+                        previousUnitsBuildDuration += factory.GetBuildableUnitData(0).BuildDuration;
+                    }
+
+                    float time = pathLength + data.Cost + previousUnitsBuildDuration;
                     unitsSources.Add(time, factory);
                 }
             }
@@ -153,6 +162,8 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
                     squad.PointOfInterest = null;
                 }
+
+                yield return null;
             }
             else
             {
@@ -169,7 +180,8 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                 yield return new WaitForSeconds(timeToLeadSquadToPoI);
             }
 
-            yield return null;
+            if (nbUnitsBeingCreated != 0)
+                yield return null;
         } while (nbUnitsBeingCreated != 0);
 
         yield break;
