@@ -104,10 +104,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                             nbUnitsBeingCreated++;
                             break;
                     }
-                }
 
-                if (currentStrength >= strengthRequired)
-                    break;
+                    if (currentStrength >= strengthRequired)
+                        break;
+                }
             }
             else
             {

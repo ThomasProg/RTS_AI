@@ -206,7 +206,6 @@ public class StrategyAI : MonoBehaviour
                 if (!enumerator.MoveNext())
                     break;
 
-                //yield return new WaitForSeconds(0.1f);
                 yield return enumerator.Current;
             }
         }
