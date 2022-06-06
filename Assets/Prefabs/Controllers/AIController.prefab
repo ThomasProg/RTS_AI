@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 580627816653263432}
   - component: {fileID: 7859672622032877473}
   - component: {fileID: 5206995088221600700}
+  - component: {fileID: 6714351295713009865}
   m_Layer: 0
   m_Name: AIController
   m_TagString: Untagged
@@ -46,6 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Team: 1
   StartingBuildPoints: 15
+  allCapturePoints: []
+  strategyAI: {fileID: 0}
 --- !u!114 &5206995088221600700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56,5 +59,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a204ea7f6de5e94ab3a7e6a68b1967c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectiveData: {fileID: 11400000, guid: 241f29dcb09ca4e458a6cc527bbe110c, type: 2}
+  subjectiveData: {fileID: 11400000, guid: 20a994df6bbf10243980c774756e46c3, type: 2}
+  objectiveUtilitySystem:
+    _inputs: []
+    _outputs: []
+  subjectiveUtilitySystem:
+    _inputs: []
+    _outputs: []
+  squadManager: {fileID: 0}
+  controller: {fileID: 0}
+--- !u!114 &6714351295713009865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6399179960504004712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 864dc1dfd126c404894a2746c35304bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

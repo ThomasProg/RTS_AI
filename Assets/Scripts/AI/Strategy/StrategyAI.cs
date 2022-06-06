@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UtilitySystem;
+using UtilitySystemPackage;
 
 [RequireComponent(typeof(SquadManager))]
 public class StrategyAI : MonoBehaviour
@@ -27,21 +27,27 @@ public class StrategyAI : MonoBehaviour
         public TargetBuilding[] EnemyUnits => throw new NotImplementedException();
         public TargetBuilding[] EnemySquads => throw new NotImplementedException();
     }
-    
-    UtilitySystem.UtilitySystem objectif;
-    UtilitySystem.UtilitySystem subjectif;
+
+    public UtilitySystemData objectiveData;
+    public UtilitySystemData subjectiveData;
+
+    public UtilitySystem objectiveUtilitySystem = new UtilitySystem();
+    public UtilitySystem subjectiveUtilitySystem = new UtilitySystem();
 
     public SquadManager squadManager;
     public AIController controller;
 
     float priorityEvaluationDelay = 5;
-    
+
     public Blackboard bb { get; private set; } = null;
-    
+
     private void Awake()
     {
         squadManager = GetComponent<SquadManager>();
         bb = new Blackboard(controller, squadManager);
+
+        objectiveUtilitySystem.Init(objectiveData);
+        subjectiveUtilitySystem.Init(subjectiveData);
         //priorityTaskRunner.blackboard = bb;
     }
 
@@ -51,8 +57,8 @@ public class StrategyAI : MonoBehaviour
         AddTactic(factoryPoI);
         factory.OnDeadEvent += current => AllPointOfInterests.Remove(factoryPoI);
     }
-    
-    void CreateSqaudPoI(Squad squad)
+
+    void CreateSquadPoI(Squad squad)
     {
         SquadPoI newSquadPoI = new SquadPoI(squad) {stratAI = this, squadManager = squadManager};
         AddTactic(newSquadPoI);
@@ -76,13 +82,14 @@ public class StrategyAI : MonoBehaviour
         {
             CreateFactoryPoI(factory);
         }
-        
+
         AddTactic(new ConstructFactoryPoI() {stratAI = this, squadManager = squadManager});
-        
+
         StartCoroutine(UpdateInterests());
-        
+
         GameServices.GetPlayerController().OnCreateFactory += CreateFactoryPoI;
-        controller.OnCreateFactory += CreateFactoryPoI;; 
+        controller.OnCreateFactory += CreateFactoryPoI;
+        ;
     }
 
     void AddTactic(PointOfInterest pointOfInterest)
@@ -100,6 +107,18 @@ public class StrategyAI : MonoBehaviour
     {
         while (true)
         {
+            objectiveUtilitySystem.Update();
+            var utilities = objectiveUtilitySystem.GetUtilities();
+
+            var dict = new Dictionary<string, float>();
+            foreach (var utility in utilities)
+            {
+                dict[utility.Name] = utility.Value;
+            }
+
+            subjectiveUtilitySystem.UpdateStats(dict, true);
+            subjectiveUtilitySystem.Update();
+
             for (int i = 0; i < tasksEnumerators.Count; i++)
             {
                 for (int j = 0; j < tasksEnumerators[i].Count; j++)
@@ -130,7 +149,6 @@ public class StrategyAI : MonoBehaviour
     }
 
 
-
     // Update is called once per frame
     IEnumerator UpdateInterests()
     {
@@ -148,13 +166,14 @@ public class StrategyAI : MonoBehaviour
                 // Add squad to PoI list
                 foreach (Squad squad in controller.PlayerSquads)
                 {
-                    CreateSqaudPoI(squad);
+                    CreateSquadPoI(squad);
                 }
             }
 
             foreach (var poi in AllPointOfInterests)
             {
                 poi.EvaluatePriority(bb);
+                yield return null;
                 // wait for seconds
             }
 
@@ -163,7 +182,8 @@ public class StrategyAI : MonoBehaviour
             AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
                 -a.priority.CompareTo(b.priority));
 
-            List<List<IPOITask<StrategyAI.Blackboard>>> tasks = new List<List<IPOITask<StrategyAI.Blackboard>>>(AllPointOfInterestsByPriority.Count);
+            List<List<IPOITask<StrategyAI.Blackboard>>> tasks =
+                new List<List<IPOITask<StrategyAI.Blackboard>>>(AllPointOfInterestsByPriority.Count);
             List<List<IEnumerator>> tasksEnumerators = new List<List<IEnumerator>>(AllPointOfInterestsByPriority.Count);
             for (int i = 0; i < AllPointOfInterestsByPriority.Count; i++)
             {
@@ -186,12 +206,9 @@ public class StrategyAI : MonoBehaviour
                 if (!enumerator.MoveNext())
                     break;
 
+                //yield return new WaitForSeconds(0.1f);
                 yield return enumerator.Current;
             }
         }
-
-
     }
-
-
 }
