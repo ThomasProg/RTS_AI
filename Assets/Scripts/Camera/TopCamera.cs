@@ -23,6 +23,8 @@ public class TopCamera : MonoBehaviour
     Terrain SceneTerrain = null;
     Vector3 TerrainSize = Vector3.zero;
 
+    private Camera Camera;
+
     #region Camera movement methods
     public void Zoom(float value)
     {
@@ -83,23 +85,42 @@ public class TopCamera : MonoBehaviour
     #endregion
 
     #region MonoBehaviour methods
-    void Start()
+    void OnEnable()
     {
         TerrainSize = GameServices.GetTerrainSize();
+        Camera = GetComponent<Camera>();
     }
     void Update()
     {
         if (Move != Vector3.zero)
         {
-            transform.position += Move;
-            if (EnableMoveLimits)
+            if (Camera.orthographic)
             {
-                // Clamp camera position (max height, terrain bounds)
-                Vector3 newPos = transform.position;
-                newPos.x = Mathf.Clamp(transform.position.x, TerrainBorder, TerrainSize.x - TerrainBorder);
-                newPos.y = Mathf.Clamp(transform.position.y, MinHeight, MaxHeight);
-                newPos.z = Mathf.Clamp(transform.position.z, TerrainBorder, TerrainSize.z - TerrainBorder);
-                transform.position = newPos;
+                transform.position += new Vector3(Move.x, 0f, Move.z);
+                Camera.orthographicSize += Move.y;
+                
+                if (EnableMoveLimits)
+                {
+                    // Clamp camera position (max height, terrain bounds)
+                    Vector3 newPos = transform.position;
+                    newPos.x = Mathf.Clamp(transform.position.x, TerrainBorder, TerrainSize.x - TerrainBorder);
+                    Camera.orthographicSize = Mathf.Clamp(Camera.orthographicSize, MinHeight, MaxHeight);
+                    newPos.z = Mathf.Clamp(transform.position.z, TerrainBorder, TerrainSize.z - TerrainBorder);
+                    transform.position = newPos;
+                }
+            }
+            else
+            {
+                transform.position += Move;
+                if (EnableMoveLimits)
+                {
+                    // Clamp camera position (max height, terrain bounds)
+                    Vector3 newPos = transform.position;
+                    newPos.x = Mathf.Clamp(transform.position.x, TerrainBorder, TerrainSize.x - TerrainBorder);
+                    newPos.y = Mathf.Clamp(transform.position.y, MinHeight, MaxHeight);
+                    newPos.z = Mathf.Clamp(transform.position.z, TerrainBorder, TerrainSize.z - TerrainBorder);
+                    transform.position = newPos;
+                }
             }
         }
 

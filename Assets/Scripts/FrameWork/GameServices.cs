@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FogOfWarPackage;
 using InfluenceMapPackage;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UtilitySystemPackage;
 using Random = System.Random;
@@ -105,7 +107,14 @@ public class GameServices : MonoBehaviour
     PlayerController playerController;
     TargetBuilding[] TargetBuildingArray;
     GameState CurrentGameState = null;
-    [SerializeField] private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
+
+    private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
+    private TerrainFogOfWar[] m_teamFogOfWar = new TerrainFogOfWar[(int) ETeam.TeamCount];
+    private List<MeshRenderer>[] m_teamsUnitsRenderer = new List<MeshRenderer>[(int) ETeam.TeamCount];
+
+    [SerializeField] ForwardRendererData m_rendererData;
+    private PostProcessFogOfWarFeature m_fowFeature;
+    
 
     Terrain CurrentTerrain = null;
     Bounds PlayableBounds;
@@ -156,6 +165,11 @@ public class GameServices : MonoBehaviour
     public TerrainInfluenceMap GetInfluenceMap(ETeam team)
     {
         return m_teamInfluenceMap[(int) team];
+    }
+    
+    public TerrainFogOfWar GetFogOfWar(ETeam team)
+    {
+        return m_teamFogOfWar[(int) team];
     }
 
     public static TargetBuilding[] GetTargetBuildings()
@@ -237,16 +251,50 @@ public class GameServices : MonoBehaviour
     ///}
     /// </example>
     /// <param name="team"></param>
-    public void RegisterUnit(ETeam team, IInfluencer unit)
+    public void RegisterUnit(ETeam team, BaseEntity entity)
     {
         if (m_teamInfluenceMap[(int) team] != null)
         {
-            m_teamInfluenceMap[(int) team].RegisterEntity(unit);
+            m_teamInfluenceMap[(int) team].RegisterEntity(entity);
         }
         else
         {
             Debug.LogWarning($"Influence map {(int) team} does not exist");
         }
+        
+        if (m_teamFogOfWar[(int) team] != null)
+        {
+            m_teamFogOfWar[(int) team].RegisterEntity(entity);
+        }
+        else
+        {
+            Debug.LogWarning($"Fog of war map {(int) team} does not exist");
+        }
+        
+        m_teamsUnitsRenderer[(int) team].Add(entity.GetComponentInChildren<MeshRenderer>());
+    }
+    
+    public void RegisterUnit(ETeam team, TargetBuilding entity)
+    {
+        if (m_teamInfluenceMap[(int) team] != null)
+        {
+            m_teamInfluenceMap[(int) team].RegisterEntity(entity);
+        }
+        else
+        {
+            Debug.LogWarning($"Influence map {(int) team} does not exist");
+        }
+        
+        if (m_teamFogOfWar[(int) team] != null)
+        {
+            m_teamFogOfWar[(int) team].RegisterEntity(entity);
+        }
+        else
+        {
+            Debug.LogWarning($"Fog of war map {(int) team} does not exist");
+        }
+        
+        m_teamsUnitsRenderer[(int) team].Remove(entity.GetComponentInChildren<MeshRenderer>());
     }
 
     /// <summary>
@@ -260,9 +308,16 @@ public class GameServices : MonoBehaviour
     ///}
     /// </example>
     /// <param name="team"></param>
-    public void UnregisterUnit(ETeam team, IInfluencer unit)
+    public void UnregisterUnit(ETeam team, BaseEntity entity)
     {
-        m_teamInfluenceMap[(int) team]?.UnregisterEntity(unit);
+        m_teamInfluenceMap[(int) team]?.UnregisterEntity(entity);
+        m_teamFogOfWar[(int) team]?.UnregisterEntity(entity);
+    }
+    
+    public void UnregisterUnit(ETeam team, TargetBuilding entity)
+    {
+        m_teamInfluenceMap[(int) team]?.UnregisterEntity(entity);
+        m_teamFogOfWar[(int) team]?.UnregisterEntity(entity);
     }
 
     #region MonoBehaviour methods
@@ -283,6 +338,8 @@ public class GameServices : MonoBehaviour
 
         // Store TargetBuildings
         TargetBuildingArray = FindObjectsOfType<TargetBuilding>();
+        m_teamInfluenceMap = FindObjectsOfType<TerrainInfluenceMap>();
+        m_teamFogOfWar = FindObjectsOfType<TerrainFogOfWar>();
 
         // Store GameState ref
         if (CurrentGameState == null)
@@ -316,10 +373,23 @@ public class GameServices : MonoBehaviour
                 new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) -
                 clampedOne * NonPlayableBorder / 2f);
         }
+        
+        m_fowFeature = m_rendererData.rendererFeatures.OfType<PostProcessFogOfWarFeature>().FirstOrDefault();
+     
+        if (m_fowFeature == null)
+            return;
+         
+        m_fowFeature.settings.terrainFogOfWars = new []{m_teamFogOfWar[(int)GetPlayerController().Team]};
+        m_rendererData.SetDirty();
+        
+        m_teamsUnitsRenderer[0] = new List<MeshRenderer>();
+        m_teamsUnitsRenderer[1] = new List<MeshRenderer>();
     }
 
     private void Update()
     {
+        UpdateHiddenObject();
+        
 #if UNITY_EDITOR
         if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
         {
@@ -352,6 +422,24 @@ public class GameServices : MonoBehaviour
                 debug.barycenter.redBarycenterInstance.transform.position.y, redBarycenter.y);
         }
 #endif
+    }
+
+    void UpdateHiddenObject()
+    {
+        TerrainFogOfWar terrainFogOfWar = m_teamFogOfWar[(int) GetPlayerController().Team];
+   
+        Color[] colors1 = terrainFogOfWar.GetDatas();
+        
+        foreach (MeshRenderer unitsRenderer in m_teamsUnitsRenderer[(int) GetAIController().Team])
+        {
+            Vector3 position = unitsRenderer.transform.position;
+            float x = (position.x - terrainFogOfWar.Terrain.GetPosition().x) / (float)terrainFogOfWar.Terrain
+                .terrainData.size.x * (terrainFogOfWar.RenderTexture.width - 1);
+            float y = (position.z - terrainFogOfWar.Terrain.GetPosition().z) / (float)terrainFogOfWar.Terrain
+                .terrainData.size.z * (terrainFogOfWar.RenderTexture.height - 1);
+        
+            unitsRenderer.enabled = colors1[((int)x + (int)y * terrainFogOfWar.RenderTexture.width)].r > 0.5f;
+        }
     }
 
     private void OnDrawGizmos()

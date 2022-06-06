@@ -1701,6 +1701,7 @@ GameObject:
   - component: {fileID: 1776657145}
   - component: {fileID: 1776657148}
   - component: {fileID: 1776657147}
+  - component: {fileID: 1776657149}
   m_Layer: 8
   m_Name: Terrain
   m_TagString: Untagged
@@ -1854,6 +1855,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shader: {fileID: 7200000, guid: ee0b846ebcd601445a8da9e9303f5006, type: 3}
   resolution: 7
+  lowPrescision: 1
+  m_drawDebug: 0
+--- !u!114 &1776657149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776657141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 775d0091b2a336245980dce68792b76a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 2b07c0bbef7ec0b4ba96d3d8cc927376, type: 3}
+  resolution: 8
   lowPrescision: 1
   m_drawDebug: 0
 --- !u!4 &1824300080 stripped
@@ -2224,6 +2241,11 @@ PrefabInstance:
       objectReference: {fileID: 1776657147}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: debug.poiDebugger.displayPriorities
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: debug.barycenter.redBarycenterPrefab
       value: 
       objectReference: {fileID: 3703286143503639579, guid: e12936fd818f81040b989457e3c4ff37,
@@ -2242,8 +2264,23 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: debug.poiDebugger.displayStrengthRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: debug.targetAnalysis.targetStatisticRadius
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: debug.utilitySystemDebug.displayUtilitySystem
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: debug.aiSquadDecisionPrevision.display3MainObjectif
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4669120816251285810, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}

@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using FogOfWarPackage;
 using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TargetBuilding : MonoBehaviour, IInfluencer
+public class TargetBuilding : MonoBehaviour, IInfluencer, IFogOfWarEntity
 {
     [SerializeField]
     float CaptureGaugeStart = 100f;
@@ -156,5 +157,20 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
             Gizmos.DrawWireSphere(transform.position + Vector3.up, gameServices.debug.targetAnalysis.targetStatisticRadius);
         }
 #endif
+    }
+
+    public Vector2 GetVisibilityPosition()
+    {
+        return GetInfluencePosition();
+    }
+
+    public float GetVisibilityRadius()
+    {
+        return GetInfluenceRadius();
+    }
+
+    public float GetPermanentVisibilityRadius()
+    {
+        return GetInfluenceRadius() * 1.5f;
     }
 }
