@@ -50,10 +50,11 @@ public class ConstructFactoryPoI : PointOfInterest
         float costRatio = point / (float)aiController.Factories[0].GetBuildableFactoryData(factoryToBuildID).Cost;
         
         // Apply priority only if position to build factory is found
-        if (EvaluateFactoryBuildPosition(out position, factoryToBuildID))
+        float costRatioAcceptance = 1 + stratAI.subjectiveUtilitySystem.GetStat("Patience").Value;
+        if (EvaluateFactoryBuildPosition(out position, factoryToBuildID) && costRatio > costRatioAcceptance)
         {
             // More a squad is farthest from factory and more money we have, more we wan't to create factory
-            priority = costRatio > 1.5f ? costRatio * Mathf.Sqrt(sqrtDistfarthestSquad) : 0;
+            priority = costRatio * Mathf.Sqrt(sqrtDistfarthestSquad);
         }
         else
         {
@@ -86,6 +87,7 @@ public class ConstructFactoryPoI : PointOfInterest
         FactoryDataScriptable factoryData = controllerFactory.GetBuildableFactoryData(factoryIndex);
         Vector2 buildPos = farthestSquad.GetInfluencePosition() - (Mathf.Sqrt(farthestSquad.GetInfluenceRadius()) + factoryData.SpawnRadius) * Vector2.down;
         
+        // Iterate on a circle to find best position
         bool isPosFound = false;
         for (int i = 0; i < maxIteration && !isPosFound; i++)
         {

@@ -28,8 +28,8 @@ public class StrategyAI : MonoBehaviour
         public TargetBuilding[] EnemySquads => throw new NotImplementedException();
     }
 
-    public UtilitySystemData objectiveData;
-    public UtilitySystemData subjectiveData;
+    [SerializeField] private UtilitySystemData objectiveData;
+    [SerializeField] private UtilitySystemData subjectiveData;
 
     public UtilitySystem objectiveUtilitySystem = new UtilitySystem();
     public UtilitySystem subjectiveUtilitySystem = new UtilitySystem();
@@ -48,6 +48,7 @@ public class StrategyAI : MonoBehaviour
 
         objectiveUtilitySystem.Init(objectiveData);
         subjectiveUtilitySystem.Init(subjectiveData);
+
         //priorityTaskRunner.blackboard = bb;
     }
 
@@ -111,7 +112,7 @@ public class StrategyAI : MonoBehaviour
             var utilities = objectiveUtilitySystem.GetUtilities();
 
             var dict = new Dictionary<string, float>();
-            foreach (var utility in utilities)
+            foreach (var utility in utilities.Values)
             {
                 dict[utility.Name] = utility.Value;
             }
