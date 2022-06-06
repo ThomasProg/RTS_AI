@@ -49,10 +49,10 @@ public class StrategyAI : MonoBehaviour
         objectiveUtilitySystem.Init(objectiveData);
         subjectiveUtilitySystem.Init(subjectiveData);
         
-        subjectiveUtilitySystem.SetStat("InformationNeed", 0.5f);
-        subjectiveUtilitySystem.SetStat("Aggressivity", 0.5f);
-        subjectiveUtilitySystem.SetStat("Patience", 0.5f);
-        subjectiveUtilitySystem.SetStat("Cupidity", 0.5f);
+        subjectiveUtilitySystem.SetStat("InformationNeed", UnityEngine.Random.Range(0.1f, 0.9f));
+        subjectiveUtilitySystem.SetStat("Aggressivity", UnityEngine.Random.Range(0.1f, 0.9f));
+        subjectiveUtilitySystem.SetStat("Patience", UnityEngine.Random.Range(0.1f, 0.9f));
+        subjectiveUtilitySystem.SetStat("Cupidity", UnityEngine.Random.Range(0.1f, 0.9f));
 
         //priorityTaskRunner.blackboard = bb;
     }
