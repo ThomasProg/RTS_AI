@@ -75,7 +75,7 @@ public class FactoryPoI : PointOfInterest
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
         {
-            priority = 0f;
+            priority = stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value;
         }
         else
         {

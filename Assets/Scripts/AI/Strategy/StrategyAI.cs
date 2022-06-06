@@ -48,6 +48,11 @@ public class StrategyAI : MonoBehaviour
 
         objectiveUtilitySystem.Init(objectiveData);
         subjectiveUtilitySystem.Init(subjectiveData);
+        
+        subjectiveUtilitySystem.SetStat("InformationNeed", 0.5f);
+        subjectiveUtilitySystem.SetStat("Aggressivity", 0.5f);
+        subjectiveUtilitySystem.SetStat("Patience", 0.5f);
+        subjectiveUtilitySystem.SetStat("Cupidity", 0.5f);
 
         //priorityTaskRunner.blackboard = bb;
     }
