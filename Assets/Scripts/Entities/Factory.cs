@@ -178,9 +178,12 @@ public sealed class Factory : BaseEntity
     #endregion
 
     #region Unit building methods
+
+    public int UnitPrefabsCount => UnitPrefabs.Length;
+    
     bool IsUnitIndexValid(int unitIndex)
     {
-        if (unitIndex < 0 || unitIndex >= UnitPrefabs.Length)
+        if (unitIndex < 0 || unitIndex >= UnitPrefabsCount)
         {
             Debug.LogWarning("Wrong unitIndex " + unitIndex);
             return false;

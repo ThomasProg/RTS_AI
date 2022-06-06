@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = System.Random;
 
 public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 {
@@ -41,10 +42,19 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     }
                 }
             }
-
+            
+            UnitController aiController = GameServices.GetAIController();
+            Dictionary<Factory, int> factoryWithUnitToBuild = new Dictionary<Factory, int>();
+            
             foreach (Factory factory in blackboard.AllyFactories)
             {
-                int unitMenuIndex = EvaluateUnitToBuild(factory, pointOfInterest);
+                int unitMenuIndex = EvaluateUnitToBuild(aiController, factory, pointOfInterest);
+                
+                if (unitMenuIndex == -1)
+                    continue;
+
+                factoryWithUnitToBuild.Add(factory, unitMenuIndex);
+                
                 int cost = factory.GetUnitCost(unitMenuIndex);
                 if (factory.CanRequestUnit(cost))
                 {
@@ -67,7 +77,6 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                 }
             }
 
-            //List<Squad> newSquads = new List<Squad>();
             List<Unit> newUnits = new List<Unit>();
             float currentStrength = 0;
             nbUnitsBeingCreated = 0;
@@ -88,12 +97,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                             break;
 
                         case Factory factory:
-                            //factory.RequestUnitBuild(EvaluateUnitToBuild(factory, pointOfInterest));
-                            //Queue<PointOfInterest> queue = blackboard.squadManager.newUnitsPoI[factory];
-                            blackboard.squadManager.RequestUnit(factory, EvaluateUnitToBuild(factory, pointOfInterest),
-                                pointOfInterest);
+                            blackboard.squadManager.RequestUnit(factory, factoryWithUnitToBuild[factory], pointOfInterest);
 
-                            currentStrength += 1;
+                            currentStrength += factory.GetUnitCost(factoryWithUnitToBuild[factory]);
                             nbUnitsBeingCreated++;
                             break;
                     }
@@ -146,9 +152,31 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         yield break;
     }
 
-    int EvaluateUnitToBuild(Factory factory, PointOfInterest poi)
+    int EvaluateUnitToBuild(UnitController controller, Factory factory, PointOfInterest poi)
     {
-        // TODO:
-        return 0;
+        List<UnitDataScriptable> unitDatas = new List<UnitDataScriptable>(factory.UnitPrefabsCount);
+
+        for (int i = 0; i < factory.UnitPrefabsCount; i++)
+        {
+            unitDatas.Add(factory.GetBuildableUnitData(i));
+        }
+
+        // The first approach is to build random unity if we can
+        int unitIndex = -1;
+        do
+        {
+            if (unitIndex != -1)
+            {
+                unitDatas.RemoveAt(unitIndex);
+                
+                if (unitDatas.Count == 0)
+                    return -1; // Error
+            }
+
+            unitIndex = UnityEngine.Random.Range(0, unitDatas.Count);
+
+        } while (unitDatas[unitIndex].Cost > controller.TotalBuildPoints); // While we can't buy this unit, try another
+        
+        return unitIndex;
     }
 }
