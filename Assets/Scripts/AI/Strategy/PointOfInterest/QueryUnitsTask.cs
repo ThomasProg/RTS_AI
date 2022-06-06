@@ -10,7 +10,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
     public float strengthRequired = 3;
     // Removed from the travel time of a unit if the unit was already on this point of interest 
-    public float persistency = 0f; 
+    public float persistency = 0f;
+
+    public float timeToLeadSquadToPoI = 0.7f;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
@@ -163,9 +165,11 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
                     squad.PointOfInterest = pointOfInterest;
                 }
+
+                yield return new WaitForSeconds(timeToLeadSquadToPoI);
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return null;
         } while (nbUnitsBeingCreated != 0);
 
         yield break;

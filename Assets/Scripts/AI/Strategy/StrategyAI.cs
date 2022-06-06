@@ -136,7 +136,7 @@ public class StrategyAI : MonoBehaviour
                         //    //yield break;
                         //}
 
-                        yield return null;
+                        yield return obj;
                         break;
                     }
                 }
