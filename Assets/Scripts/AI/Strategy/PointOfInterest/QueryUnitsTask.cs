@@ -98,10 +98,13 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                             break;
 
                         case Factory factory:
-                            blackboard.squadManager.RequestUnit(factory, factoryWithUnitToBuild[factory], pointOfInterest);
+                            bool isUnitBeingBuilt = blackboard.squadManager.RequestUnit(factory, factoryWithUnitToBuild[factory], pointOfInterest);
 
-                            currentStrength += factory.GetUnitCost(factoryWithUnitToBuild[factory]);
-                            nbUnitsBeingCreated++;
+                            if (isUnitBeingBuilt)
+                            {
+                                currentStrength += factory.GetUnitCost(factoryWithUnitToBuild[factory]);
+                                nbUnitsBeingCreated++;
+                            }
                             break;
                     }
 
@@ -137,17 +140,32 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
             blackboard.squadManager.RegisterSquads(newSquads);
 
-            foreach (Squad squad in newSquads)
+            if (currentStrength < strengthRequired)
             {
-                if (squad.IsPartiallyIdle)
+                foreach (Squad squad in newSquads)
                 {
-                    squad.Stop();
-                }
+                    if (squad.IsPartiallyIdle)
+                    {
+                        squad.Stop();
+                    }
 
-                squad.PointOfInterest = pointOfInterest;
+                    squad.PointOfInterest = null;
+                }
+            }
+            else
+            {
+                foreach (Squad squad in newSquads)
+                {
+                    if (squad.IsPartiallyIdle)
+                    {
+                        squad.Stop();
+                    }
+
+                    squad.PointOfInterest = pointOfInterest;
+                }
             }
 
-            yield return null;
+            yield return new WaitForSeconds(1f);
         } while (nbUnitsBeingCreated != 0);
 
         yield break;
