@@ -52,7 +52,7 @@ public class StrategyAI : MonoBehaviour
         factory.OnDeadEvent += current => AllPointOfInterests.Remove(factoryPoI);
     }
     
-    void CreateSqaudPoI(Squad squad)
+    void CreateSquadPoI(Squad squad)
     {
         SquadPoI newSquadPoI = new SquadPoI(squad) {stratAI = this, squadManager = squadManager};
         AddTactic(newSquadPoI);
@@ -148,13 +148,14 @@ public class StrategyAI : MonoBehaviour
                 // Add squad to PoI list
                 foreach (Squad squad in controller.PlayerSquads)
                 {
-                    CreateSqaudPoI(squad);
+                    CreateSquadPoI(squad);
                 }
             }
 
             foreach (var poi in AllPointOfInterests)
             {
                 poi.EvaluatePriority(bb);
+                yield return null;
                 // wait for seconds
             }
 
@@ -186,6 +187,7 @@ public class StrategyAI : MonoBehaviour
                 if (!enumerator.MoveNext())
                     break;
 
+                //yield return new WaitForSeconds(0.1f);
                 yield return enumerator.Current;
             }
         }
