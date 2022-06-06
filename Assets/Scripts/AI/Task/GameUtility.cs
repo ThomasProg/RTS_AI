@@ -324,18 +324,18 @@ public static class GameUtility
     /// <returns></returns>
     public static List<EnemySquadPotentialObjectives> EvaluateEnemySquadObjective(AIController ai, PlayerController player, float radiusErrorCoef)
     {
-        Squad[] squadsAI = ai.Squads;
         Squad[] squadsPlayer = ai.PlayerSquads;
+        Squad[] squadsAI = ai.Squads;
         
         TargetBuilding[] targetBuildings = GameServices.GetTargetBuildings();
         
-        Factory[] factoriesCurrent = ai.Factories;
-        Factory[] factoriesEnemy = player.Factories;
+        Factory[] factoriesPlayer = player.Factories;
+        Factory[] factoriesAI = ai.Factories;
 
         List<EnemySquadPotentialObjectives> squadsObjective = new List<EnemySquadPotentialObjectives>();
         
         // Need to compare squad distance with enemy squad, building and target building. 
-        foreach (Squad squad in squadsAI)
+        foreach (Squad squad in squadsPlayer)
         {
             EnemySquadPotentialObjectives squadPotentialObjectives = new EnemySquadPotentialObjectives();
             squadPotentialObjectives.objectives = new List<SquadObjective>();
@@ -343,10 +343,10 @@ public static class GameUtility
             
             float squadSqrInfluenceRadius = squad.GetSqrInfluenceRadius();
 
-            ProcessObjective(radiusErrorCoef, targetBuildings, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.CaptureTargetBuilding);
-            ProcessObjective(radiusErrorCoef, factoriesCurrent, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.ProtectFactory);
-            ProcessObjective(radiusErrorCoef, factoriesEnemy, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.AttackFactory);
-            ProcessObjective(radiusErrorCoef, squadsPlayer, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.AttackSquad);
+            ProcessObjective(radiusErrorCoef, targetBuildings, squad, squadSqrInfluenceRadius, squadsPlayer, squadsAI, ref squadPotentialObjectives, EObjectiveType.CaptureTargetBuilding);
+            ProcessObjective(radiusErrorCoef, factoriesPlayer, squad, squadSqrInfluenceRadius, squadsPlayer, squadsAI, ref squadPotentialObjectives, EObjectiveType.ProtectFactory);
+            ProcessObjective(radiusErrorCoef, factoriesAI, squad, squadSqrInfluenceRadius, squadsPlayer, squadsAI, ref squadPotentialObjectives, EObjectiveType.AttackFactory);
+            ProcessObjective(radiusErrorCoef, squadsAI, squad, squadSqrInfluenceRadius, squadsPlayer, squadsAI, ref squadPotentialObjectives, EObjectiveType.AttackSquad);
             
             squadsObjective.Add(squadPotentialObjectives);
         }
