@@ -53,7 +53,7 @@ public class CapturePointPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1.1f, 0.5f);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
@@ -133,7 +133,7 @@ public class CapturePointPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetPlayerController().GetTeam() , 10f, 1.1f, 0.5f);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1.1f, 0.5f);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;

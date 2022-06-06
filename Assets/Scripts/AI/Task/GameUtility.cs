@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using InfluenceMapPackage;
 using UnityEngine;
@@ -253,23 +254,18 @@ public static class GameUtility
     /// </summary>
     /// <param name="poi"></param>
     /// <param name="enemyTeam"></param>
-    /// <param name="groupDistance"></param>
     /// <param name="radiusErrorCoef"></param>
     /// <param name="objectifFilterPrirotiy">This value is used to filter priority of the current objectif</param>
     /// <returns></returns>
-    public static List<POITargetByEnemySquad> GetPOITargetByEnemySquad(PointOfInterest poi, ETeam enemyTeam, float groupDistance, float radiusErrorCoef, float objectifFilterPrirotiy)
+    public static List<POITargetByEnemySquad> GetPOITargetByEnemySquad(PointOfInterest poi, AIController ai, PlayerController playerController, float radiusErrorCoef, float objectifFilterPrirotiy)
     {
         List<POITargetByEnemySquad> rst = new List<POITargetByEnemySquad>();
-        List<EnemySquadPotentialObjectives> enemySquadsObjectives = EvaluateEnemySquadObjective(enemyTeam, groupDistance, radiusErrorCoef);
+        List<EnemySquadPotentialObjectives> enemySquadsObjectives = EvaluateEnemySquadObjective(ai, playerController, radiusErrorCoef);
 
         foreach (EnemySquadPotentialObjectives enemySquadObjectives in enemySquadsObjectives)
         {
-            float efficiencyTotal = 0f;
-            foreach (SquadObjective objective in enemySquadObjectives.objectives)
-            {
-                efficiencyTotal += objective.GetStrategyEffectivity();
-            }
-            
+            float efficiencyTotal = enemySquadObjectives.objectives.Sum(objective => objective.GetStrategyEffectivity());
+
             foreach (SquadObjective objective in enemySquadObjectives.objectives)
             {
                 float priority = objective.GetStrategyEffectivity() / efficiencyTotal;
@@ -326,23 +322,20 @@ public static class GameUtility
     /// <param name="groupDistance">The distance used to evaluate squads</param>
     /// <param name="radiusErrorCoef"></param>
     /// <returns></returns>
-    public static List<EnemySquadPotentialObjectives> EvaluateEnemySquadObjective(ETeam enemyTeam, float groupDistance, float radiusErrorCoef)
+    public static List<EnemySquadPotentialObjectives> EvaluateEnemySquadObjective(AIController ai, PlayerController player, float radiusErrorCoef)
     {
-        UnitController controllerCurrent = GameServices.GetControllerByTeam(enemyTeam);
-        UnitController controllerEnemy = GameServices.GetControllerByTeam(enemyTeam == ETeam.Blue ? ETeam.Red : ETeam.Blue);
-        
-        List<Squad> squadsCurrent = Squad.MakeSquadsDependingOnDistance(controllerCurrent.Units, groupDistance);
-        List<Squad> squadsEnemy = Squad.MakeSquadsDependingOnDistance(controllerEnemy.Units, groupDistance);
+        Squad[] squadsAI = ai.Squads;
+        Squad[] squadsPlayer = ai.PlayerSquads;
         
         TargetBuilding[] targetBuildings = GameServices.GetTargetBuildings();
         
-        Factory[] factoriesCurrent = controllerCurrent.Factories;
-        Factory[] factoriesEnemy = controllerEnemy.Factories;
+        Factory[] factoriesCurrent = ai.Factories;
+        Factory[] factoriesEnemy = player.Factories;
 
         List<EnemySquadPotentialObjectives> squadsObjective = new List<EnemySquadPotentialObjectives>();
         
         // Need to compare squad distance with enemy squad, building and target building. 
-        foreach (Squad squad in squadsCurrent)
+        foreach (Squad squad in squadsAI)
         {
             EnemySquadPotentialObjectives squadPotentialObjectives = new EnemySquadPotentialObjectives();
             squadPotentialObjectives.objectives = new List<SquadObjective>();
@@ -350,10 +343,10 @@ public static class GameUtility
             
             float squadSqrInfluenceRadius = squad.GetSqrInfluenceRadius();
 
-            ProcessObjective(radiusErrorCoef, targetBuildings, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.CaptureTargetBuilding);
-            ProcessObjective(radiusErrorCoef, factoriesCurrent, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.ProtectFactory);
-            ProcessObjective(radiusErrorCoef, factoriesEnemy, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.AttackFactory);
-            ProcessObjective(radiusErrorCoef, squadsEnemy, squad, squadSqrInfluenceRadius, squadsCurrent, squadsEnemy, ref squadPotentialObjectives, EObjectiveType.AttackSquad);
+            ProcessObjective(radiusErrorCoef, targetBuildings, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.CaptureTargetBuilding);
+            ProcessObjective(radiusErrorCoef, factoriesCurrent, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.ProtectFactory);
+            ProcessObjective(radiusErrorCoef, factoriesEnemy, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.AttackFactory);
+            ProcessObjective(radiusErrorCoef, squadsPlayer, squad, squadSqrInfluenceRadius, squadsAI, squadsPlayer, ref squadPotentialObjectives, EObjectiveType.AttackSquad);
             
             squadsObjective.Add(squadPotentialObjectives);
         }
@@ -362,7 +355,7 @@ public static class GameUtility
     }
 
     internal static void ProcessObjective<T>(float radiusErrorCoef, IEnumerable<T> influencers, Squad squad,
-        float squadSqrInfluenceRadius, List<Squad> squadsCurrent, List<Squad> squadsEnemy, ref EnemySquadPotentialObjectives squadPotentialObjectives, EObjectiveType type) where T : IInfluencer
+        float squadSqrInfluenceRadius, IEnumerable squadsCurrent, IEnumerable squadsEnemy, ref EnemySquadPotentialObjectives squadPotentialObjectives, EObjectiveType type) where T : IInfluencer
     {
         Vector2 squadPos = squad.GetAveragePosition();
         Vector2 squadDir = squad.GetUnormalizedDirection().normalized;
