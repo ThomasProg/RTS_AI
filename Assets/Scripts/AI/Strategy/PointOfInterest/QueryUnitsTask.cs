@@ -10,7 +10,9 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
     public float strengthRequired = 3;
     // Removed from the travel time of a unit if the unit was already on this point of interest 
-    public float persistency = 0f; 
+    public float persistency = 0f;
+
+    public float timeToLeadSquadToPoI = 0.1f;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
@@ -98,10 +100,13 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                             break;
 
                         case Factory factory:
-                            blackboard.squadManager.RequestUnit(factory, factoryWithUnitToBuild[factory], pointOfInterest);
+                            bool isUnitBeingBuilt = blackboard.squadManager.RequestUnit(factory, factoryWithUnitToBuild[factory], pointOfInterest);
 
-                            currentStrength += factory.GetUnitCost(factoryWithUnitToBuild[factory]);
-                            nbUnitsBeingCreated++;
+                            if (isUnitBeingBuilt)
+                            {
+                                currentStrength += factory.GetUnitCost(factoryWithUnitToBuild[factory]);
+                                nbUnitsBeingCreated++;
+                            }
                             break;
                     }
 
@@ -137,14 +142,31 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
             blackboard.squadManager.RegisterSquads(newSquads);
 
-            foreach (Squad squad in newSquads)
+            if (currentStrength < strengthRequired)
             {
-                if (squad.IsPartiallyIdle)
+                foreach (Squad squad in newSquads)
                 {
-                    squad.Stop();
+                    if (squad.IsPartiallyIdle)
+                    {
+                        squad.Stop();
+                    }
+
+                    squad.PointOfInterest = null;
+                }
+            }
+            else
+            {
+                foreach (Squad squad in newSquads)
+                {
+                    if (squad.IsPartiallyIdle)
+                    {
+                        squad.Stop();
+                    }
+
+                    squad.PointOfInterest = pointOfInterest;
                 }
 
-                squad.PointOfInterest = pointOfInterest;
+                yield return new WaitForSeconds(timeToLeadSquadToPoI);
             }
 
             yield return null;

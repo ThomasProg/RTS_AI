@@ -38,7 +38,8 @@ public class SquadManager : MonoBehaviour
         }
     }
 
-    public void RequestUnit(Factory factory, int unitBuildID, PointOfInterest poi)
+    // Returns true if a unit is being built for this factory
+    public bool RequestUnit(Factory factory, int unitBuildID, PointOfInterest poi)
     {
         Queue<PointOfInterest> queue;
         if (!newUnitsPoI.TryGetValue(factory, out queue))
@@ -50,8 +51,15 @@ public class SquadManager : MonoBehaviour
         if (!queue.Contains(poi))
         {
             if (factory.RequestUnitBuild(unitBuildID))
+            {
                 queue.Enqueue(poi);
+                return true;
+            }
+            else
+                return false;
         }
+        else
+            return true;
     }
 
     public void LinkToAI(Factory factory)
