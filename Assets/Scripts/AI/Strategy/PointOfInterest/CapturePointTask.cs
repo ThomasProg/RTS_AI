@@ -17,7 +17,7 @@ public class CapturePointTask : IPOITask<StrategyAI.Blackboard>
             if (squad.IsIdle)
             {
                 //Debug.Log(Time.time + " : ========== GoCapturePoint : " + i);
-                squad.GoCapturePoint(capturePointPoI.targetBuilding);
+                squad.GoCaptureTarget(capturePointPoI.targetBuilding);
                 yield return new WaitForSeconds(timeToLeadSquadToPoI);
             }
         }

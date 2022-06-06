@@ -67,6 +67,7 @@ public class GameServices : MonoBehaviour
     public struct POIDebugger
     {
         public bool displayPriorities;
+        public bool displayStrengthRequired;
     }
 
     [Serializable]
@@ -380,7 +381,19 @@ public class GameServices : MonoBehaviour
             {
                 foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
                 {
-                    Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}");
+                    GUIStyle style = new GUIStyle();
+                    style.normal.textColor = Color.yellow;
+                    Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}", style);
+                }
+            }
+            
+            if (debug.poiDebugger.displayStrengthRequired)
+            {
+                foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
+                {
+                    GUIStyle style = new GUIStyle();
+                    style.normal.textColor = Color.red;
+                    Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y + 15f), $"{poi.strengthRequired}", style);
                 }
             }
 
@@ -411,11 +424,10 @@ public class GameServices : MonoBehaviour
                     for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
                     {
                         GameUtility.SquadObjective lastObjective = squadObjective.objectives[i];
-                        Color color = lastObjective.type == GameUtility.EObjectiveType.ProtectFactory
-                            ? Color.blue
-                            : Color.red;
+                        Color color = Color.blue;
+                           
                         Vector3 p1 = new Vector3(influencePosition.x, 1f, influencePosition.y);
-                        Vector3 p2 = new Vector3(lastObjective.position.x, 1f, lastObjective.position.y);
+                        Vector3 p2 = new Vector3(lastObjective.poi.position.x, 1f, lastObjective.poi.position.y);
                         Handles.DrawBezier(p1, p2, p1, p2, color, null, thickness);
                         thickness -= 1;
 
@@ -490,7 +502,7 @@ public class GameServices : MonoBehaviour
 
                 GameUtility.SquadObjective lastObjective = squadObjective.objectives.Last();
                 GUILayout.Label(
-                    $"Main objective: {lastObjective.type.ToString()} | Enemy strength {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
+                    $"Main objective: {lastObjective.poi} | Enemy strength {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
 
                 GUILayout.EndHorizontal();
 
@@ -499,8 +511,8 @@ public class GameServices : MonoBehaviour
 
                 Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
                 Debug.DrawLine(new Vector3(influencePosition.x, 10f, influencePosition.y),
-                    new Vector3(lastObjective.position.x, 10f, lastObjective.position.y),
-                    lastObjective.type == GameUtility.EObjectiveType.ProtectFactory ? Color.blue : Color.red);
+                    new Vector3(lastObjective.poi.position.x, 10f, lastObjective.poi.position.y),
+                    Color.blue);
             }
 
             GUILayout.EndVertical();

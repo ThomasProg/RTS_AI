@@ -10,7 +10,7 @@ public class Squad : IInfluencer
     public HashSet<Unit> Units { get; private set; } = new HashSet<Unit>();
     public List<Unit> UnitList => Units.ToList();
     TargetBuilding targetCapturePoint;
-    Formation formation;
+    public Formation formation;
 
     PointOfInterest _pointOfInterest;
 
@@ -18,7 +18,7 @@ public class Squad : IInfluencer
 
     private int previousFramePosUpdated;
     private Vector2 currentPosition;
-    
+
     public PointOfInterest PointOfInterest
     {
         get => _pointOfInterest;
@@ -68,14 +68,13 @@ public class Squad : IInfluencer
 
     public Squad(HashSet<Unit> squadUnits)
     {
-        Units = squadUnits;
+        Units = new HashSet<Unit>();
         
-        foreach (Unit unit in Units)
+        foreach (Unit unit in squadUnits)
         {
+            AddUnit(unit);
             unit.OnDeadEvent += unitToRemove => RemoveUnit(unitToRemove as Unit);
         }
-        
-        NormalizeSquadSpeed();
     }
 
     public void NormalizeSquadSpeed()
@@ -89,12 +88,12 @@ public class Squad : IInfluencer
 
     public Squad(List<Unit> squadUnits)
     {
+        Units = new HashSet<Unit>();
+
         foreach (var unit in squadUnits)
         {
             AddUnit(unit);
-        }
-
-        NormalizeSquadSpeed();
+        } 
     }
 
     /// <summary>
@@ -146,7 +145,8 @@ public class Squad : IInfluencer
         foreach (Unit unit in Units)
         {
             float unitInflRad = unit.GetInfluenceRadius();
-            sqrInfluenceRadius = Mathf.Max(sqrInfluenceRadius, (squadPos - unit.GetInfluencePosition()).sqrMagnitude + unitInflRad * unitInflRad);
+            sqrInfluenceRadius = Mathf.Max(sqrInfluenceRadius,
+                (squadPos - unit.GetInfluencePosition()).sqrMagnitude + unitInflRad * unitInflRad);
         }
 
         return sqrInfluenceRadius;
@@ -168,6 +168,7 @@ public class Squad : IInfluencer
     /// </summary>
     public float GetSquadSpeed()
     {
+        if (IsEmpty) return 0;
         return Units.Select(unit => unit.GetUnitData.Speed).Min();
     }
 
@@ -351,7 +352,7 @@ public class Squad : IInfluencer
         List<Squad> squads = new List<Squad>();
         foreach (Unit unit in units)
         {
-            Squad squad = new Squad(new HashSet<Unit>{unit});
+            Squad squad = new Squad(new HashSet<Unit> {unit});
             squads.Add(squad);
         }
 
@@ -369,11 +370,11 @@ public class Squad : IInfluencer
         PointOfInterest = null;
     }
 
-    public void GoCapturePoint(TargetBuilding targetCapturePoint)
+    public void GoCaptureTarget(TargetBuilding targetCapturePoint)
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(targetCapturePoint.transform.position);
+            unit.SetTaskGoTo(targetCapturePoint.transform.position, unit.UnitData.CaptureDistanceMax);
             unit.AddTaskCaptureTarget(targetCapturePoint);
         }
     }
@@ -382,9 +383,62 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(attackedEntity.transform.position);
+            unit.SetTaskGoTo(attackedEntity.transform.position, unit.UnitData.AttackDistanceMax);
             unit.AddTaskAttackTarget(attackedEntity);
         }
+    }
+
+    public void RepairTarget(BaseEntity repairedEntity)
+    {
+        foreach (Unit unit in Units)
+        {
+            unit.SetTaskGoTo(repairedEntity.transform.position, unit.UnitData.RepairDistanceMax);
+            unit.AddTaskRepairTarget(repairedEntity);
+        }
+    }
+
+    public void Goto(Vector3 target, float stoppingDistance = 1f)
+    {
+        CheckAndUpdateFormation(target);
+
+        Dictionary<Unit, Vector3> formationTargetPositions = formation.GetUnitsPosition(target);
+
+        foreach (Unit unit in Units)
+        {
+            unit.SetTaskGoTo(formationTargetPositions[unit], stoppingDistance);
+        }
+    }
+    
+    public void Regroup(Vector3 target)
+    {
+        CheckAndUpdateFormation(target);
+
+        Vector3 averagePosition3D = GameUtility.ToVec3(GetAveragePosition());
+        Dictionary<Unit, Vector3> formationAveragePosition = formation.GetUnitsPosition(averagePosition3D);
+
+        foreach (Unit unit in Units)
+        {
+            unit.SetTaskGoTo(formationAveragePosition[unit]);
+        }
+    }
+
+    private void CheckAndUpdateFormation(Vector3 target)
+    {
+        NormalizeSquadSpeed();
+
+        if (formation == null)
+        {
+            formation = new CircleFormation(this);
+            formation.Scale = 2;
+        }
+
+        Vector3 position = GameUtility.ToVec3(GetAveragePosition());
+
+        formation.Position = target;
+        formation.Scale = Mathf.Log(Units.Count) + 1;
+
+        Vector3 diff = formation.GetFormationCenterPosition() - position;
+        formation.Rotation = Quaternion.LookRotation(-diff).eulerAngles.y;
     }
 
     public bool IsPartiallyIdle
@@ -421,4 +475,15 @@ public class Squad : IInfluencer
     {
         return Units.First().GetTeam();
     }
+
+    private Vector3 ComputeActionRangeOffset(Vector3 StartPos, Vector3 TargetPos, float maxRange)
+    {
+        Vector3 targetDir = TargetPos - StartPos;
+        return targetDir.normalized * maxRange;
+    }
+
+    // private float GetSquadAttackRange()
+    // {
+    //     Units.Select(unit => unit.da)
+    // }
 }

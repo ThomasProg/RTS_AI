@@ -239,16 +239,18 @@ public class Unit : BaseEntity
         m_taskRunner.ProcessNextTask();
     }
 
-    public void GoTo(Vector2 pos)
+    public void GoTo(Vector2 pos, float stoppingDistance = 1f)
     {
         if (!navMeshAgent.isOnNavMesh)
             return;
 
+        navMeshAgent.stoppingDistance = stoppingDistance;
+        
         // See : https://youtu.be/bqtqltqcQhw?t=329
         bool isdestinationFound = false;
         float turnFaction = 0.618033f;
         float pow  = 0.5f;
-        float radius = 10;
+        float radius = 20;
         
         int maxIteration = 10;
         for (int i = 0; i < maxIteration && !isdestinationFound; i++)
@@ -278,9 +280,9 @@ public class Unit : BaseEntity
     // $$$ To be updated for AI implementation $$$
 
     // Moving Task
-    public void AddTaskGoTo(Vector3 pos)
+    public void AddTaskGoTo(Vector3 pos, float stoppingDistance = 1f)
     {
-        m_taskRunner.AddNewTask(new GoTo(this, new Vector2(pos.x, pos.z)));
+        m_taskRunner.AddNewTask(new GoTo(this, new Vector2(pos.x, pos.z), stoppingDistance));
     }
 
     // Targetting Task - attack
@@ -312,9 +314,9 @@ public class Unit : BaseEntity
     
     
     // Moving Task
-    public void SetTaskGoTo(Vector3 pos)
+    public void SetTaskGoTo(Vector3 pos, float stoppingDistance = 1f)
     {
-        m_taskRunner.AssignNewTask(new GoTo(this, new Vector2(pos.x, pos.z)));
+        m_taskRunner.AssignNewTask(new GoTo(this, new Vector2(pos.x, pos.z), stoppingDistance));
     }
 
     // Targetting Task - attack

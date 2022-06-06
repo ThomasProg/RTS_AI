@@ -180,6 +180,7 @@ public sealed class Factory : BaseEntity
     #region Unit building methods
 
     public int UnitPrefabsCount => UnitPrefabs.Length;
+    public int FactoryPrefabsCount => FactoryPrefabs.Length;
     
     bool IsUnitIndexValid(int unitIndex)
     {

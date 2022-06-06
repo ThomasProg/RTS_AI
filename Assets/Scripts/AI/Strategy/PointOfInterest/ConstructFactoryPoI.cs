@@ -64,8 +64,30 @@ public class ConstructFactoryPoI : PointOfInterest
     
     int EvaluateFactoryToBuild()
     {
-        // TODO:
-        return 0;
+        List<FactoryDataScriptable> unitDatas = new List<FactoryDataScriptable>(stratAI.controller.Factories[0].FactoryPrefabsCount);
+
+        for (int i = 0; i < stratAI.controller.Factories[0].FactoryPrefabsCount; i++)
+        {
+            unitDatas.Add(stratAI.controller.Factories[0].GetBuildableFactoryData(i));
+        }
+
+        // The first approach is to build random unity if we can
+        int unitIndex = -1;
+        do
+        {
+            if (unitIndex != -1)
+            {
+                unitDatas.RemoveAt(unitIndex);
+                
+                if (unitDatas.Count == 0)
+                    return -1; // Error
+            }
+
+            unitIndex = UnityEngine.Random.Range(0, unitDatas.Count);
+
+        } while (unitDatas[unitIndex].Cost > stratAI.controller.TotalBuildPoints); // While we can't buy this unit, try another
+        
+        return unitIndex;
     }
 
     /// <summary>
