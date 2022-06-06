@@ -38,7 +38,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
                     foreach (Unit unit in squad.UnitList)
                     {
-                        unitsSources.Add(time, unit);
+                        unitsSources.Add(time, new System.Tuple<Unit, Squad>(unit, squad));
                     }
                 }
             }
@@ -91,9 +91,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                         //    newSquads.Add(squad);
                         //    currentStrength += squad.GetStrength();
                         //    break;
-                        case Unit unit:
-                            newUnits.Add(unit);
-                            currentStrength += unit.GetStrength();
+                        case System.Tuple<Unit, Squad> unitTuple:
+                            newUnits.Add(unitTuple.Item1);
+                            currentStrength += unitTuple.Item1.GetStrength();
+                            unitTuple.Item2.RemoveUnit(unitTuple.Item1);
                             break;
 
                         case Factory factory:
@@ -103,10 +104,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                             nbUnitsBeingCreated++;
                             break;
                     }
-                }
 
-                if (currentStrength >= strengthRequired)
-                    break;
+                    if (currentStrength >= strengthRequired)
+                        break;
+                }
             }
             else
             {
