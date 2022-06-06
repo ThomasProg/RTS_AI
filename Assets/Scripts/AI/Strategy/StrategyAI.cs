@@ -179,7 +179,7 @@ public class StrategyAI : MonoBehaviour
             foreach (var poi in AllPointOfInterests)
             {
                 poi.EvaluatePriority(bb);
-                yield return null;
+                //yield return null;
                 // wait for seconds
             }
 
