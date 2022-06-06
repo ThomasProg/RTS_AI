@@ -5,6 +5,7 @@ using InfluenceMapPackage;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using UtilitySystemPackage;
 using Random = System.Random;
 
 public enum ETeam
@@ -27,7 +28,7 @@ public class GameServices : MonoBehaviour
         public bool drawTargetStatistic;
         public float targetStatisticRadius;
     }
-    
+
     [System.Serializable]
     public struct BarycenterDebug
     {
@@ -35,39 +36,45 @@ public class GameServices : MonoBehaviour
         [HideInInspector] public GameObject globalBarycenterInstance;
         [HideInInspector] public GameObject redBarycenterInstance;
         [HideInInspector] public GameObject blueBarycenterInstance;
-        
+
         public bool drawBarycenters;
         public GameObject globalBarycenterPrefab;
         public GameObject redBarycenterPrefab;
         public GameObject blueBarycenterPrefab;
     }
-    
+
     [System.Serializable]
     public struct AISquadDecisionPrevision
     {
         public bool displayStatistic;
         public bool display3MainObjectif;
     }
-    
+
     [System.Serializable]
     public struct AISquadDebug
     {
         public bool displayAISquad;
         public bool useDifferentColors;
     }
-    
+
     [System.Serializable]
     public struct TimeScaleDebugger
     {
         public bool displayTimeScale;
     }
-    
+
     [System.Serializable]
     public struct POIDebugger
     {
         public bool displayPriorities;
     }
-    
+
+    [Serializable]
+    public struct UtilitySystemDebug
+    {
+        public bool displayUtilitySystem;
+    }
+
     [System.Serializable]
     public struct DebugSettings
     {
@@ -77,10 +84,11 @@ public class GameServices : MonoBehaviour
         public POIDebugger poiDebugger;
         public TimeScaleDebugger timeScaleDebugger;
         public AISquadDebug aiSquadDebug;
+        public UtilitySystemDebug utilitySystemDebug;
     }
-    
+
 #endif
-    
+
     [SerializeField, Tooltip("Generic material used for 3D models, in the following order : blue, red and green")]
     Material[] TeamMaterials = new Material[3];
 
@@ -106,11 +114,12 @@ public class GameServices : MonoBehaviour
 #endif
 
     #region Static methods
+
     public static AIController GetAIController()
     {
         return Instance.ControllersArray.OfType<AIController>().First();
     }
-    
+
     public static PlayerController GetPlayerController()
     {
         return Instance.ControllersArray.OfType<PlayerController>().First();
@@ -120,36 +129,43 @@ public class GameServices : MonoBehaviour
     {
         return Instance;
     }
+
     public static GameState GetGameState()
     {
         return Instance.CurrentGameState;
     }
+
     public static UnitController GetControllerByTeam(ETeam team)
     {
-        if (Instance.ControllersArray.Length < (int)team)
+        if (Instance.ControllersArray.Length < (int) team)
             return null;
-        return Instance.ControllersArray[(int)team];
+        return Instance.ControllersArray[(int) team];
     }
+
     public static Material GetTeamMaterial(ETeam team)
     {
-        return Instance.TeamMaterials[(int)team];
+        return Instance.TeamMaterials[(int) team];
     }
+
     public static ETeam GetOpponent(ETeam team)
     {
         return Instance.CurrentGameState.GetOpponent(team);
     }
-    
+
     public TerrainInfluenceMap GetInfluenceMap(ETeam team)
     {
         return m_teamInfluenceMap[(int) team];
     }
-    
-    public static TargetBuilding[] GetTargetBuildings() { return Instance.TargetBuildingArray; }
+
+    public static TargetBuilding[] GetTargetBuildings()
+    {
+        return Instance.TargetBuildingArray;
+    }
 
     // return RGB color struct for each team
     public static Color GetTeamColor(ETeam team)
     {
-        switch(team)
+        switch (team)
         {
             case ETeam.Blue:
                 return Color.blue;
@@ -161,16 +177,27 @@ public class GameServices : MonoBehaviour
                 return Color.grey;
         }
     }
-    public static float GetNonPlayableBorder { get { return Instance.NonPlayableBorder; } }
-    public static Terrain GetTerrain { get { return Instance.CurrentTerrain; } }
+
+    public static float GetNonPlayableBorder
+    {
+        get { return Instance.NonPlayableBorder; }
+    }
+
+    public static Terrain GetTerrain
+    {
+        get { return Instance.CurrentTerrain; }
+    }
+
     public static Bounds GetPlayableBounds()
     {
         return Instance.PlayableBounds;
     }
+
     public static Vector3 GetTerrainSize()
     {
         return Instance.TerrainSize;
     }
+
     public static bool IsPosInPlayableBounds(Vector3 pos)
     {
         if (GetPlayableBounds().Contains(pos))
@@ -178,6 +205,7 @@ public class GameServices : MonoBehaviour
 
         return false;
     }
+
     public Vector3 TerrainSize
     {
         get
@@ -197,7 +225,7 @@ public class GameServices : MonoBehaviour
             controller.Team = GetOpponent(controller.Team);
         }
     }
-    
+
     /// <summary>
     /// Need to be called in OnEnable
     /// </summary>
@@ -210,13 +238,13 @@ public class GameServices : MonoBehaviour
     /// <param name="team"></param>
     public void RegisterUnit(ETeam team, IInfluencer unit)
     {
-        if (m_teamInfluenceMap[(int)team] != null)
+        if (m_teamInfluenceMap[(int) team] != null)
         {
-            m_teamInfluenceMap[(int)team].RegisterEntity(unit);
+            m_teamInfluenceMap[(int) team].RegisterEntity(unit);
         }
         else
         {
-            Debug.LogWarning($"Influence map {(int)team} does not exist");
+            Debug.LogWarning($"Influence map {(int) team} does not exist");
         }
     }
 
@@ -237,6 +265,7 @@ public class GameServices : MonoBehaviour
     }
 
     #region MonoBehaviour methods
+
     void OnEnable()
     {
         Instance = this;
@@ -245,7 +274,7 @@ public class GameServices : MonoBehaviour
         ControllersArray = new UnitController[2];
         foreach (UnitController controller in FindObjectsOfType<UnitController>())
         {
-            ControllersArray[(int)controller.GetTeam()] = controller;
+            ControllersArray[(int) controller.GetTeam()] = controller;
 
             if (controller is PlayerController pController)
                 this.playerController = pController;
@@ -270,21 +299,26 @@ public class GameServices : MonoBehaviour
         {
             PlayableBounds = CurrentTerrain.terrainData.bounds;
             Vector3 clampedOne = new Vector3(1f, 0f, 1f);
-            Vector3 heightReduction = Vector3.up * 0.1f; // $$ hack : this is to prevent selectioning / building in high areas
-            PlayableBounds.SetMinMax(PlayableBounds.min + clampedOne * NonPlayableBorder / 2f, PlayableBounds.max - clampedOne * NonPlayableBorder / 2f - heightReduction);
+            Vector3
+                heightReduction =
+                    Vector3.up * 0.1f; // $$ hack : this is to prevent selectioning / building in high areas
+            PlayableBounds.SetMinMax(PlayableBounds.min + clampedOne * NonPlayableBorder / 2f,
+                PlayableBounds.max - clampedOne * NonPlayableBorder / 2f - heightReduction);
         }
         else
         {
             Debug.LogWarning("could not find terrain asset in scene, setting default PlayableBounds");
             Vector3 clampedOne = new Vector3(1f, 0f, 1f);
-            PlayableBounds.SetMinMax(   new Vector3(-DefaultPlayableBoundsSize, -10.0f, -DefaultPlayableBoundsSize) + clampedOne * NonPlayableBorder / 2f,
-                                        new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) - clampedOne * NonPlayableBorder / 2f);
+            PlayableBounds.SetMinMax(
+                new Vector3(-DefaultPlayableBoundsSize, -10.0f, -DefaultPlayableBoundsSize) +
+                clampedOne * NonPlayableBorder / 2f,
+                new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) -
+                clampedOne * NonPlayableBorder / 2f);
         }
     }
-    
+
     private void Update()
     {
-        
 #if UNITY_EDITOR
         if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
         {
@@ -303,7 +337,7 @@ public class GameServices : MonoBehaviour
                 Destroy(debug.barycenter.redBarycenterInstance);
             }
         }
-        
+
         if (debug.barycenter.drawBarycenters)
         {
             Vector2 globalBarycenter = GameUtility.GetGlobalBarycenter();
@@ -318,7 +352,7 @@ public class GameServices : MonoBehaviour
         }
 #endif
     }
-    
+
     private void OnDrawGizmos()
     {
         if (Instance != null)
@@ -329,15 +363,19 @@ public class GameServices : MonoBehaviour
                 for (int index = 0; index < squads.Length; index++)
                 {
                     Squad squad = squads[index];
-                    Handles.color = debug.aiSquadDebug.useDifferentColors ? GameUtility.GetGoldenRatioColorWithIndex(index)  /*Color.HSVToRGB(index / (float)squads.Length, 1f, 1f)*/  : Color.blue;
+                    Handles.color = debug.aiSquadDebug.useDifferentColors
+                        ? GameUtility
+                            .GetGoldenRatioColorWithIndex(
+                                index) /*Color.HSVToRGB(index / (float)squads.Length, 1f, 1f)*/
+                        : Color.blue;
 
                     Vector3 center = GameUtility.ToVec3(squad.GetAveragePosition());
                     float radius = Mathf.Sqrt(squad.GetInfluenceRadius());
-                    
+
                     Handles.DrawWireDisc(center, Vector3.up, radius, 2f);
                 }
             }
-            
+
             if (debug.poiDebugger.displayPriorities)
             {
                 foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
@@ -361,7 +399,7 @@ public class GameServices : MonoBehaviour
 
                     Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
                     float influenceRadius = Mathf.Sqrt(squadObjective.current.GetInfluenceRadius());
-                    
+
                     float efficiencyTotal = 0f;
                     for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
                     {
@@ -383,7 +421,7 @@ public class GameServices : MonoBehaviour
 
                         Handles.Label((p2 + p1) / 2f,
                             $"{lastObjective.GetStrategyEffectivity() / efficiencyTotal * 100f}%");
-                        
+
                         Handles.color = Color.blue;
                         Handles.DrawWireDisc(p1, Vector3.up, influenceRadius, 2f);
                     }
@@ -397,27 +435,28 @@ public class GameServices : MonoBehaviour
 #if UNITY_EDITOR
         if (debug.timeScaleDebugger.displayTimeScale)
         {
-
             GUILayout.BeginHorizontal("box");
             GUILayout.Label("Time scale");
             Time.timeScale = GUILayout.HorizontalSlider(Time.timeScale, 0f, 10f, GUILayout.Width(Screen.width / 6f));
             GUILayout.EndHorizontal();
         }
-        
+
         if (debug.targetAnalysis.drawTargetStatistic)
         {
-            
-            GameUtility.TargetBuildingAnalysisData[] targetBuildingAnalysisData = GameUtility.GetTargetBuildingAnalysisData(playerController.GetTeam(), debug.targetAnalysis.targetStatisticRadius);
-            
+            GameUtility.TargetBuildingAnalysisData[] targetBuildingAnalysisData =
+                GameUtility.GetTargetBuildingAnalysisData(playerController.GetTeam(),
+                    debug.targetAnalysis.targetStatisticRadius);
+
             GUILayout.BeginVertical("box");
             GUILayout.Label("Target building analysis");
 
             foreach (GameUtility.TargetBuildingAnalysisData buildingAnalysisData in targetBuildingAnalysisData)
             {
                 GUILayout.BeginHorizontal("box");
-                
+
                 GUILayout.Label($"{buildingAnalysisData.target.name}:");
-                GUILayout.Label($"Distance from blue team barycenter: {Mathf.Sqrt(buildingAnalysisData.sqrDistanceFromTeamBarycenter)}");
+                GUILayout.Label(
+                    $"Distance from blue team barycenter: {Mathf.Sqrt(buildingAnalysisData.sqrDistanceFromTeamBarycenter)}");
                 GUILayout.Label($"Blue occupation: {buildingAnalysisData.balancing.occupationTeam1 * 100f}%");
                 GUILayout.Label($"Red occupation: {buildingAnalysisData.balancing.occupationTeam2 * 100f}%");
 
@@ -428,8 +467,9 @@ public class GameServices : MonoBehaviour
         }
         else if (debug.aiSquadDecisionPrevision.displayStatistic)
         {
-            List<GameUtility.EnemySquadPotentialObjectives> squadsObjective = GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), 1.1f);
-            
+            List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
+                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), 1.1f);
+
             GUILayout.BeginVertical("box");
             GUILayout.Label("AI squad decision prevision");
 
@@ -441,27 +481,70 @@ public class GameServices : MonoBehaviour
                 {
                     return objective.GetStrategyEffectivity().CompareTo(objective1.GetStrategyEffectivity());
                 }));
-                
+
                 GUILayout.BeginVertical("box");
-                GUILayout.Label($"Squad {squadID} | Units = {squadObjective.current.UnitList.Count} | Strength = {squadObjective.current.GetStrength()}:");
-                
+                GUILayout.Label(
+                    $"Squad {squadID} | Units = {squadObjective.current.UnitList.Count} | Strength = {squadObjective.current.GetStrength()}:");
+
                 GUILayout.BeginHorizontal("box");
 
                 GameUtility.SquadObjective lastObjective = squadObjective.objectives.Last();
-                GUILayout.Label($"Main objective: {lastObjective.type.ToString()} | Enemy strength {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
+                GUILayout.Label(
+                    $"Main objective: {lastObjective.type.ToString()} | Enemy strength {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
 
                 GUILayout.EndHorizontal();
-                
+
                 GUILayout.EndVertical();
                 ++squadID;
 
                 Vector2 influencePosition = squadObjective.current.GetInfluencePosition();
-                Debug.DrawLine(new Vector3(influencePosition.x, 10f, influencePosition.y), new Vector3(lastObjective.position.x, 10f, lastObjective.position.y), lastObjective.type == GameUtility.EObjectiveType.ProtectFactory ? Color.blue : Color.red);
+                Debug.DrawLine(new Vector3(influencePosition.x, 10f, influencePosition.y),
+                    new Vector3(lastObjective.position.x, 10f, lastObjective.position.y),
+                    lastObjective.type == GameUtility.EObjectiveType.ProtectFactory ? Color.blue : Color.red);
             }
-            
+
+            GUILayout.EndVertical();
+        }
+        else if (debug.utilitySystemDebug.displayUtilitySystem)
+        {
+            StrategyAI strategyAI = GetAIController().strategyAI;
+            GUILayout.BeginVertical();
+            DisplayUtilitySystem(strategyAI.objectiveUtilitySystem, "objective");
+            DisplayUtilitySystem(strategyAI.subjectiveUtilitySystem, "subjective");
             GUILayout.EndVertical();
         }
 #endif
     }
-#endregion
+
+#if UNITY_EDITOR
+    private void DisplayUtilitySystem(UtilitySystem system, string name)
+    {
+        GUILayout.Label(name);
+        GUILayout.BeginHorizontal();
+        GUILayout.BeginVertical("box");
+        foreach (var stat in system.GetInputs())
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(stat.Name);
+            stat.Value = GUILayout.HorizontalSlider(stat.Value, 0f, 1f, GUILayout.Width(100f));
+            GUILayout.EndHorizontal();
+        }
+
+        GUILayout.EndVertical();
+
+        GUILayout.BeginVertical("box");
+        foreach (var utility in system.GetUtilities())
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(utility.Name);
+            GUILayout.HorizontalSlider(utility.Value, 0f, 1f, GUILayout.Width(100f));
+            GUILayout.EndHorizontal();
+        }
+
+        GUILayout.EndVertical();
+        GUILayout.EndHorizontal();
+    }
+#endif
+
+    #endregion
 }

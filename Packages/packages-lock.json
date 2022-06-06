@@ -191,11 +191,11 @@
       "hash": "7f34133214acd1b5a9722d074896147663dd9ae7"
     },
     "open-source-unity-package.utility-system": {
-      "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git",
+      "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git#1.0.2",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "8be48f188c01886c7e6c27375c2e3be9bc5e4738"
+      "hash": "304a152f3d8a23bb91231e34c3f0cef005b431d3"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
