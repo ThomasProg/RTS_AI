@@ -12,7 +12,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     // Removed from the travel time of a unit if the unit was already on this point of interest 
     public float persistency = 0f;
 
-    public float timeToLeadSquadToPoI = 0.7f;
+    public float timeToLeadSquadToPoI = 0.1f;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
