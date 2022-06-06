@@ -47,6 +47,12 @@ public class ConstructFactoryPoI : PointOfInterest
         // Evaluate the cost ratio
         int point = aiController.TotalBuildPoints;
         factoryToBuildID = EvaluateFactoryToBuild();
+        priority = 0;
+        
+        if (factoryToBuildID == -1)
+            return;
+        
+
         float costRatio = point / (float)aiController.Factories[0].GetBuildableFactoryData(factoryToBuildID).Cost;
         
         // Apply priority only if position to build factory is found
@@ -55,10 +61,6 @@ public class ConstructFactoryPoI : PointOfInterest
         {
             // More a squad is farthest from factory and more money we have, more we wan't to create factory
             priority = costRatio * Mathf.Sqrt(sqrtDistfarthestSquad);
-        }
-        else
-        {
-            priority = 0;
         }
     }
     
