@@ -552,6 +552,8 @@ public sealed class PlayerController : UnitController
     {
         if (SelectedUnitList.Count == 0)
             return;
+        
+        Squad selectedSquad = new Squad(SelectedUnitList);
 
         int damageableMask = (1 << LayerMask.NameToLayer("Unit")) | (1 << LayerMask.NameToLayer("Factory"));
         int targetMask = 1 << LayerMask.NameToLayer("Target");
@@ -567,15 +569,11 @@ public sealed class PlayerController : UnitController
             {
                 if (other.GetTeam() != GetTeam())
                 {
-                    // Direct call to attacking task $$$ to be improved by AI behaviour
-                    foreach (Unit unit in SelectedUnitList)
-                        unit.SetTaskAttackTarget(other);
+                    selectedSquad.AttackTarget(other);
                 }
                 else if (other.NeedsRepairing())
                 {
-                    // Direct call to reparing task $$$ to be improved by AI behaviour
-                    foreach (Unit unit in SelectedUnitList)
-                        unit.SetTaskRepairTarget(other);
+                    selectedSquad.RepairTarget(other);
                 }
             }
         }
@@ -586,23 +584,18 @@ public sealed class PlayerController : UnitController
             if (target != null && target.GetTeam() != GetTeam())
             {
                 // Direct call to capturing task $$$ to be improved by AI behaviour
-                foreach (Unit unit in SelectedUnitList)
-                {
-                    unit.SetTaskGoTo(GameUtility.ToVec3(target.GetInfluencePosition()));
-                    unit.AddTaskCaptureTarget(target);
-                }
+                selectedSquad.GoCaptureTarget(target);
             }
         }
         // Set unit move target
         else if (Physics.Raycast(ray, out raycastInfo, Mathf.Infinity, floorMask))
         {
-
             Vector3 newPos = raycastInfo.point;
             SetTargetCursorPosition(newPos);
 
-            // Direct call to moving task $$$ to be improved by AI behaviour
-            foreach (Unit unit in SelectedUnitList)
-                unit.SetTaskGoTo(newPos);
+            float stoppingDistance = (selectedSquad.formation != null) ? selectedSquad.formation.Scale : 1f;
+            
+            selectedSquad.Goto(newPos, stoppingDistance);
         }
     }
     #endregion
