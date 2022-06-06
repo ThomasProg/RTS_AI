@@ -52,7 +52,7 @@ public class FactoryPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1.1f, 0.5f);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f,  stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
@@ -70,7 +70,7 @@ public class FactoryPoI : PointOfInterest
         }
 
         float aiStrength =
-            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget);
+            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget) * stratAI.subjectiveUtilitySystem.GetStat("Patience").OneNegValue * 2f;
         
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
@@ -81,12 +81,10 @@ public class FactoryPoI : PointOfInterest
         {
             priority = 6f;
             priority += playerStrength == 0 ? 1 : aiStrength / playerStrength;
+            priority *= stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value;
         }
         
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
-        
-        // Apply direct coefficient depending on AI personality
-        // TODO:
     }
 
 
@@ -95,7 +93,7 @@ public class FactoryPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1.1f, 0.5f);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f, stratAI.subjectiveUtilitySystem.GetUtility("Protect").Value);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
@@ -113,12 +111,13 @@ public class FactoryPoI : PointOfInterest
         }
 
         float aiStrength =
-            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget);
+            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, factory.GetInfluencePosition(), distPlayerUnitsToTarget) * stratAI.subjectiveUtilitySystem.GetStat("Patience").OneNegValue * 2f;
         
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
         {
             priority = 6f;
+            priority *= stratAI.subjectiveUtilitySystem.GetUtility("Protect").Value;
         }
         else
         {
@@ -126,9 +125,6 @@ public class FactoryPoI : PointOfInterest
         }
 
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
-        
-        // Apply direct coefficient depending on AI personality
-        // TODO:
     }
 
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)

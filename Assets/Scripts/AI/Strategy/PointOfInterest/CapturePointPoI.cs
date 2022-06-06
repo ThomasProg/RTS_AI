@@ -125,7 +125,7 @@ public class CapturePointPoI : PointOfInterest
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
 
         // Apply direct coefficient depending on AI personality
-        // TODO:
+        priority += stratAI.subjectiveUtilitySystem.GetUtility("Capture").Value;
     }
 
     void EvaluateDefendThisPointPriority(IEnumerable aiSquads)
@@ -184,7 +184,7 @@ public class CapturePointPoI : PointOfInterest
         
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
         // Apply direct coefficient depending on AI personality
-        // TODO:
+        priority += stratAI.subjectiveUtilitySystem.GetUtility("Capture").Value;
     }
 
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)

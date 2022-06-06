@@ -522,7 +522,7 @@ public class GameServices : MonoBehaviour
         GUILayout.Label(name);
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical("box");
-        foreach (var stat in system.GetInputs())
+        foreach (var stat in system.GetInputs().Values)
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label(stat.Name);
@@ -533,7 +533,7 @@ public class GameServices : MonoBehaviour
         GUILayout.EndVertical();
 
         GUILayout.BeginVertical("box");
-        foreach (var utility in system.GetUtilities())
+        foreach (var utility in system.GetUtilities().Values)
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label(utility.Name);
