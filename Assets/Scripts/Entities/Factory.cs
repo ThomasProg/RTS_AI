@@ -285,7 +285,7 @@ public sealed class Factory : BaseEntity
         int slotIndex = SpawnCount % FactoryData.NbSpawnSlots;
         // compute simple spawn position around the factory
         float angle = 2f * Mathf.PI / FactoryData.NbSpawnSlots * slotIndex;
-        int offsetIndex = Mathf.FloorToInt(SpawnCount / FactoryData.NbSpawnSlots);
+        int offsetIndex = Mathf.FloorToInt(SpawnCount / FactoryData.NbSpawnSlots) % 4;
         float radius = FactoryData.SpawnRadius + offsetIndex * FactoryData.RadiusOffset;
         Vector3 spawnPos = transform.position + new Vector3(radius * Mathf.Cos(angle), 0f, radius * Mathf.Sin(angle));
 
