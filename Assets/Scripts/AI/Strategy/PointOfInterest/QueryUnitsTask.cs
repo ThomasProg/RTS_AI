@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = System.Random;
@@ -13,7 +14,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     // Removed from the travel time of a unit if the unit was already on this point of interest 
     public float persistency = 0f;
 
-    public float timeToLeadSquadToPoI = 1f;
+    public float timeToLeadSquadToPoI = 0f;
     public float currentStrength = 0f;
 
     public bool queryAllAvailableUnits = false;
@@ -139,9 +140,34 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             }
             else
             {
-                if (blackboard.AllyFactories.Length > 1 && aiController.TotalBuildPoints < 10)
+                if (blackboard.AllyFactories.Length > 2 && aiController.TotalBuildPoints < 10)
                 {
-                    var randomIndexes = Enumerable.Range(0, blackboard.AllyFactories.Length)
+                    List<Factory> factories = new List<Factory>(blackboard.AllyFactories);
+
+                    float maxDistance = float.MaxValue;
+                    float minDistance = float.MinValue;
+                    
+                    int maxDistanceFactory = 0;
+                    int minDistanceFactory = 0;
+
+                    Vector3 enemyBarycenter = GameUtility.GetTeamBarycenter(ETeam.Blue);
+                    
+                    for (int index = 0; index < factories.Count; index++)
+                    {
+                        float factoryDistance = (factories[index].transform.position - enemyBarycenter).magnitude;
+                        if (factoryDistance > maxDistance)
+                        {
+                            maxDistance = factoryDistance;
+                            maxDistanceFactory = index;
+                        }
+                        else if (factoryDistance < minDistance)
+                        {
+                            minDistance = factoryDistance;
+                            minDistanceFactory = index;
+                        }
+                    }
+                    
+                    var randomIndexes = Enumerable.Range(0, blackboard.AllyFactories.Length).Where(factoryIndex =>  factoryIndex != maxDistanceFactory && factoryIndex != minDistanceFactory)
                         .OrderBy(i => UnityEngine.Random.Range(0, 100)).ToList();
                     bool found = false;
                     int i = 0;
@@ -166,7 +192,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                         }
 
                         i++;
-                    } while (!found && i < blackboard.AllyFactories.Length);
+                    } while (!found && i < randomIndexes.Count);
                 }
             }
 

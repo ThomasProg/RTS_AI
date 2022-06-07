@@ -70,6 +70,8 @@ public class ConstructFactoryPoI : PointOfInterest
         // Get all buildable factory
         FactoryDataScriptable tiere1Factory = null;
         FactoryDataScriptable tiere2Factory = null;
+        int idTiere1Factory = 0;
+        int idTiere2Factory = 0;
         
         for (int i = 0; i < stratAI.controller.Factories[0].FactoryPrefabsCount; i++)
         {
@@ -78,10 +80,12 @@ public class ConstructFactoryPoI : PointOfInterest
             {
                 case "Light Factory":
                     tiere1Factory = factory;
+                    idTiere1Factory = i;
                     break;
                 
                 case "Heavy Factory":
                     tiere2Factory = factory;
+                    idTiere2Factory = i;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -99,28 +103,30 @@ public class ConstructFactoryPoI : PointOfInterest
         // Evaluate chance to construct tiere 2 factory
         float constructFactoryTiere2Chance = 0f;
 
-        float rationPOIOccupiedByIA = GameServices.GetAIController().CapturedTargets /
-                                      (float) GameServices.GetTargetBuildings().Length;
+        float rationPOIOccupiedByIA = 0f;
+                
+        rationPOIOccupiedByIA += GameServices.GetAIController().CapturedTargets /
+            (float) GameServices.GetTargetBuildings().Length;
 
         constructFactoryTiere2Chance = rationPOIOccupiedByIA;
 
         if (GameServices.GetPlayerController().IsTiere2())
         {
-            constructFactoryTiere2Chance *= IAAnticipation * 2f;
+            constructFactoryTiere2Chance += IAAnticipation;
         }
 
         float randomUnitValue = UnityEngine.Random.value;
 
         if (randomUnitValue > 1f - Mathf.Min(constructFactoryTiere2Chance, 1f))
         {
-            if (stratAI.controller.TotalBuildPoints < tiere2Factory.Cost * costAnticipationRatio)
-                return tiere2Factory.TypeId;
+            if (stratAI.controller.TotalBuildPoints > tiere2Factory.Cost * costAnticipationRatio)
+                return idTiere2Factory;
             else
                 return -1;
         }
         else
         {
-            return tiere1Factory.TypeId;
+            return idTiere1Factory;
         }
     }
 
