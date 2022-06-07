@@ -502,7 +502,7 @@ public class GameServices : MonoBehaviour
 
                 GameUtility.SquadObjective lastObjective = squadObjective.objectives.Last();
                 GUILayout.Label(
-                    $"Main objective: {lastObjective.poi} | Enemy strength {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
+                    $"Main objective: {lastObjective.poi} | Enemy strength {lastObjective.aiStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
 
                 GUILayout.EndHorizontal();
 
