@@ -5,7 +5,7 @@ using UnityEngine;
 public class CapturePointTask : IPOITask<StrategyAI.Blackboard>
 {
     public CapturePointPoI capturePointPoI;
-    public float timeToLeadSquadToPoI = 1f;
+    public float timeToLeadSquadToPoI = 3f;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {

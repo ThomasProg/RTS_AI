@@ -71,7 +71,6 @@ public class StrategyAI : MonoBehaviour
         squad.OnSquadEmpty += current =>
         {
             newSquadPoI.RemoveAllSquads();
-            AllPointOfInterests.Remove(newSquadPoI);
         };
     }
 
@@ -192,7 +191,7 @@ public class StrategyAI : MonoBehaviour
                 }
 
                 AllPointOfInterests.RemoveAll(interest =>
-                    interest is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam);
+                    interest is SquadPoI squadPoI);
 
                 // Add squad to PoI list
                 foreach (Squad squad in controller.PlayerSquads)

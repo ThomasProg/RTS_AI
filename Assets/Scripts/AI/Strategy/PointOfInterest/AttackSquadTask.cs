@@ -9,9 +9,6 @@ public class AttackSquadTask : IPOITask<StrategyAI.Blackboard>
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
-        if (squadPoI.enemySquad.Units.Count == 0)
-            squadPoI.RemoveAllSquads();
-
         // Foreach makes an error, since reevaluation can be called during the wait of this loop
         // However, this task should not be continue, so it shouldn't be an error
         for (int i = 0; i < squadPoI.squads.Count; i++)
