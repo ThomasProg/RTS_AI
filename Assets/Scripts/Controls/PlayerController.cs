@@ -569,10 +569,12 @@ public sealed class PlayerController : UnitController
             {
                 if (other.GetTeam() != GetTeam())
                 {
+                    selectedSquad.Stop();
                     selectedSquad.AttackTarget(other);
                 }
                 else if (other.NeedsRepairing())
                 {
+                    selectedSquad.Stop();
                     selectedSquad.RepairTarget(other);
                 }
             }
@@ -584,6 +586,7 @@ public sealed class PlayerController : UnitController
             if (target != null && target.GetTeam() != GetTeam())
             {
                 // Direct call to capturing task $$$ to be improved by AI behaviour
+                selectedSquad.Stop();
                 selectedSquad.GoCaptureTarget(target);
             }
         }
@@ -595,6 +598,7 @@ public sealed class PlayerController : UnitController
 
             float stoppingDistance = (selectedSquad.formation != null) ? selectedSquad.formation.Scale : 1f;
             
+            selectedSquad.Stop();
             selectedSquad.Goto(newPos, stoppingDistance);
         }
     }
