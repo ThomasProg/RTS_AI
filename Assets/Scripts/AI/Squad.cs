@@ -495,6 +495,7 @@ public class Squad : IInfluencer
 
     public ETeam GetTeam()
     {
+        if (IsEmpty) return ETeam.Neutral;
         return Units.First().GetTeam();
     }
 

@@ -237,6 +237,7 @@ public class StrategyAI : MonoBehaviour
 
         while (true)
         {
+            GameServices.GetGameServices().FixMissingMoney();
             // Update player squads
             {
                 ETeam playerTeam = GameServices.GetPlayerController().Team;
@@ -315,17 +316,17 @@ public class StrategyAI : MonoBehaviour
                 yield return enumerator.Current;
             }
 
-            IEnumerator enumerator2 = RunLastTasks(tasksEnumerators);
-
-            // TODO : loop until a certain amount of time without reevaluatioon priorities
-            while (true)
-            {
-                //yield return RunTasks(tasksEnumerators);
-                if (!enumerator2.MoveNext())
-                    break;
-
-                yield return enumerator2.Current;
-            }
+            // IEnumerator enumerator2 = RunLastTasks(tasksEnumerators);
+            //
+            // // TODO : loop until a certain amount of time without reevaluatioon priorities
+            // while (true)
+            // {
+            //     //yield return RunTasks(tasksEnumerators);
+            //     if (!enumerator2.MoveNext())
+            //         break;
+            //
+            //     yield return enumerator2.Current;
+            // }
         }
     }
 }

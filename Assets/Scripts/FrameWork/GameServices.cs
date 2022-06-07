@@ -749,6 +749,30 @@ public class GameServices : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 
+    public void FixMissingMoney()
+    {
+        AIController Controller = GetAIController();
+        int totalUnitCost = 0;
+        int totalBuildingCost = 0;
+        int PendingCost = 0;
+
+        foreach (var unit in Controller.Units)
+        {
+            totalUnitCost += unit.Cost;
+        }
+        
+        foreach (Factory factory in Controller.Factories)
+        {
+            PendingCost += factory.GetPendingCost();
+            totalBuildingCost += factory.Cost;
+        }
+        
+        int totalSpent = totalBuildingCost + totalUnitCost;
+        int maximumPoints = Controller.StartingBuildPoints + Controller.CapturedTargets * 5 + 10;
+
+        Controller.TotalBuildPoints += maximumPoints - (totalSpent + Controller.TotalBuildPoints + PendingCost);
+    }
+
 #if UNITY_EDITOR
     private void DisplayUtilitySystem(UtilitySystem system, string name)
     {
