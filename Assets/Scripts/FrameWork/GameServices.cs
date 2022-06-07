@@ -391,8 +391,14 @@ public class GameServices : MonoBehaviour
             return;
          
         m_fowFeature.settings.terrainFogOfWars = new []{m_teamPlayerFogOfWar};
-        m_rendererData.SetDirty();
         
+#if UNITY_EDITOR
+        m_fowFeature.settings.IsEnabled = debug.fogOfWarDebug.useFogOfWar;
+        debug.fogOfWarDebug.useFogOfWar = debug.fogOfWarDebug.debugButtonPrevious;
+#endif
+        
+        m_rendererData.SetDirty();
+
         m_teamsUnitsRenderer[0] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
         m_teamsUnitsRenderer[1] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
     }
