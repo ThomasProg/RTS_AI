@@ -33,7 +33,7 @@ public class Unit : BaseEntity
 
     public float GetStrength()
     {
-        return Cost;
+        return GetUnitData.DPS;
     }
 
     override public void Init(ETeam _team)
