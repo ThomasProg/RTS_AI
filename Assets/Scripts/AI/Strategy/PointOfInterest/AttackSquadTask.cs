@@ -18,7 +18,8 @@ public class AttackSquadTask : IPOITask<StrategyAI.Blackboard>
             {
                 //Debug.Log(Time.time + " : ========== GoCapturePoint : " + i);
                 Unit unit = squadPoI.enemySquad.GetNearestUnit(squad.GetAveragePosition());
-
+                
+                squad.Goto(unit.transform.position, squad.GetSquadAttackRange());
                 squad.AttackTarget(unit);
                 yield return new WaitForSeconds(timeToLeadSquadToPoI);
             }

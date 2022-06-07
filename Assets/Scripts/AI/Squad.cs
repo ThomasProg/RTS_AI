@@ -429,10 +429,10 @@ public class Squad : IInfluencer
             unit.SetTaskGoTo(formationTargetPositions[unit], stoppingDistance);
         }
     }
-    
-    public void Regroup(Vector3 target)
+
+    public void Regroup()
     {
-        CheckAndUpdateFormation(target);
+        CheckAndUpdateFormation(GameUtility.ToVec3(GetAveragePosition()));
 
         Vector3 averagePosition3D = GameUtility.ToVec3(GetAveragePosition());
         Dictionary<Unit, Vector3> formationAveragePosition = formation.GetUnitsPosition(averagePosition3D);
@@ -503,8 +503,18 @@ public class Squad : IInfluencer
         return targetDir.normalized * maxRange;
     }
 
-    // private float GetSquadAttackRange()
-    // {
-    //     Units.Select(unit => unit.da)
-    // }
+    public float GetSquadAttackRange()
+    {
+        return Units.Select(unit => unit.UnitData.AttackDistanceMax).Max();
+    }
+    
+    public float GetSquadRepairRange()
+    {
+        return Units.Select(unit => unit.UnitData.CaptureDistanceMax).Max();
+    }
+    
+    public float GetSquadCaptureRange()
+    {
+        return Units.Select(unit => unit.UnitData.CaptureDistanceMax).Max();
+    }
 }
