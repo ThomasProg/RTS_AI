@@ -23,7 +23,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         int nbUnitsBeingCreated;
         do
         {
-            if (currentStrength > strengthRequired)
+            if (currentStrength > strengthRequired && !queryAllAvailableUnits)
                 yield break;
 
             //Debug.Log(Time.time + " : ========== Query Units ==========");

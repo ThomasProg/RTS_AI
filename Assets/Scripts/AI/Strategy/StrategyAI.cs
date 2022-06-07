@@ -181,6 +181,11 @@ public class StrategyAI : MonoBehaviour
             {
                 ETeam playerTeam = GameServices.GetPlayerController().Team;
                 //Remove previous player squad
+                foreach (PointOfInterest poi in AllPointOfInterests)
+                {
+                    if (poi is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam)
+                        poi.RemoveAllSquads();
+                }
                 AllPointOfInterests.RemoveAll(interest =>
                     interest is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam);
 
