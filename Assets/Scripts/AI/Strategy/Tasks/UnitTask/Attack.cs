@@ -42,7 +42,14 @@ public class Attack : Task
     public bool CanAttack()
     {
         float sqrDist = (m_target.GetInfluencePosition() - m_unit.GetInfluencePosition()).sqrMagnitude;
-        return sqrDist <= m_unit.UnitData.AttackDistanceMax * m_unit.GetUnitData.AttackDistanceMax && m_target.GetTeam() != m_unit.GetTeam();
+        return sqrDist <= m_unit.UnitData.AttackDistanceMax * m_unit.GetUnitData.AttackDistanceMax * 9 // if unit is further than 3 times its range, give up the attack
+               && m_target.GetTeam() != m_unit.GetTeam();
+    }
+
+    private bool IsCloseEnough()
+    {
+        return (m_target.GetInfluencePosition() - m_unit.GetInfluencePosition()).sqrMagnitude <
+            m_unit.UnitData.AttackDistanceMax * m_unit.GetUnitData.AttackDistanceMax;
     }
     
     public void ComputeAttack()
@@ -51,6 +58,10 @@ public class Attack : Task
         {
             OnEnd();
             return;
+        }
+        if (!IsCloseEnough())
+        {
+            m_unit.GoTo(m_target.GetInfluencePosition(), m_unit.GetUnitData.AttackDistanceMax);
         }
 
         Transform transform = m_unit.transform;
