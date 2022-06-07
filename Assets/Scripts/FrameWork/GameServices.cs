@@ -534,14 +534,14 @@ public class GameServices : MonoBehaviour
                     float influenceRadius = Mathf.Sqrt(squadObjective.current.GetInfluenceRadius());
 
                     float efficiencyTotal = 0f;
-                    for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+                    for (int i = squadObjective.objectives.Count - 1; i >= Mathf.Max(0, squadObjective.objectives.Count - 3); i--)
                     {
                         efficiencyTotal += squadObjective.objectives[i].GetStrategyEffectivity();
                     }
 
                     // display the 3 main objectives
                     float thickness = 4f;
-                    for (int i = squadObjective.objectives.Count - 1; i >= squadObjective.objectives.Count - 3; i--)
+                    for (int i = squadObjective.objectives.Count - 1; i >= Mathf.Max(0, squadObjective.objectives.Count - 3); i--)
                     {
                         GameUtility.SquadObjective lastObjective = squadObjective.objectives[i];
                         Color color = Color.blue;
