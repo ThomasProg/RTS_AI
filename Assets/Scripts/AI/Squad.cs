@@ -396,7 +396,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(targetCapturePoint.transform.position, unit.UnitData.CaptureDistanceMax - offsetToDestination);
+            unit.AddTaskGoTo(targetCapturePoint.transform.position, unit.UnitData.CaptureDistanceMax * 0.9f );
             unit.AddTaskCaptureTarget(targetCapturePoint);
         }
     }
@@ -405,7 +405,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(attackedEntity.transform.position, unit.UnitData.AttackDistanceMax - offsetToDestination);
+            unit.AddTaskGoTo(attackedEntity.transform.position, unit.UnitData.AttackDistanceMax * 0.9f  );
             unit.AddTaskAttackTarget(attackedEntity);
         }
     }
@@ -414,7 +414,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(repairedEntity.transform.position, unit.UnitData.RepairDistanceMax - offsetToDestination);
+            unit.AddTaskGoTo(repairedEntity.transform.position, unit.UnitData.RepairDistanceMax * 0.9f  );
             unit.AddTaskRepairTarget(repairedEntity);
         }
     }
@@ -427,7 +427,7 @@ public class Squad : IInfluencer
 
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(formationTargetPositions[unit], stoppingDistance);
+            unit.AddTaskGoTo(formationTargetPositions[unit], stoppingDistance);
         }
     }
 
@@ -440,7 +440,7 @@ public class Squad : IInfluencer
 
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(formationAveragePosition[unit]);
+            unit.AddTaskGoTo(formationAveragePosition[unit]);
         }
     }
 
@@ -506,16 +506,16 @@ public class Squad : IInfluencer
 
     public float GetSquadAttackRange()
     {
-        return Units.Select(unit => unit.UnitData.AttackDistanceMax).Max();
+        return Units.Select(unit => unit.UnitData.AttackDistanceMax).Max() * 0.9f; // A little bit closer to have some margin
     }
     
     public float GetSquadRepairRange()
     {
-        return Units.Select(unit => unit.UnitData.CaptureDistanceMax).Max();
+        return Units.Select(unit => unit.UnitData.RepairDistanceMax).Max() * 0.9f; // A little bit closer to have some margin
     }
     
     public float GetSquadCaptureRange()
     {
-        return Units.Select(unit => unit.UnitData.CaptureDistanceMax).Max();
+        return Units.Select(unit => unit.UnitData.CaptureDistanceMax).Max() * 0.9f; // A little bit closer to have some margin
     }
 }

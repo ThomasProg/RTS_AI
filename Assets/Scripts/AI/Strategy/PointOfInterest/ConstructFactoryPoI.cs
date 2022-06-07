@@ -130,6 +130,15 @@ public class ConstructFactoryPoI : PointOfInterest
     
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
+        if (priority < Mathf.Epsilon)
+        {
+            Debug.LogWarning("Constructing a factory with priority 0");
+        }
+        else
+        {
+            Debug.Log($"Constructing a factory with priority {priority}");
+
+        }
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
         constructTask.position = position;
         constructTask.idFactoryToBuild = factoryToBuildID;

@@ -14,7 +14,11 @@ public class DestroyFactoryTask : IPOITask<StrategyAI.Blackboard>
         {
             Squad squad = factoryPoI.squads[i];
             if (squad.IsIdle)
+            {
+                squad.Regroup();
+                squad.Goto(factoryPoI.factory.transform.position, squad.GetSquadAttackRange());
                 squad.AttackTarget(factoryPoI.factory);
+            }
         }
 
         yield break;

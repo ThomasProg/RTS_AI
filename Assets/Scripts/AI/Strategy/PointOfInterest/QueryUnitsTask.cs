@@ -134,7 +134,11 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             }
             else
             {
-                // TODO: What the squads have to do if we have no solution to counter the power of the enemy.
+                if (blackboard.AllyFactories.Length > 1)
+                {
+                    Factory factoryToDestroy = blackboard.AllyFactories[UnityEngine.Random.Range(0, blackboard.AllyFactories.Length)]; // TODO: don't choose randomly
+                    factoryToDestroy.Destroy();
+                }
             }
 
 
