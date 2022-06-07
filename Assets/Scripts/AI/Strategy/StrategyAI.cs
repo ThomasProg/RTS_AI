@@ -218,6 +218,23 @@ public class StrategyAI : MonoBehaviour
                 }
             }
 
+            // For idle squads : go to the poi with the highest priority
+            if (AllPointOfInterestsByPriority.Count > 0)
+            {
+                List<IPOITask<Blackboard>> poiTasks = AllPointOfInterestsByPriority[0].GetProcessTasks(bb);
+                List<IEnumerator> taskEnumerators = new List<IEnumerator>(poiTasks.Count);
+                for (int j = 0; j < poiTasks.Count; j++)
+                {
+                    if (poiTasks.Count > 0 && poiTasks[0] is QueryUnitsTask queryUnitsTask)
+                    {
+                        queryUnitsTask.queryAllAvailableUnits = true;
+                        queryUnitsTask.queryIdleUnitsOnly = true;
+                    }
+                    taskEnumerators.Add(poiTasks[j].Execute(bb));
+                }
+                tasksEnumerators.Add(taskEnumerators);
+            }
+
             float lastPriorityUpdate = Time.time;
 
             IEnumerator enumerator = RunTasks(tasksEnumerators);

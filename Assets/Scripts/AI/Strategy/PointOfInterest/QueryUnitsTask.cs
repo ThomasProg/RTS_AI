@@ -16,6 +16,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     public float currentStrength = 0f;
 
     public bool queryAllAvailableUnits = false;
+    public bool queryIdleUnitsOnly = false;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
@@ -40,7 +41,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
             foreach (Squad squad in blackboard.squadManager.squads)
             {
-                if (squad.PointOfInterest == null || squad.PointOfInterest == pointOfInterest || squad.PointOfInterest.priority <= pointOfInterest.priority)
+                if (squad.PointOfInterest == null || squad.PointOfInterest.priority == 0 || squad.PointOfInterest == pointOfInterest || (squad.PointOfInterest.priority <= pointOfInterest.priority && !queryIdleUnitsOnly))
                 {
                     float time = (pointOfInterest.position - squad.GetAveragePosition()).magnitude / squad.GetSquadSpeed();
                     if (squad.PointOfInterest == pointOfInterest)
