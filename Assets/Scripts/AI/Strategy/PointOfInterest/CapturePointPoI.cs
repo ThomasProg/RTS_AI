@@ -176,7 +176,7 @@ public class CapturePointPoI : PointOfInterest
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = strengthRequired });  // Strength : [1.. strengthRequired + 1]
+        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(strengthRequired) });
         tasks.Add(new CapturePointTask() { capturePointPoI = this });
         return tasks;
     }
