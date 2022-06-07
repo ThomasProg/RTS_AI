@@ -28,10 +28,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
         
         IsInitialized = true;
     }
-    public Color GetColor()
-    {
-        return GameServices.GetTeamColor(GetTeam());
-    }
+    
     void UpdateHpUI()
     {
         if (HPText != null)
