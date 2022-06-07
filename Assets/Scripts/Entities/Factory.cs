@@ -14,6 +14,7 @@ public sealed class Factory : BaseEntity
     int RequestedEntityBuildIndex = -1;
     Image BuildGaugeImage;
     float CurrentBuildDuration = 0f;
+    int CurrentBuildCost = 0;
     float EndBuildDate = 0f;
     int SpawnCount = 0;
     /* !! max available unit count in menu is set to 9, available factories count to 3 !! */
@@ -252,6 +253,7 @@ public sealed class Factory : BaseEntity
         }
 
         CurrentBuildDuration = GetBuildableUnitData(unitMenuIndex).BuildDuration;
+        CurrentBuildCost = GetBuildableUnitData(unitMenuIndex).Cost;
         //Debug.Log("currentBuildDuration " + CurrentBuildDuration);
 
         CurrentState = State.BuildingUnit;
@@ -329,6 +331,7 @@ public sealed class Factory : BaseEntity
 
         BuildGaugeImage.fillAmount = 0f;
         CurrentBuildDuration = 0f;
+        CurrentBuildCost = 0;
         RequestedEntityBuildIndex = -1;
 
         OnBuildCanceled?.Invoke();
@@ -414,5 +417,19 @@ public sealed class Factory : BaseEntity
         EndBuildDate = Time.time + FactoryData.BuildDuration;
     }
 
+
+    public int GetPendingCost()
+    {
+        int pendingCost = 0;
+        foreach (int unitIndex in BuildingQueue)
+        {
+            pendingCost += GetUnitCost(unitIndex);
+        }
+
+        if (CurrentState == State.BuildingUnit)
+            pendingCost += CurrentBuildCost;
+
+        return pendingCost;
+    }
     #endregion
 }

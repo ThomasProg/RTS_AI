@@ -11,7 +11,7 @@ public abstract class UnitController : MonoBehaviour
     public ETeam GetTeam() { return Team; }
 
     [SerializeField]
-    protected int StartingBuildPoints = 15;
+    protected int _StartingBuildPoints = 15;
 
     protected int _TotalBuildPoints = 0;
     public int TotalBuildPoints
@@ -24,6 +24,8 @@ public abstract class UnitController : MonoBehaviour
             OnBuildPointsUpdated?.Invoke();
         }
     }
+
+    public int StartingBuildPoints => _StartingBuildPoints;
 
     protected int _CapturedTargets = 0;
     public int CapturedTargets
