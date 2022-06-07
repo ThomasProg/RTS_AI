@@ -793,6 +793,11 @@ PrefabInstance:
       objectReference: {fileID: 1508647155}
     - target: {fileID: 114127896467981986, guid: dc4ee6691f59b07458286e0cfb38d82d,
         type: 3}
+      propertyPath: _StartingBuildPoints
+      value: 10000
+      objectReference: {fileID: 0}
+    - target: {fileID: 114127896467981986, guid: dc4ee6691f59b07458286e0cfb38d82d,
+        type: 3}
       propertyPath: FactoryPreviewTransparency
       value: 0.3
       objectReference: {fileID: 0}
@@ -2383,6 +2388,11 @@ PrefabInstance:
       objectReference: {fileID: 1776657147}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: debug.fogOfWarDebug.useFogOfWar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: m_teamInfluenceMap.Array.data[0]
       value: 
       objectReference: {fileID: 1776657148}
@@ -2409,7 +2419,7 @@ PrefabInstance:
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
       propertyPath: debug.aiSquadDecisionPrevision.display3MainObjectif
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4669120816251285810, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
@@ -2760,6 +2770,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: AIController
+      objectReference: {fileID: 0}
+    - target: {fileID: 7859672622032877473, guid: fee74b0095774cf4f9701d9fab58813d,
+        type: 3}
+      propertyPath: _StartingBuildPoints
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fee74b0095774cf4f9701d9fab58813d, type: 3}
