@@ -19,6 +19,8 @@ public class Squad : IInfluencer
     private int previousFramePosUpdated;
     private Vector2 currentPosition;
 
+    float offsetToDestination = 2f;
+
     public PointOfInterest PointOfInterest
     {
         get => _pointOfInterest;
@@ -49,9 +51,12 @@ public class Squad : IInfluencer
     {
         Units.Remove(unit);
         unit.OnDeadEvent -= unitToRemove => RemoveUnit(unitToRemove as Unit);
-        
+
         if (Units.Count == 0)
+        {
+            PointOfInterest = null;
             OnSquadEmpty?.Invoke(this);
+        }
     }
 
     public bool IsEmpty => Units.Count == 0;
@@ -374,7 +379,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(targetCapturePoint.transform.position, unit.UnitData.CaptureDistanceMax);
+            unit.SetTaskGoTo(targetCapturePoint.transform.position, unit.UnitData.CaptureDistanceMax - offsetToDestination);
             unit.AddTaskCaptureTarget(targetCapturePoint);
         }
     }
@@ -383,7 +388,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(attackedEntity.transform.position, unit.UnitData.AttackDistanceMax);
+            unit.SetTaskGoTo(attackedEntity.transform.position, unit.UnitData.AttackDistanceMax - offsetToDestination);
             unit.AddTaskAttackTarget(attackedEntity);
         }
     }
@@ -392,7 +397,7 @@ public class Squad : IInfluencer
     {
         foreach (Unit unit in Units)
         {
-            unit.SetTaskGoTo(repairedEntity.transform.position, unit.UnitData.RepairDistanceMax);
+            unit.SetTaskGoTo(repairedEntity.transform.position, unit.UnitData.RepairDistanceMax - offsetToDestination);
             unit.AddTaskRepairTarget(repairedEntity);
         }
     }
