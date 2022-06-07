@@ -12,6 +12,7 @@ public class Unit : BaseEntity
     private PoolTaskRunner m_taskRunner = new PoolTaskRunner();
 
     public Formation formation;
+    public float LastActionDate = 0f;
 
     NavMeshAgent navMeshAgent;
     public bool IsIdle => !m_taskRunner.IsRunningTask();

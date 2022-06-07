@@ -6,7 +6,6 @@ public class Attack : Task
 {
     private Unit m_unit;
     private BaseEntity m_target;
-    float LastActionDate = 0f;
 
     public Attack(Unit unit, BaseEntity target)
     {
@@ -62,9 +61,9 @@ public class Attack : Task
         eulerRotation.z = 0f;
         transform.eulerAngles = eulerRotation;
 
-        if ((Time.time - LastActionDate) > m_unit.UnitData.AttackFrequency)
+        if ((Time.time - m_unit.LastActionDate) > m_unit.UnitData.AttackFrequency)
         {
-            LastActionDate = Time.time;
+            m_unit.LastActionDate = Time.time;
             // visual only ?
             if (m_unit.UnitData.BulletPrefab)
             {
