@@ -109,8 +109,8 @@ public class GameServices : MonoBehaviour
     GameState CurrentGameState = null;
 
     private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
-    private TerrainFogOfWar[] m_teamFogOfWar = new TerrainFogOfWar[(int) ETeam.TeamCount];
-    private List<MeshRenderer>[] m_teamsUnitsRenderer = new List<MeshRenderer>[(int) ETeam.TeamCount];
+    private TerrainFogOfWar m_teamPlayerFogOfWar;
+    private Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>[] m_teamsUnitsRenderer = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>[(int) ETeam.TeamCount];
 
     [SerializeField] ForwardRendererData m_rendererData;
     private PostProcessFogOfWarFeature m_fowFeature;
@@ -165,11 +165,6 @@ public class GameServices : MonoBehaviour
     public TerrainInfluenceMap GetInfluenceMap(ETeam team)
     {
         return m_teamInfluenceMap[(int) team];
-    }
-    
-    public TerrainFogOfWar GetFogOfWar(ETeam team)
-    {
-        return m_teamFogOfWar[(int) team];
     }
 
     public static TargetBuilding[] GetTargetBuildings()
@@ -262,16 +257,12 @@ public class GameServices : MonoBehaviour
             Debug.LogWarning($"Influence map {(int) team} does not exist");
         }
         
-        if (m_teamFogOfWar[(int) team] != null)
+        if (team == GetPlayerController().Team)
         {
-            m_teamFogOfWar[(int) team].RegisterEntity(entity);
-        }
-        else
-        {
-            Debug.LogWarning($"Fog of war map {(int) team} does not exist");
+            m_teamPlayerFogOfWar.RegisterEntity(entity);
         }
         
-        m_teamsUnitsRenderer[(int) team].Add(entity.GetComponentInChildren<MeshRenderer>());
+        m_teamsUnitsRenderer[(int) team].Add(entity, new Tuple<Renderer[], Canvas>(entity.GetComponentsInChildren<Renderer>(), entity.GetComponentInChildren<Canvas>()));
     }
     
     public void RegisterUnit(ETeam team, TargetBuilding entity)
@@ -285,16 +276,10 @@ public class GameServices : MonoBehaviour
             Debug.LogWarning($"Influence map {(int) team} does not exist");
         }
         
-        if (m_teamFogOfWar[(int) team] != null)
+        if (team == GetPlayerController().Team)
         {
-            m_teamFogOfWar[(int) team].RegisterEntity(entity);
+            m_teamPlayerFogOfWar.RegisterEntity(entity);
         }
-        else
-        {
-            Debug.LogWarning($"Fog of war map {(int) team} does not exist");
-        }
-        
-        m_teamsUnitsRenderer[(int) team].Remove(entity.GetComponentInChildren<MeshRenderer>());
     }
 
     /// <summary>
@@ -311,13 +296,22 @@ public class GameServices : MonoBehaviour
     public void UnregisterUnit(ETeam team, BaseEntity entity)
     {
         m_teamInfluenceMap[(int) team]?.UnregisterEntity(entity);
-        m_teamFogOfWar[(int) team]?.UnregisterEntity(entity);
+        
+        if (team == GetPlayerController().Team)
+        {
+            m_teamPlayerFogOfWar?.UnregisterEntity(entity);
+        }
+        m_teamsUnitsRenderer[(int) team].Remove(entity);
     }
     
     public void UnregisterUnit(ETeam team, TargetBuilding entity)
     {
         m_teamInfluenceMap[(int) team]?.UnregisterEntity(entity);
-        m_teamFogOfWar[(int) team]?.UnregisterEntity(entity);
+        
+        if (team == GetPlayerController().Team)
+        {
+            m_teamPlayerFogOfWar?.UnregisterEntity(entity);
+        }
     }
 
     #region MonoBehaviour methods
@@ -339,7 +333,7 @@ public class GameServices : MonoBehaviour
         // Store TargetBuildings
         TargetBuildingArray = FindObjectsOfType<TargetBuilding>();
         m_teamInfluenceMap = FindObjectsOfType<TerrainInfluenceMap>();
-        m_teamFogOfWar = FindObjectsOfType<TerrainFogOfWar>();
+        m_teamPlayerFogOfWar = FindObjectOfType<TerrainFogOfWar>();
 
         // Store GameState ref
         if (CurrentGameState == null)
@@ -379,11 +373,11 @@ public class GameServices : MonoBehaviour
         if (m_fowFeature == null)
             return;
          
-        m_fowFeature.settings.terrainFogOfWars = new []{m_teamFogOfWar[(int)GetPlayerController().Team]};
+        m_fowFeature.settings.terrainFogOfWars = new []{m_teamPlayerFogOfWar};
         m_rendererData.SetDirty();
         
-        m_teamsUnitsRenderer[0] = new List<MeshRenderer>();
-        m_teamsUnitsRenderer[1] = new List<MeshRenderer>();
+        m_teamsUnitsRenderer[0] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
+        m_teamsUnitsRenderer[1] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
     }
 
     private void Update()
@@ -426,19 +420,25 @@ public class GameServices : MonoBehaviour
 
     void UpdateHiddenObject()
     {
-        TerrainFogOfWar terrainFogOfWar = m_teamFogOfWar[(int) GetPlayerController().Team];
-   
-        Color[] colors1 = terrainFogOfWar.GetDatas();
+        Color[] colors1 = m_teamPlayerFogOfWar.GetDatas();
         
-        foreach (MeshRenderer unitsRenderer in m_teamsUnitsRenderer[(int) GetAIController().Team])
+        foreach (KeyValuePair<BaseEntity, Tuple<Renderer[], Canvas>> unitsRenderers in m_teamsUnitsRenderer[(int) GetAIController().Team])
         {
-            Vector3 position = unitsRenderer.transform.position;
-            float x = (position.x - terrainFogOfWar.Terrain.GetPosition().x) / (float)terrainFogOfWar.Terrain
-                .terrainData.size.x * (terrainFogOfWar.RenderTexture.width - 1);
-            float y = (position.z - terrainFogOfWar.Terrain.GetPosition().z) / (float)terrainFogOfWar.Terrain
-                .terrainData.size.z * (terrainFogOfWar.RenderTexture.height - 1);
-        
-            unitsRenderer.enabled = colors1[((int)x + (int)y * terrainFogOfWar.RenderTexture.width)].r > 0.5f;
+            Vector3 position = unitsRenderers.Key.transform.position;
+            float x = (position.x - m_teamPlayerFogOfWar.Terrain.GetPosition().x) / (float)m_teamPlayerFogOfWar.Terrain
+                .terrainData.size.x * (m_teamPlayerFogOfWar.RenderTexture.width - 1);
+            float y = (position.z - m_teamPlayerFogOfWar.Terrain.GetPosition().z) / (float)m_teamPlayerFogOfWar.Terrain
+                .terrainData.size.z * (m_teamPlayerFogOfWar.RenderTexture.height - 1);
+
+            bool shouldBeDisplay = colors1[((int) x + (int) y * m_teamPlayerFogOfWar.RenderTexture.width)].r > 0.5f;
+
+            foreach (Renderer unitsRenderer in unitsRenderers.Value.Item1)
+            {
+                unitsRenderer.enabled = shouldBeDisplay;
+            }
+
+            if (unitsRenderers.Value.Item2 != null)
+                unitsRenderers.Value.Item2.enabled = shouldBeDisplay;
         }
     }
 
@@ -488,7 +488,7 @@ public class GameServices : MonoBehaviour
             if (debug.aiSquadDecisionPrevision.display3MainObjectif)
             {
                 List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
-                    GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), 1.1f);
+                    GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), GetAIController().PlayerSquads , GetAIController().Squads, 1.1f);
 
                 foreach (GameUtility.EnemySquadPotentialObjectives squadObjective in squadsObjective)
                 {
@@ -568,7 +568,7 @@ public class GameServices : MonoBehaviour
         else if (debug.aiSquadDecisionPrevision.displayStatistic)
         {
             List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
-                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), 1.1f);
+                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), GetAIController().PlayerSquads , GetAIController().Squads, 1.1f);
 
             GUILayout.BeginVertical("box");
             GUILayout.Label("AI squad decision prevision");
@@ -590,7 +590,7 @@ public class GameServices : MonoBehaviour
 
                 GameUtility.SquadObjective lastObjective = squadObjective.objectives.Last();
                 GUILayout.Label(
-                    $"Main objective: {lastObjective.poi} | Enemy strength {lastObjective.enemyStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
+                    $"Main objective: {lastObjective.poi} | Enemy strength {lastObjective.aiStrength} | Efficiency {lastObjective.GetStrategyEffectivity()} | Distance {Mathf.Sqrt(lastObjective.sqrtDistanceFromSquad)}");
 
                 GUILayout.EndHorizontal();
 

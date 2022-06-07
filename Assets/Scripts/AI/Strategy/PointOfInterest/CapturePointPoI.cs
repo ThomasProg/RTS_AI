@@ -53,7 +53,7 @@ public class CapturePointPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f,  stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1f + stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value,  0.4f);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
@@ -120,7 +120,7 @@ public class CapturePointPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f,  stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1f +  stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value,  0.4f);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
@@ -176,7 +176,7 @@ public class CapturePointPoI : PointOfInterest
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = strengthRequired });  // Strength : [1.. strengthRequired + 1]
+        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(strengthRequired) });
         tasks.Add(new CapturePointTask() { capturePointPoI = this });
         return tasks;
     }

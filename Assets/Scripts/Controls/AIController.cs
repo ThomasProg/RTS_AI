@@ -25,7 +25,7 @@ public sealed class AIController : UnitController
             if (Time.frameCount != currentFrame)
             {
                 currentFrame = Time.frameCount;
-                playerSquadsEvaluated = Squad.MakeSquadsDependingOnDistance(GameServices.GetPlayerController().Units, 50f).ToArray();
+                playerSquadsEvaluated = Squad.MakeSquadsDependingOnDistance(GameServices.GetPlayerController().Units, 20f).ToArray();
             }
             return playerSquadsEvaluated;
         }
@@ -45,6 +45,12 @@ public sealed class AIController : UnitController
 
         strategyAI = GetComponent<StrategyAI>();
         strategyAI.controller = this;
+
+        GameServices.GetGameState().OnGameOver += team =>
+        {
+            strategyAI.StopAllCoroutines();
+            Destroy(this);
+        };
     }
 
     protected override void OnEnable()
