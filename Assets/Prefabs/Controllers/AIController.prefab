@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Team: 1
-  StartingBuildPoints: 15
+  _StartingBuildPoints: 15
   allCapturePoints: []
-  strategyAI: {fileID: 0}
+  strategyAI: {fileID: 5206995088221600700}
 --- !u!114 &5206995088221600700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,14 +63,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectiveData: {fileID: 11400000, guid: 241f29dcb09ca4e458a6cc527bbe110c, type: 2}
   subjectiveData: {fileID: 11400000, guid: 20a994df6bbf10243980c774756e46c3, type: 2}
-  objectiveUtilitySystem:
-    _inputs: []
-    _outputs: []
-  subjectiveUtilitySystem:
-    _inputs: []
-    _outputs: []
-  squadManager: {fileID: 0}
-  controller: {fileID: 0}
+  squadManager: {fileID: 6714351295713009865}
+  controller: {fileID: 7859672622032877473}
 --- !u!114 &6714351295713009865
 MonoBehaviour:
   m_ObjectHideFlags: 0

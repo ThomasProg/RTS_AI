@@ -1235,45 +1235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f361e24ae60f5c8438582fd63c5eaeb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1162211806 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3124353299293301192, guid: 32676265f95fdeb40833df7b0b170998,
-    type: 3}
-  m_PrefabInstance: {fileID: 1758179112}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1162211812
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162211806}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
 --- !u!4 &1163074007 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4162452776302188, guid: 0d9616ec63050ca4fa2fc0cc793599d0,
@@ -1663,16 +1624,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3124353299293301188, guid: 32676265f95fdeb40833df7b0b170998,
-        type: 3}
-      propertyPath: orthographic
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3124353299293301188, guid: 32676265f95fdeb40833df7b0b170998,
-        type: 3}
-      propertyPath: orthographic size
-      value: 66
-      objectReference: {fileID: 0}
     - target: {fileID: 3124353299293301191, guid: 32676265f95fdeb40833df7b0b170998,
         type: 3}
       propertyPath: m_RootOrder
@@ -2094,6 +2045,45 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 85679479}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1910818995 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3124353299293301192, guid: 32676265f95fdeb40833df7b0b170998,
+    type: 3}
+  m_PrefabInstance: {fileID: 1758179112}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1910819001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910818995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
 --- !u!4 &1924697396 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 580627816653263432, guid: fee74b0095774cf4f9701d9fab58813d,
@@ -2260,12 +2250,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
-      propertyPath: m_rendererData
-      value: 
-      objectReference: {fileID: 11400000, guid: 033a4e715226d1f41a22d8aa64d2fa0f,
-        type: 2}
-    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
-        type: 3}
       propertyPath: teamInfluenceMap.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -2286,11 +2270,6 @@ PrefabInstance:
       objectReference: {fileID: 1776657147}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
-      propertyPath: debug.fogOfWarDebug.useFogOfWar
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
-        type: 3}
       propertyPath: m_teamInfluenceMap.Array.data[0]
       value: 
       objectReference: {fileID: 1776657148}
@@ -2306,31 +2285,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
-      propertyPath: debug.barycenter.redBarycenterPrefab
-      value: 
-      objectReference: {fileID: 3703286143503639579, guid: e12936fd818f81040b989457e3c4ff37,
-        type: 3}
-    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
-        type: 3}
-      propertyPath: debug.barycenter.blueBarycenterPrefab
-      value: 
-      objectReference: {fileID: 3703286143503639579, guid: ad7c10e738ff7814c907241a798027e1,
-        type: 3}
-    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
-        type: 3}
-      propertyPath: debug.barycenter.globalBarycenterPrefab
-      value: 
-      objectReference: {fileID: 3703286143503639579, guid: 788c1a2bae5f1f140bd0ed87ef3ccc47,
-        type: 3}
-    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
-        type: 3}
       propertyPath: debug.poiDebugger.displayStrengthRequired
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
-        type: 3}
-      propertyPath: debug.targetAnalysis.targetStatisticRadius
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}

@@ -50,23 +50,43 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 8d99f6689328c0c479f78811db5e37ec, type: 2}
   NonPlayableBorder: 100
   DefaultPlayableBoundsSize: 100
-  m_teamInfluenceMap:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  m_rendererData: {fileID: 11400000, guid: 033a4e715226d1f41a22d8aa64d2fa0f, type: 2}
   debug:
     targetAnalysis:
       drawTargetStatistic: 0
-      targetStatisticRadius: 0
+      targetStatisticRadius: 10
     barycenter:
       prevDrawBarycenters: 0
       globalBarycenterInstance: {fileID: 0}
       redBarycenterInstance: {fileID: 0}
       blueBarycenterInstance: {fileID: 0}
       drawBarycenters: 0
-      globalBarycenterPrefab: {fileID: 0}
-      redBarycenterPrefab: {fileID: 0}
-      blueBarycenterPrefab: {fileID: 0}
+      globalBarycenterPrefab: {fileID: 3703286143503639579, guid: 788c1a2bae5f1f140bd0ed87ef3ccc47,
+        type: 3}
+      redBarycenterPrefab: {fileID: 3703286143503639579, guid: e12936fd818f81040b989457e3c4ff37,
+        type: 3}
+      blueBarycenterPrefab: {fileID: 3703286143503639579, guid: ad7c10e738ff7814c907241a798027e1,
+        type: 3}
+    aiSquadDecisionPrevision:
+      displayStatistic: 0
+      display3MainObjectif: 0
+    poiDebugger:
+      displayPriorities: 0
+      displayStrengthRequired: 0
+    timeScaleDebugger:
+      displayTimeScale: 0
+    aiSquadDebug:
+      displayAISquad: 0
+      useDifferentColors: 0
+    utilitySystemDebug:
+      displayUtilitySystem: 0
+    ResourcePointDebug:
+      displayAIDebug: 0
+      displayPlayerDebug: 0
+    fogOfWarDebug:
+      fowPreviousSetting: 0
+      debugButtonPrevious: 0
+      useFogOfWar: 1
 --- !u!114 &4669120816251285810
 MonoBehaviour:
   m_ObjectHideFlags: 0

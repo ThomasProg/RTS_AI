@@ -12,7 +12,7 @@ public class RepairFactoryTask : IPOITask<StrategyAI.Blackboard>
         for (int i = 0; i < factoryPoI.squads.Count; i++)
         {
             Squad squad = factoryPoI.squads[i];
-            if (squad.IsIdle && factoryPoI != null)
+            if (squad.IsIdle && factoryPoI != null && factoryPoI.factory != null)
             {
                 squad.RepairTarget(factoryPoI.factory);
             }
