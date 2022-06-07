@@ -254,7 +254,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
             unitIndex = UnityEngine.Random.Range(0, unitDatas.Count);
 
-        } while (unitDatas[unitIndex].Cost > controller.TotalBuildPoints); // While we can't buy this unit, try another
+        } while (unitDatas.Count != 0 && unitDatas[unitIndex].Cost > controller.TotalBuildPoints); // While we can't buy this unit, try another
         
         return unitIndex;
     }
