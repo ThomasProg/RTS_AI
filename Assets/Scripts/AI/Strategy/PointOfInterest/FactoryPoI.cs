@@ -84,7 +84,7 @@ public class FactoryPoI : PointOfInterest
             priority *= stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value;
         }
         
-        strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
+        strengthRequired = Mathf.Max(1, playerStrength * strengthRequiredAdditionalCoef);
     }
 
 
@@ -130,7 +130,7 @@ public class FactoryPoI : PointOfInterest
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(Mathf.Max(strengthRequired, 1f)), queryAllAvailableUnits = stratAI.controller.Team != factory.GetTeam()}); // Strength : [1.. strengthRequired + 1]
+        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(strengthRequired), queryAllAvailableUnits = stratAI.controller.Team != factory.GetTeam()}); // Strength : [1.. strengthRequired + 1]
         tasks.Add(new DestroyFactoryTask() { factoryPoI = this });
         return tasks;
     }
