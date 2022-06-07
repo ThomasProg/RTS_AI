@@ -74,7 +74,7 @@ public class Attack : Task
             }
             // apply damages
             int damages = Mathf.FloorToInt(m_unit.UnitData.DPS * m_unit.UnitData.AttackFrequency);
-            m_target.AddDamage(damages);
+            m_target.AddDamage(m_unit, damages);
         }
     }
 }

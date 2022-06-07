@@ -1,6 +1,6 @@
 ﻿
 public interface IDamageable
 {
-    void AddDamage(int amount);
+    void AddDamage(BaseEntity from, int amount);
     void Destroy();
 }

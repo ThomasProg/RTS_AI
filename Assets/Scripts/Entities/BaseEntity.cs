@@ -11,6 +11,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
 
     protected int HP = 0;
     protected Action OnHpUpdated;
+    public Action<BaseEntity> OnTakeDamage;
     protected GameObject SelectedSprite = null;
     protected Text HPText = null;
     protected bool IsInitialized = false;
@@ -28,10 +29,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
         
         IsInitialized = true;
     }
-    public Color GetColor()
-    {
-        return GameServices.GetTeamColor(GetTeam());
-    }
+    
     void UpdateHpUI()
     {
         if (HPText != null)
@@ -51,7 +49,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     #endregion
 
     #region IDamageable
-    public void AddDamage(int damageAmount)
+    public void AddDamage(BaseEntity from, int damageAmount)
     {
         if (IsAlive == false)
             return;
@@ -59,6 +57,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
         HP -= damageAmount;
 
         OnHpUpdated?.Invoke();
+        OnTakeDamage?.Invoke(from);
 
         if (HP <= 0)
         {
@@ -69,7 +68,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     }
     public void Destroy()
     {
-        AddDamage(HP);
+        AddDamage(null, HP);
     }
     #endregion
 

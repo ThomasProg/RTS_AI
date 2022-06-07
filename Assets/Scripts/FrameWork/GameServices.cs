@@ -77,6 +77,14 @@ public class GameServices : MonoBehaviour
     {
         public bool displayUtilitySystem;
     }
+    
+    [Serializable]
+    public struct FogOfWarDebug
+    {
+        [HideInInspector] public bool fowPreviousSetting;
+        [HideInInspector] public bool debugButtonPrevious;
+        public bool useFogOfWar;
+    }
 
     [Serializable]
     public struct ResourcePointDebug
@@ -96,6 +104,7 @@ public class GameServices : MonoBehaviour
         public AISquadDebug aiSquadDebug;
         public UtilitySystemDebug utilitySystemDebug;
         public ResourcePointDebug ResourcePointDebug;
+        public FogOfWarDebug fogOfWarDebug;
     }
 
 #endif
@@ -388,19 +397,26 @@ public class GameServices : MonoBehaviour
         m_teamsUnitsRenderer[1] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
     }
 
-    private bool fowPreviousSetting;
     private void Update()
     {
         if (m_fowFeature.settings.IsEnabled)
             UpdateHiddenObject();
-        else if (fowPreviousSetting != m_fowFeature.settings.IsEnabled)
+        
+#if UNITY_EDITOR
+        else if (debug.fogOfWarDebug.fowPreviousSetting != m_fowFeature.settings.IsEnabled)
         {
             ShowAllEntities();
         }
 
-        fowPreviousSetting = m_fowFeature.settings.IsEnabled;
+        if (debug.fogOfWarDebug.debugButtonPrevious != debug.fogOfWarDebug.useFogOfWar)
+        {
+            m_fowFeature.settings.IsEnabled = debug.fogOfWarDebug.useFogOfWar;
+            m_rendererData.SetDirty();
+            debug.fogOfWarDebug.fowPreviousSetting = m_fowFeature.settings.IsEnabled;
+        }
 
-#if UNITY_EDITOR
+        debug.fogOfWarDebug.debugButtonPrevious = debug.fogOfWarDebug.useFogOfWar;
+        
         if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
         {
             debug.barycenter.prevDrawBarycenters = debug.barycenter.drawBarycenters;
