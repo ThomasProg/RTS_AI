@@ -359,7 +359,7 @@ public class Unit : BaseEntity
     
     public override float GetVisibilityRadius()
     {
-        return Mathf.Max(UnitData.AttackDistanceMax, UnitData.CaptureDistanceMax, UnitData.RepairDistanceMax);
+        return Mathf.Max(UnitData.AttackDistanceMax, UnitData.CaptureDistanceMax, UnitData.RepairDistanceMax) * 1.1f;
     }
 
     #endregion

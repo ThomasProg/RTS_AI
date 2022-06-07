@@ -171,11 +171,11 @@ public class TargetBuilding : MonoBehaviour, IInfluencer, IFogOfWarEntity
 
     public float GetVisibilityRadius()
     {
-        return GetInfluenceRadius();
+        return 40f;
     }
 
     public float GetPermanentVisibilityRadius()
     {
-        return GetInfluenceRadius() * 1.5f;
+        return GetVisibilityRadius() * 1.5f;
     }
 }

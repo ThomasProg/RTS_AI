@@ -431,5 +431,10 @@ public sealed class Factory : BaseEntity
 
         return pendingCost;
     }
+    
+    public override float GetVisibilityRadius()
+    {
+        return 85f;
+    }
     #endregion
 }
