@@ -9,12 +9,14 @@ public class DestroyFactoryTask : IPOITask<StrategyAI.Blackboard>
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
-        foreach (Squad squad in factoryPoI.squads)
+        //foreach (Squad squad in factoryPoI.squads)
+        for (int i = 0; i < factoryPoI.squads.Count; i++)
         {
+            Squad squad = factoryPoI.squads[i];
             if (squad.IsIdle)
                 squad.AttackTarget(factoryPoI.factory);
         }
 
-        yield return null;
+        yield break;
     }
 }

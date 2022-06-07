@@ -37,7 +37,7 @@ public class StrategyAI : MonoBehaviour
     public SquadManager squadManager;
     public AIController controller;
 
-    float priorityEvaluationDelay = 10;
+    float priorityEvaluationDelay = 15;
 
     public Blackboard bb { get; private set; } = null;
 
@@ -76,7 +76,7 @@ public class StrategyAI : MonoBehaviour
     {
         foreach (TargetBuilding targetBuilding in controller.allCapturePoints)
         {
-            AddTactic(new CapturePointPoI(targetBuilding) {stratAI = this, squadManager = squadManager});
+            AddTactic(new CapturePointPoI(targetBuilding) { stratAI = this, squadManager = squadManager });
         }
 
         foreach (Factory factory in controller.Factories)
@@ -89,7 +89,7 @@ public class StrategyAI : MonoBehaviour
             CreateFactoryPoI(factory);
         }
 
-        AddTactic(new ConstructFactoryPoI() {stratAI = this, squadManager = squadManager});
+        AddTactic(new ConstructFactoryPoI() { stratAI = this, squadManager = squadManager });
 
         StartCoroutine(UpdateInterests());
 
@@ -146,11 +146,17 @@ public class StrategyAI : MonoBehaviour
                         }
                         else
                             break;
+
                     } while (true);
 
-
-                    if (!isFinished)
+                    if (!isFinished && !(obj is WaitForSeconds))
                     {
+                        //if (obj is WaitForSeconds waitForSeconds)
+                        //{
+                        //    yield return obj;
+                        //    //yield break;
+                        //}
+
                         yield return obj;
                         break;
                     }
@@ -176,7 +182,7 @@ public class StrategyAI : MonoBehaviour
                 ETeam playerTeam = GameServices.GetPlayerController().Team;
                 //Remove previous player squad
                 AllPointOfInterests.RemoveAll(interest =>
-                    interest is SquadPoI squadPoI && squadPoI.squad.GetTeam() == playerTeam);
+                    interest is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam);
 
                 // Add squad to PoI list
                 foreach (Squad squad in controller.PlayerSquads)
@@ -209,8 +215,6 @@ public class StrategyAI : MonoBehaviour
                     tasksEnumerators[i].Add(tasks[i][j].Execute(bb));
                 }
             }
-
-            //Debug.Log(Time.time + " : ========== Reevaluation ==========");
 
             float lastPriorityUpdate = Time.time;
 

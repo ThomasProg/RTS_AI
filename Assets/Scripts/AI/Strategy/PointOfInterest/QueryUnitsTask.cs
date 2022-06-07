@@ -13,12 +13,17 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     public float persistency = 0f;
 
     public float timeToLeadSquadToPoI = 0.0f;
+    public float currentStrength = 0f;
+
+    public bool queryAllAvailableUnits = false;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
         int nbUnitsBeingCreated;
         do
         {
+            if (currentStrength > strengthRequired)
+                yield break;
 
             //Debug.Log(Time.time + " : ========== Query Units ==========");
 
@@ -47,49 +52,52 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     }
                 }
             }
-            
+
+
             UnitController aiController = GameServices.GetAIController();
             Dictionary<Factory, int> factoryWithUnitToBuild = new Dictionary<Factory, int>();
-            
-            foreach (Factory factory in blackboard.AllyFactories)
+
+            //if (!queryAllAvailableUnits)
             {
-                int unitMenuIndex = EvaluateUnitToBuild(aiController, factory, pointOfInterest);
-                
-                if (unitMenuIndex == -1)
-                    continue;
-
-                factoryWithUnitToBuild.Add(factory, unitMenuIndex);
-                
-                int cost = factory.GetUnitCost(unitMenuIndex);
-                if (factory.CanRequestUnit(cost))
+                foreach (Factory factory in blackboard.AllyFactories)
                 {
-                    UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
-                    Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
+                    int unitMenuIndex = EvaluateUnitToBuild(aiController, factory, pointOfInterest);
 
-                    // If we wan't create unit from factory that is the PoI, path is egale to 0 (and GetPathLength will be invalid)
-                    if (pointOfInterest is FactoryPoI factoryPoI && factory == factoryPoI.factory)
-                    {
-                        unitsSources.Add(0f, factory);
+                    if (unitMenuIndex == -1)
                         continue;
-                    }
 
-                    float pathLength =
-                        GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI,
-                            pointOfInterest.position - factory.Size * factoryToPoI) / data.Speed;
+                    factoryWithUnitToBuild.Add(factory, unitMenuIndex);
 
-                    float previousUnitsBuildDuration = 0f;
-                    for (int i = 0; i < factory.GetQueuedCount(0); i++) // TODO : Do that for each unit
+                    int cost = factory.GetUnitCost(unitMenuIndex);
+                    if (factory.CanRequestUnit(cost))
                     {
-                        previousUnitsBuildDuration += factory.GetBuildableUnitData(0).BuildDuration;
-                    }
+                        UnitDataScriptable data = factory.GetBuildableUnitData(0); // TODO: Change it depending on unit
+                        Vector2 factoryToPoI = (pointOfInterest.position - factory.GetInfluencePosition()).normalized;
 
-                    float time = pathLength + data.Cost + previousUnitsBuildDuration;
-                    unitsSources.Add(time, factory);
+                        // If we wan't create unit from factory that is the PoI, path is egale to 0 (and GetPathLength will be invalid)
+                        if (pointOfInterest is FactoryPoI factoryPoI && factory == factoryPoI.factory)
+                        {
+                            unitsSources.Add(0f, factory);
+                            continue;
+                        }
+
+                        float pathLength =
+                            GameUtility.GetPathLength(factory.GetInfluencePosition() + factory.Size * factoryToPoI,
+                                pointOfInterest.position - factory.Size * factoryToPoI) / data.Speed;
+
+                        float previousUnitsBuildDuration = 0f;
+                        for (int i = 0; i < factory.GetQueuedCount(0); i++) // TODO : Do that for each unit
+                        {
+                            previousUnitsBuildDuration += factory.GetBuildableUnitData(0).BuildDuration;
+                        }
+
+                        float time = pathLength + data.Cost + previousUnitsBuildDuration;
+                        unitsSources.Add(time, factory);
+                    }
                 }
             }
 
             List<Unit> newUnits = new List<Unit>();
-            float currentStrength = 0;
             nbUnitsBeingCreated = 0;
 
             if (unitsSources.Values.Count > 0)
@@ -119,7 +127,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                             break;
                     }
 
-                    if (currentStrength >= strengthRequired)
+                    if (currentStrength >= strengthRequired && !queryAllAvailableUnits)
                         break;
                 }
             }
@@ -142,12 +150,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             foreach (Unit unit in newUnits)
             {
                 Squad squad = blackboard.squadManager.squadsOfUnits[unit];
-                if (squad.UnitList.Count == 1)
-                    blackboard.squadManager.UnregisterSquad(squad);
                 squad.RemoveUnit(unit);
             }
 
-            List<Squad> newSquads = Squad.MakeSquadsDependingOnDistance(newUnits, 1000);
+            List<Squad> newSquads = Squad.MakeSquadsDependingOnDistance(newUnits, 50);
 
             blackboard.squadManager.RegisterSquads(newSquads);
 
