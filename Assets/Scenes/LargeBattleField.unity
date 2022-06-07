@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748171, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2286,6 +2286,11 @@ PrefabInstance:
       objectReference: {fileID: 1776657147}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: debug.fogOfWarDebug.useFogOfWar
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: m_teamInfluenceMap.Array.data[0]
       value: 
       objectReference: {fileID: 1776657148}
@@ -2365,6 +2370,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2861331913738556991, guid: 71d18aeefd17f5046abcbf69f67cb97b,
+        type: 3}
+      propertyPath: m_Carve
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5132452488542777162, guid: 71d18aeefd17f5046abcbf69f67cb97b,
         type: 3}

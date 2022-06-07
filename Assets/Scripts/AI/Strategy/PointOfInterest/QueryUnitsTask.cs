@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = System.Random;
@@ -138,10 +139,34 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
             }
             else
             {
-                if (blackboard.AllyFactories.Length > 1)
+                if (blackboard.AllyFactories.Length > 1 && aiController.TotalBuildPoints < 10)
                 {
-                    Factory factoryToDestroy = blackboard.AllyFactories[UnityEngine.Random.Range(0, blackboard.AllyFactories.Length)]; // TODO: don't choose randomly
-                    factoryToDestroy.Destroy();
+                    var randomIndexes = Enumerable.Range(0, blackboard.AllyFactories.Length)
+                        .OrderBy(i => UnityEngine.Random.Range(0, 100)).ToList();
+                    bool found = false;
+                    int i = 0;
+                    do
+                    {
+                        bool shouldDestroy = true;
+                        Factory factoryToDestroy = blackboard.AllyFactories[randomIndexes[i]];
+                        if (blackboard.squadManager.newUnitsPoI.ContainsKey(factoryToDestroy) && !factoryToDestroy.IsBuildingUnit)
+                        {
+                            foreach (PointOfInterest poi in blackboard.squadManager.newUnitsPoI[factoryToDestroy])
+                            {
+                                if (poi.priority > pointOfInterest.priority)
+                                {
+                                    shouldDestroy = false;
+                                }
+                            }
+                            if (shouldDestroy)
+                            {
+                                factoryToDestroy.Destroy();
+                                found = true;
+                            }
+                        }
+
+                        i++;
+                    } while (!found && i < blackboard.AllyFactories.Length);
                 }
             }
 

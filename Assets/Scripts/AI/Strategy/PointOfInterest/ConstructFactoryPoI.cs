@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 
 public class ConstructFactoryPoI : PointOfInterest
@@ -120,8 +121,14 @@ public class ConstructFactoryPoI : PointOfInterest
 
             rst.x = buildPos.x + radius * dst * Mathf.Cos(angle);
             rst.y = buildPos.y + radius * dst * Mathf.Sin(angle);
-            isPosFound = controllerFactory
-                .CanPositionFactory(factoryIndex, GameUtility.ToVec3(rst));
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(GameUtility.ToVec3(rst), out hit, dst, 1))
+            {
+                rst.x = hit.position.x;
+                rst.y = hit.position.z;
+                isPosFound = controllerFactory.CanPositionFactory(factoryIndex, GameUtility.ToVec3(rst));
+            }
         }
 
         posOut = rst;

@@ -82,7 +82,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &114482993201708958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,6 +111,7 @@ GameObject:
   - component: {fileID: 4162452776302188}
   - component: {fileID: 136606077456973920}
   - component: {fileID: 114577780331047682}
+  - component: {fileID: 3084120249049141799}
   m_Layer: 9
   m_Name: TargetBuilding_Lab
   m_TagString: Untagged
@@ -165,6 +166,22 @@ MonoBehaviour:
   BuildPoints: 5
   BlueTeamMaterial: {fileID: 2100000, guid: d7f0c86ff6be81e4d8e82f13e6fa7691, type: 2}
   RedTeamMaterial: {fileID: 2100000, guid: 03993c9801677ca4b9741101b3033488, type: 2}
+--- !u!208 &3084120249049141799
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015054854264874}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 3, y: 4, z: 3}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 4, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &1923820954981334
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,6 +311,10 @@ PrefabInstance:
     - target: {fileID: 443312, guid: a1211af52fd766446977b868c97e6bbd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2350704, guid: a1211af52fd766446977b868c97e6bbd, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2350704, guid: a1211af52fd766446977b868c97e6bbd, type: 3}
       propertyPath: m_Materials.Array.data[0]
