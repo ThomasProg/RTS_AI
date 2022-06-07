@@ -380,10 +380,18 @@ public class GameServices : MonoBehaviour
         m_teamsUnitsRenderer[1] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
     }
 
+    private bool fowPreviousSetting;
     private void Update()
     {
-        UpdateHiddenObject();
-        
+        if (m_fowFeature.settings.IsEnabled)
+            UpdateHiddenObject();
+        else if (fowPreviousSetting != m_fowFeature.settings.IsEnabled)
+        {
+            ShowAllEntities();
+        }
+
+        fowPreviousSetting = m_fowFeature.settings.IsEnabled;
+
 #if UNITY_EDITOR
         if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
         {
@@ -439,6 +447,20 @@ public class GameServices : MonoBehaviour
 
             if (unitsRenderers.Value.Item2 != null)
                 unitsRenderers.Value.Item2.enabled = shouldBeDisplay;
+        }
+    }
+    
+    void ShowAllEntities()
+    {
+        foreach (KeyValuePair<BaseEntity, Tuple<Renderer[], Canvas>> unitsRenderers in m_teamsUnitsRenderer[(int) GetAIController().Team])
+        {
+            foreach (Renderer unitsRenderer in unitsRenderers.Value.Item1)
+            {
+                unitsRenderer.enabled = true;
+            }
+
+            if (unitsRenderers.Value.Item2 != null)
+                unitsRenderers.Value.Item2.enabled = true;
         }
     }
 
