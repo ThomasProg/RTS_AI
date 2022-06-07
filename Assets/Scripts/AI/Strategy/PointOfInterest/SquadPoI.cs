@@ -106,7 +106,8 @@ public class SquadPoI : PointOfInterest
                 }
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                priority = 0f;
+                break;
         }
     }
 
