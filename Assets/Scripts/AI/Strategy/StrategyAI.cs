@@ -37,7 +37,7 @@ public class StrategyAI : MonoBehaviour
     public SquadManager squadManager;
     public AIController controller;
 
-    float priorityEvaluationDelay = 15;
+    float priorityEvaluationDelay = 5;
 
     public Blackboard bb { get; private set; } = null;
 
