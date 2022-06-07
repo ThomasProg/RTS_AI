@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    IsEnabled: 1
+    IsEnabled: 0
     WhenToInsert: 550
     material: {fileID: 2100000, guid: 1534b02085d383a48bb4d226315bbc22, type: 2}
-    terrainFogOfWars: []
+    terrainFogOfWars:
+    - {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

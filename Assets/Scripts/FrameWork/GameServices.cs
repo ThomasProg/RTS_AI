@@ -108,10 +108,7 @@ public class GameServices : MonoBehaviour
     }
 
 #endif
-
-    [SerializeField, Tooltip("Generic material used for 3D models, in the following order : blue, red and green")]
-    Material[] TeamMaterials = new Material[3];
-
+    
     [SerializeField, Tooltip("Unplayable terrain border size")]
     float NonPlayableBorder = 100f;
 
@@ -167,11 +164,6 @@ public class GameServices : MonoBehaviour
         if (Instance.ControllersArray.Length < (int) team)
             return null;
         return Instance.ControllersArray[(int) team];
-    }
-
-    public static Material GetTeamMaterial(ETeam team)
-    {
-        return Instance.TeamMaterials[(int) team];
     }
 
     public static ETeam GetOpponent(ETeam team)

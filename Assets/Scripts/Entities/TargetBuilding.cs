@@ -17,8 +17,7 @@ public class TargetBuilding : MonoBehaviour, IInfluencer, IFogOfWarEntity
     [SerializeField]
     Material RedTeamMaterial = null;
 
-    Material NeutralMaterial = null;
-    MeshRenderer BuildingMeshRenderer = null;
+    MeshRenderer[] BuildingMeshRenderers = null;
     Image GaugeImage;
     int[] TeamScore;
     float CaptureGaugeValue;
@@ -31,9 +30,8 @@ public class TargetBuilding : MonoBehaviour, IInfluencer, IFogOfWarEntity
     #region MonoBehaviour methods
     void Start()
     {
-        BuildingMeshRenderer = GetComponentInChildren<MeshRenderer>();
-        NeutralMaterial = BuildingMeshRenderer.material;
-
+        BuildingMeshRenderers = GetComponentsInChildren<MeshRenderer>();
+        
         GaugeImage = GetComponentInChildren<Image>();
         if (GaugeImage)
             GaugeImage.fillAmount = 0f;
@@ -137,7 +135,12 @@ public class TargetBuilding : MonoBehaviour, IInfluencer, IFogOfWarEntity
         
         ResetCapture();
         OwningTeam = newTeam;
-        BuildingMeshRenderer.material = newTeam == ETeam.Blue ? BlueTeamMaterial : RedTeamMaterial;
+        
+        for (int i = 0; i < BuildingMeshRenderers.Length; i++)
+        {
+            BuildingMeshRenderers[i].material = newTeam == ETeam.Blue ? BlueTeamMaterial : RedTeamMaterial;
+
+        }
     }
     #endregion
 

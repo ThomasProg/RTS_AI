@@ -15,6 +15,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     protected GameObject SelectedSprite = null;
     protected Text HPText = null;
     protected bool IsInitialized = false;
+    MeshRenderer meshRenderer;
 
     public Action<BaseEntity> OnDeadEvent;
     public bool IsSelected { get; protected set; }
@@ -26,6 +27,7 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
 
         Team = _team;
         GameServices.GetGameServices().RegisterUnit(Team,this);
+        meshRenderer.material.color = GameServices.GetTeamColor(GetTeam());
         
         IsInitialized = true;
     }
@@ -99,6 +101,8 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
             HPText = hpTransform.GetComponent<Text>();
 
         OnHpUpdated += UpdateHpUI;
+        meshRenderer = transform.Find("Minimap").GetComponent<MeshRenderer>();
+        meshRenderer.material.color = GameServices.GetTeamColor(GetTeam());
     }
     virtual protected void Start()
     {
