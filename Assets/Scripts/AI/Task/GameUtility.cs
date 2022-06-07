@@ -252,9 +252,9 @@ public static class GameUtility
     /// <param name="poi"></param>
     /// <param name="enemyTeam"></param>
     /// <param name="radiusErrorCoef"></param>
-    /// <param name="objectifFilterPrirotiy">This value is used to filter priority of the current objectif</param>
+    /// <param name="objectiveFilterPriority">This value is used to filter priority of the current objective</param>
     /// <returns></returns>
-    public static List<POITargetByEnemySquad> GetPOITargetByEnemySquad(PointOfInterest poi, AIController ai, PlayerController playerController, float radiusErrorCoef, float objectifFilterPrirotiy)
+    public static List<POITargetByEnemySquad> GetPOITargetByEnemySquad(PointOfInterest poi, AIController ai, PlayerController playerController, float radiusErrorCoef, float objectiveFilterPriority)
     {
         List<POITargetByEnemySquad> rst = new List<POITargetByEnemySquad>();
         List<EnemySquadPotentialObjectives> enemySquadsObjectives = EvaluateEnemySquadObjective(ai, playerController, radiusErrorCoef);
@@ -273,7 +273,7 @@ public static class GameUtility
                 
                 float priority = objective.GetStrategyEffectivity() / efficiencyTotal;
                 
-                if (priority > objectifFilterPrirotiy)
+                if (priority > objectiveFilterPriority)
                 {
                     rst.Add(new POITargetByEnemySquad
                     {

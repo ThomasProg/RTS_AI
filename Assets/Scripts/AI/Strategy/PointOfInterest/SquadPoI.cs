@@ -55,7 +55,7 @@ public class SquadPoI : PointOfInterest
             GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(),1f + stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value , 0.4f);
 
         float distPlayerUnitsToTarget = float.MinValue;
-        float playerStrength = 0f;
+        float playerStrength = enemySquad.GetStrength();
         foreach (GameUtility.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
         {
             float sqrDistSquadTarget =
@@ -96,7 +96,7 @@ public class SquadPoI : PointOfInterest
             GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), 1f + stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value, 0.4f);
 
         float distPlayerUnitsToTarget = float.MinValue;
-        float playerStrength = 0f;
+        float playerStrength = enemySquad.GetStrength();
         foreach (GameUtility.POITargetByEnemySquad playerSquadObjective in playerSquadObjectives)
         {
             float sqrDistSquadTarget =
