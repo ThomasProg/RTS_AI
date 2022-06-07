@@ -16,7 +16,6 @@ public class Squad : IInfluencer
 
     public Action<Squad> OnSquadEmpty;
 
-    private int previousFramePosUpdated;
     private Vector2 currentPosition;
 
     float offsetToDestination = 2f;
@@ -106,11 +105,6 @@ public class Squad : IInfluencer
     /// </summary>
     public Vector2 GetAveragePosition()
     {
-        if (previousFramePosUpdated == Time.frameCount)
-            return currentPosition;
-
-        previousFramePosUpdated = Time.frameCount;
-      
         Vector2 averagePosition = Vector2.zero;
         foreach (Unit unit in Units)
         {
@@ -211,12 +205,19 @@ public class Squad : IInfluencer
     /// <returns>The squad containing units from `other` that did not satisfy the `predicate`</returns>
     public void MergeIf(Squad other, Func<Squad, Unit, bool> predicate)
     {
+        List<Unit> unitToRemove = new List<Unit>();
         foreach (var unit in other.Units)
         {
             if (predicate(this, unit) && !Units.Contains(unit))
             {
                 AddUnit(unit);
+                unitToRemove.Add(unit);
             }
+        }
+
+        foreach (var unit in unitToRemove)
+        {
+            other.RemoveUnit(unit);
         }
 
         other.Units.ExceptWith(Units);
