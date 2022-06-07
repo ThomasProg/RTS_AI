@@ -54,7 +54,7 @@ public class Attack : Task
     
     public void ComputeAttack()
     {
-        if (CanAttack() == false)
+        if (CanAttack() == false || m_target == null)
         {
             OnEnd();
             return;
