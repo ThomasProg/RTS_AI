@@ -101,6 +101,8 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
                 GaugeImage.color = GameServices.GetTeamColor(CapturingTeam);
             }
         }
+        else if (TeamScore[(int)unit.GetTeam()] < 0)
+            TeamScore[(int)unit.GetTeam()] = 0; // TeamScore should NEVER be less than 0, but sometimes, a bug happens where it is, which prevents capturing the point
     }
     void ResetCapture()
     {

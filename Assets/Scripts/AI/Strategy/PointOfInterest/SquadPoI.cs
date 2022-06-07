@@ -7,12 +7,12 @@ using UnityEngine;
 public class SquadPoI : PointOfInterest
 {
     public StrategyAI stratAI;
-    public Squad squad;
+    public Squad enemySquad;
 
-    public SquadPoI(Squad squad)
+    public SquadPoI(Squad enemySquad)
     {
-        this.squad = squad;
-        position = squad.GetInfluencePosition();
+        this.enemySquad = enemySquad;
+        position = enemySquad.GetInfluencePosition();
         queryUnitsTask = new QueryUnitsTask() { pointOfInterest = this };
     }
 
@@ -37,11 +37,11 @@ public class SquadPoI : PointOfInterest
         // - Apply coefficient to this result depending on distance from our base or enemy base. Depending on AI personality
         // - Apply direct coefficient depending on AI personality
         
-        if (stratAI.controller.Team != squad.GetTeam())
+        if (stratAI.controller.Team != enemySquad.GetTeam())
         {
             EvaluateAttackSquadPriority(aiSquads);
         }
-        else if (stratAI.controller.Team == squad.GetTeam())
+        else if (stratAI.controller.Team == enemySquad.GetTeam())
         {
             EvaluateDefendThisPointPriority(aiSquads);
         }
@@ -70,7 +70,7 @@ public class SquadPoI : PointOfInterest
         }
 
         float aiStrength =
-            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, squad.GetInfluencePosition(), distPlayerUnitsToTarget) * stratAI.subjectiveUtilitySystem.GetStat("Patience").OneNegValue * 2f;
+            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, enemySquad.GetInfluencePosition(), distPlayerUnitsToTarget) * stratAI.subjectiveUtilitySystem.GetStat("Patience").OneNegValue * 2f;
         
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
@@ -111,7 +111,7 @@ public class SquadPoI : PointOfInterest
         }
 
         float aiStrength =
-            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, squad.GetInfluencePosition(), distPlayerUnitsToTarget) * stratAI.subjectiveUtilitySystem.GetStat("Patience").OneNegValue * 2f;
+            GameUtility.EvaluateSquadsStrengthInZone(aiSquads, enemySquad.GetInfluencePosition(), distPlayerUnitsToTarget) * stratAI.subjectiveUtilitySystem.GetStat("Patience").OneNegValue * 2f;
         
         // Process the balance of power and evaluate the cost of loose/keep this point. Depending on AI personality
         if (playerStrength > aiStrength)
@@ -134,7 +134,7 @@ public class SquadPoI : PointOfInterest
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
         queryUnitsTask.strengthRequired = Mathf.Ceil(Mathf.Max(strengthRequired, 1f)); // [1.. strengthRequired + 1]
         tasks.Add(queryUnitsTask);
-        //tasks.Add(new CapturePointTask() { capturePointPoI = this });
+        tasks.Add(new AttackSquadTask() { squadPoI = this });
         return tasks;
     }
 }

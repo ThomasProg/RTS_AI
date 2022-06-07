@@ -121,6 +121,22 @@ public class Squad : IInfluencer
         return currentPosition;
     }
 
+    public Unit GetNearestUnit(Vector2 pos)
+    {
+        float minSqrDist = float.MaxValue;
+        Unit minUnit = null;
+        foreach (Unit unit in Units)
+        {
+            float sqrDist = (unit.GetInfluencePosition() - pos).sqrMagnitude;
+            if (minSqrDist > sqrDist)
+            {
+                minSqrDist = sqrDist;
+                minUnit = unit;
+            }
+        }
+        return minUnit;
+    }
+
     public Vector2 GetUnormalizedDirection()
     {
         Vector2 groupDir = Vector2.zero;

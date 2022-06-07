@@ -31,11 +31,6 @@ public class SquadManager : MonoBehaviour
     {
         squad.OnSquadEmpty -= UnregisterSquad;
         squads.Remove(squad);
-
-        foreach (Unit unit in squad.UnitList)
-        {
-            squadsOfUnits.Remove(unit);
-        }
     }
 
     // Returns true if a unit is being built for this factory
