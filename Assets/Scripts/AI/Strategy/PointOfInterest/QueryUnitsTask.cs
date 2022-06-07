@@ -17,6 +17,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
     public bool queryAllAvailableUnits = false;
     public bool queryIdleUnitsOnly = false;
+    public bool queryRepairUnitsOnly = false;
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
@@ -49,7 +50,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
                     foreach (Unit unit in squad.UnitList)
                     {
-                        unitsSources.Add(time, new System.Tuple<Unit, Squad>(unit, squad));
+                        if (!queryRepairUnitsOnly || unit.GetUnitData.CanRepair)
+                        {
+                            unitsSources.Add(time, new System.Tuple<Unit, Squad>(unit, squad));
+                        }
                     }
                 }
             }
@@ -204,7 +208,11 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
         for (int i = 0; i < factory.UnitPrefabsCount; i++)
         {
-            unitDatas.Add(factory.GetBuildableUnitData(i));
+            UnitDataScriptable unitDataScriptable = factory.GetBuildableUnitData(i);
+            if (!queryRepairUnitsOnly || unitDataScriptable.CanRepair)
+            {
+                unitDatas.Add(unitDataScriptable);
+            }
         }
 
         // The first approach is to build random unity if we can

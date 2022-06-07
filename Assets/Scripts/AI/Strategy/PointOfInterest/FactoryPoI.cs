@@ -125,13 +125,26 @@ public class FactoryPoI : PointOfInterest
         }
 
         strengthRequired = playerStrength * strengthRequiredAdditionalCoef;
+
+        if (factory.NeedsRepairing())
+        {
+            priority += 3f;
+        }
     }
 
     public override List<IPOITask<StrategyAI.Blackboard>> GetProcessTasks(StrategyAI.Blackboard blackboard)
     {
         List<IPOITask<StrategyAI.Blackboard>> tasks = new List<IPOITask<StrategyAI.Blackboard>>();
-        tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(strengthRequired) }); // Strength : [0.. strengthRequired + 1]
-        tasks.Add(new DestroyFactoryTask() { factoryPoI = this });
+        if (stratAI.controller.Team != factory.GetTeam())
+        {
+            tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(strengthRequired) }); // Strength : [0.. strengthRequired + 1]
+            tasks.Add(new DestroyFactoryTask() { factoryPoI = this });
+        }
+        else
+        {
+            tasks.Add(new QueryUnitsTask() { pointOfInterest = this, strengthRequired = Mathf.Ceil(strengthRequired), queryRepairUnitsOnly = true }); // Strength : [0.. strengthRequired + 1]
+            tasks.Add(new RepairFactoryTask() { factoryPoI = this });
+        }
         return tasks;
     }
 }
