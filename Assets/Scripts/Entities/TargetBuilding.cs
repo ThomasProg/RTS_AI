@@ -46,6 +46,9 @@ public class TargetBuilding : MonoBehaviour, IInfluencer
         if (CapturingTeam == OwningTeam || CapturingTeam == ETeam.Neutral)
             return;
 
+        if (CaptureGaugeSpeed == 0)
+            ResetCapture();
+        
         CaptureGaugeValue -= TeamScore[(int)CapturingTeam] * CaptureGaugeSpeed * Time.deltaTime;
 
         GaugeImage.fillAmount = 1f - CaptureGaugeValue / CaptureGaugeStart;
