@@ -399,6 +399,14 @@ public class GameServices : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR
+        if (debug.fogOfWarDebug.debugButtonPrevious != debug.fogOfWarDebug.useFogOfWar)
+        {
+            m_fowFeature.settings.IsEnabled = debug.fogOfWarDebug.useFogOfWar;
+            m_rendererData.SetDirty();
+            debug.fogOfWarDebug.debugButtonPrevious = debug.fogOfWarDebug.useFogOfWar;
+        } 
+#endif
         if (m_fowFeature.settings.IsEnabled)
             UpdateHiddenObject();
         
@@ -407,15 +415,8 @@ public class GameServices : MonoBehaviour
         {
             ShowAllEntities();
         }
+        debug.fogOfWarDebug.fowPreviousSetting = m_fowFeature.settings.IsEnabled;
 
-        if (debug.fogOfWarDebug.debugButtonPrevious != debug.fogOfWarDebug.useFogOfWar)
-        {
-            m_fowFeature.settings.IsEnabled = debug.fogOfWarDebug.useFogOfWar;
-            m_rendererData.SetDirty();
-            debug.fogOfWarDebug.fowPreviousSetting = m_fowFeature.settings.IsEnabled;
-        }
-
-        debug.fogOfWarDebug.debugButtonPrevious = debug.fogOfWarDebug.useFogOfWar;
         
         if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
         {
