@@ -248,7 +248,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         int currentIndex = 0;
         for (int i = 0; i < unitDatas.Count; i++)
         {
-            if (unitDatas[i].Speed > maxStrength)
+            if (unitDatas[i].DPS > maxStrength)
             {
                 maxStrength = unitDatas[i].DPS;
                 currentIndex = i;
