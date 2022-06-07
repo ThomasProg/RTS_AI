@@ -14,7 +14,7 @@ public class AttackSquadTask : IPOITask<StrategyAI.Blackboard>
         for (int i = 0; i < squadPoI.squads.Count; i++)
         {
             Squad squad = squadPoI.squads[i];
-            if (squad.IsIdle)
+            if (squadPoI.enemySquad.Units.Count > 0 && squad.IsIdle)
             {
                 //Debug.Log(Time.time + " : ========== GoCapturePoint : " + i);
                 Unit unit = squadPoI.enemySquad.GetNearestUnit(squad.GetAveragePosition());

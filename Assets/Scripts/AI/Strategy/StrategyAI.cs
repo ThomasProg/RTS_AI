@@ -181,6 +181,11 @@ public class StrategyAI : MonoBehaviour
             {
                 ETeam playerTeam = GameServices.GetPlayerController().Team;
                 //Remove previous player squad
+                foreach (PointOfInterest poi in AllPointOfInterests)
+                {
+                    if (poi is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam)
+                        poi.RemoveAllSquads();
+                }
                 AllPointOfInterests.RemoveAll(interest =>
                     interest is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam);
 
@@ -203,17 +208,36 @@ public class StrategyAI : MonoBehaviour
             AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
                 -a.priority.CompareTo(b.priority));
 
-            List<List<IPOITask<Blackboard>>> tasks =
-                new List<List<IPOITask<Blackboard>>>(AllPointOfInterestsByPriority.Count);
             List<List<IEnumerator>> tasksEnumerators = new List<List<IEnumerator>>(AllPointOfInterestsByPriority.Count);
             for (int i = 0; i < AllPointOfInterestsByPriority.Count; i++)
             {
-                tasks.Add(AllPointOfInterestsByPriority[i].GetProcessTasks(bb));
-                tasksEnumerators.Add(new List<IEnumerator>(tasks[i].Count));
-                for (int j = 0; j < tasks[i].Count; j++)
+                if (AllPointOfInterestsByPriority[i].priority > 0)
                 {
-                    tasksEnumerators[i].Add(tasks[i][j].Execute(bb));
+                    List<IPOITask<Blackboard>> poiTasks = AllPointOfInterestsByPriority[i].GetProcessTasks(bb);
+                    List<IEnumerator> taskEnumerators = new List<IEnumerator>(poiTasks.Count);
+                    for (int j = 0; j < poiTasks.Count; j++)
+                    {
+                        taskEnumerators.Add(poiTasks[j].Execute(bb));
+                    }
+                    tasksEnumerators.Add(taskEnumerators);
                 }
+            }
+
+            // For idle squads : go to the poi with the highest priority
+            if (AllPointOfInterestsByPriority.Count > 0)
+            {
+                List<IPOITask<Blackboard>> poiTasks = AllPointOfInterestsByPriority[0].GetProcessTasks(bb);
+                List<IEnumerator> taskEnumerators = new List<IEnumerator>(poiTasks.Count);
+                for (int j = 0; j < poiTasks.Count; j++)
+                {
+                    if (poiTasks.Count > 0 && poiTasks[0] is QueryUnitsTask queryUnitsTask)
+                    {
+                        queryUnitsTask.queryAllAvailableUnits = true;
+                        queryUnitsTask.queryIdleUnitsOnly = true;
+                    }
+                    taskEnumerators.Add(poiTasks[j].Execute(bb));
+                }
+                tasksEnumerators.Add(taskEnumerators);
             }
 
             float lastPriorityUpdate = Time.time;
