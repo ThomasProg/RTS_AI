@@ -4,6 +4,7 @@ using System.Linq;
 using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Assertions;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -257,7 +258,7 @@ public static class GameUtility
     public static List<POITargetByEnemySquad> GetPOITargetByEnemySquad(PointOfInterest poi, AIController ai, PlayerController playerController, float radiusErrorCoef, float objectiveFilterPriority)
     {
         List<POITargetByEnemySquad> rst = new List<POITargetByEnemySquad>();
-        List<EnemySquadPotentialObjectives> enemySquadsObjectives = EvaluateEnemySquadObjective(ai, playerController, radiusErrorCoef);
+        List<EnemySquadPotentialObjectives> enemySquadsObjectives = EvaluateEnemySquadObjective(ai, playerController, ai.PlayerSquads , ai.Squads, radiusErrorCoef);
 
         foreach (EnemySquadPotentialObjectives enemySquadObjectives in enemySquadsObjectives)
         {
@@ -287,7 +288,31 @@ public static class GameUtility
         return rst;
     }
     
-    public struct SquadObjective
+    
+    public static SquadObjective GetGreaterObjective(List<SquadObjective> objectives)
+    {
+        SquadObjective rst = null;
+        
+        float efficiencyTotal = objectives.Sum(obj => obj.GetStrategyEffectivity());
+        Assert.IsFalse(efficiencyTotal == 0);
+        
+        float bestPriority = float.MinValue;
+        
+        foreach (SquadObjective objective in objectives)
+        {
+            float priority = objective.GetStrategyEffectivity() / efficiencyTotal;
+            
+            if (priority > bestPriority)
+            {
+                bestPriority = priority;
+                rst = objective;
+            }
+        }
+        
+        return rst;
+    }
+
+    public class SquadObjective
     {
         public PointOfInterest poi;
         public float sqrtDistanceFromSquad; // including error marge
@@ -318,11 +343,8 @@ public static class GameUtility
     /// <param name="groupDistance">The distance used to evaluate squads</param>
     /// <param name="radiusErrorCoef"></param>
     /// <returns></returns>
-    public static List<EnemySquadPotentialObjectives> EvaluateEnemySquadObjective(AIController ai, PlayerController player, float radiusErrorCoef)
+    public static List<EnemySquadPotentialObjectives> EvaluateEnemySquadObjective(AIController ai, PlayerController player, Squad[] squadsPlayer, Squad[] squadsAI, float radiusErrorCoef)
     {
-        Squad[] squadsPlayer = ai.PlayerSquads;
-        Squad[] squadsAI = ai.Squads;
-        
         // Get all POI and remove POI with player squads
         List<PointOfInterest> pointOfInterests = new List<PointOfInterest>(ai.strategyAI.AllPointOfInterests);
         pointOfInterests.RemoveAll((interest =>

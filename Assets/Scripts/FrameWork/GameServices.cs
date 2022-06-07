@@ -400,7 +400,7 @@ public class GameServices : MonoBehaviour
             if (debug.aiSquadDecisionPrevision.display3MainObjectif)
             {
                 List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
-                    GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), 1.1f);
+                    GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), GetAIController().PlayerSquads , GetAIController().Squads, 1.1f);
 
                 foreach (GameUtility.EnemySquadPotentialObjectives squadObjective in squadsObjective)
                 {
@@ -480,7 +480,7 @@ public class GameServices : MonoBehaviour
         else if (debug.aiSquadDecisionPrevision.displayStatistic)
         {
             List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
-                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), 1.1f);
+                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), GetAIController().PlayerSquads , GetAIController().Squads, 1.1f);
 
             GUILayout.BeginVertical("box");
             GUILayout.Label("AI squad decision prevision");
