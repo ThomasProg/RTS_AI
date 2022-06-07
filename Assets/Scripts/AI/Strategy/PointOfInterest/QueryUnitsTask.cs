@@ -227,6 +227,36 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
         yield break;
     }
 
+    static int GetIndexOfUnitWithMaxSpeed(List<UnitDataScriptable> unitDatas)
+    {
+        float maxSpeed = 0;
+        int currentIndex = 0;
+        for (int i = 0; i < unitDatas.Count; i++)
+        {
+            if (unitDatas[i].Speed > maxSpeed)
+            {
+                maxSpeed = unitDatas[i].Speed;
+                currentIndex = i;
+            }
+        }
+        return currentIndex;
+    }
+
+    static int GetIndexOfUnitWithMaxStrength(List<UnitDataScriptable> unitDatas)
+    {
+        float maxStrength = 0;
+        int currentIndex = 0;
+        for (int i = 0; i < unitDatas.Count; i++)
+        {
+            if (unitDatas[i].Speed > maxStrength)
+            {
+                maxStrength = unitDatas[i].DPS;
+                currentIndex = i;
+            }
+        }
+        return currentIndex;
+    }
+
     int EvaluateUnitToBuild(UnitController controller, Factory factory, PointOfInterest poi)
     {
         List<UnitDataScriptable> unitDatas = new List<UnitDataScriptable>(factory.UnitPrefabsCount);
@@ -252,7 +282,17 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
                     return -1; // Error
             }
 
-            unitIndex = UnityEngine.Random.Range(0, unitDatas.Count);
+            //unitIndex = UnityEngine.Random.Range(0, unitDatas.Count);
+            switch (poi)
+            {
+                case CapturePointPoI capturePointPoI:
+                    unitIndex = GetIndexOfUnitWithMaxSpeed(unitDatas);
+                    break;
+
+                default:
+                    unitIndex = GetIndexOfUnitWithMaxStrength(unitDatas);
+                    break;
+            }
 
         } while (unitDatas.Count != 0 && unitDatas[unitIndex].Cost > controller.TotalBuildPoints); // While we can't buy this unit, try another
         
