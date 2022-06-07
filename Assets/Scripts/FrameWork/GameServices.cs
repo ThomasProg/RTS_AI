@@ -78,6 +78,13 @@ public class GameServices : MonoBehaviour
         public bool displayUtilitySystem;
     }
 
+    [Serializable]
+    public struct ResourcePointDebug
+    {
+        public bool displayAIDebug;
+        public bool displayPlayerDebug;
+    }
+
     [System.Serializable]
     public struct DebugSettings
     {
@@ -88,6 +95,7 @@ public class GameServices : MonoBehaviour
         public TimeScaleDebugger timeScaleDebugger;
         public AISquadDebug aiSquadDebug;
         public UtilitySystemDebug utilitySystemDebug;
+        public ResourcePointDebug ResourcePointDebug;
     }
 
 #endif
@@ -496,21 +504,23 @@ public class GameServices : MonoBehaviour
                     Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y), $"{poi.priority}", style);
                 }
             }
-            
+
             if (debug.poiDebugger.displayStrengthRequired)
             {
                 foreach (var poi in GetAIController().strategyAI.AllPointOfInterests)
                 {
                     GUIStyle style = new GUIStyle();
                     style.normal.textColor = Color.red;
-                    Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y + 15f), $"{poi.strengthRequired}", style);
+                    Handles.Label(new Vector3(poi.position.x, 20f, poi.position.y + 15f), $"{poi.strengthRequired}",
+                        style);
                 }
             }
 
             if (debug.aiSquadDecisionPrevision.display3MainObjectif)
             {
                 List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
-                    GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), GetAIController().PlayerSquads , GetAIController().Squads, 1.1f);
+                    GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(),
+                        GetAIController().PlayerSquads, GetAIController().Squads, 1.1f);
 
                 foreach (GameUtility.EnemySquadPotentialObjectives squadObjective in squadsObjective)
                 {
@@ -535,7 +545,7 @@ public class GameServices : MonoBehaviour
                     {
                         GameUtility.SquadObjective lastObjective = squadObjective.objectives[i];
                         Color color = Color.blue;
-                           
+
                         Vector3 p1 = new Vector3(influencePosition.x, 1f, influencePosition.y);
                         Vector3 p2 = new Vector3(lastObjective.poi.position.x, 1f, lastObjective.poi.position.y);
                         Handles.DrawBezier(p1, p2, p1, p2, color, null, thickness);
@@ -590,7 +600,8 @@ public class GameServices : MonoBehaviour
         else if (debug.aiSquadDecisionPrevision.displayStatistic)
         {
             List<GameUtility.EnemySquadPotentialObjectives> squadsObjective =
-                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(), GetAIController().PlayerSquads , GetAIController().Squads, 1.1f);
+                GameUtility.EvaluateEnemySquadObjective(GetAIController(), GetPlayerController(),
+                    GetAIController().PlayerSquads, GetAIController().Squads, 1.1f);
 
             GUILayout.BeginVertical("box");
             GUILayout.Label("AI squad decision prevision");
@@ -636,83 +647,91 @@ public class GameServices : MonoBehaviour
             GUILayout.EndVertical();
         }
 
-        if (true)
+        if (debug.ResourcePointDebug.displayAIDebug)
         {
-            AIController aiController = GetAIController();
-            GUILayout.BeginHorizontal("box");
+            DrawResourcePointDebug(GetAIController(), "Player");
+        }
 
-            int totalUnitCost = 0;
-            {
-                GUILayout.BeginVertical("box");
-                GUILayout.Label($"Units Cost");
-                GUILayout.BeginVertical("box");
-                foreach (var squad in aiController.Squads)
-                {
-                    foreach (var unit in squad.Units)
-                    {
-                        totalUnitCost += unit.Cost;
-                        GUILayout.Label($"{unit.name} : {unit.Cost}");
-                    }
-                }
-
-                GUILayout.EndVertical();
-
-                GUILayout.Label($"Total Unit Cost: {totalUnitCost}");
-                GUILayout.EndVertical();
-            }
-
-            int totalBuildingCost = 0;
-            {
-                GUILayout.BeginVertical("box");
-                GUILayout.Label($"Factories Cost");
-                GUILayout.BeginVertical("box");
-
-                foreach (Factory factory in aiController.Factories)
-                {
-                    totalBuildingCost += factory.Cost;
-                    GUILayout.Label($"{factory.name} : {factory.Cost}");
-                }
-
-                GUILayout.EndVertical();
-
-                GUILayout.Label($"Total Factory Cost: {totalBuildingCost}");
-                GUILayout.EndVertical();
-            }
-
-            int PendingCost = 0;
-            {
-                GUILayout.BeginVertical("box");
-                GUILayout.Label($"Factories Pending Cost");
-                GUILayout.BeginVertical("box");
-
-                foreach (Factory factory in aiController.Factories)
-                {
-                    PendingCost += factory.GetPendingCost();
-                    GUILayout.Label($"{factory.name} : {factory.GetPendingCost()}");
-                }
-                
-                GUILayout.EndVertical();
-
-                GUILayout.Label($"Total Pending Cost: {PendingCost}");
-                GUILayout.EndVertical();
-            }
-
-            int totalSpent = totalBuildingCost + totalUnitCost;
-            int maximumPoints = aiController.StartingBuildPoints + aiController.CapturedTargets * 5 + 10;
-            {
-                GUILayout.BeginVertical("box");
-
-                GUILayout.Label($"Maximum Points: {maximumPoints}");
-                GUILayout.Label($"Available Points: {aiController.TotalBuildPoints}");
-                GUILayout.Label($"Total actually spent : {totalSpent}");
-                GUILayout.Label($"Missing points : {maximumPoints - (totalSpent + aiController.TotalBuildPoints + PendingCost)}");
-                
-                GUILayout.EndVertical();
-            }
-            
-            GUILayout.EndHorizontal();
+        if (debug.ResourcePointDebug.displayPlayerDebug)
+        {
+            DrawResourcePointDebug(GetPlayerController(), "AI");
         }
 #endif
+    }
+
+    private static void DrawResourcePointDebug(UnitController Controller, string name)
+    {
+        GUILayout.Label($"{name}'s Resources");
+        GUILayout.BeginHorizontal("box");
+
+        int totalUnitCost = 0;
+        {
+            GUILayout.BeginVertical("box");
+            GUILayout.Label($"Units Cost");
+            GUILayout.BeginVertical("box");
+            foreach (var unit in Controller.Units)
+            {
+                totalUnitCost += unit.Cost;
+                GUILayout.Label($"{unit.name} : {unit.Cost}");
+            }
+
+            GUILayout.EndVertical();
+
+            GUILayout.Label($"Total Unit Cost: {totalUnitCost}");
+            GUILayout.EndVertical();
+        }
+
+        int totalBuildingCost = 0;
+        {
+            GUILayout.BeginVertical("box");
+            GUILayout.Label($"Factories Cost");
+            GUILayout.BeginVertical("box");
+
+            foreach (Factory factory in Controller.Factories)
+            {
+                totalBuildingCost += factory.Cost;
+                GUILayout.Label($"{factory.name} : {factory.Cost}");
+            }
+
+            GUILayout.EndVertical();
+
+            GUILayout.Label($"Total Factory Cost: {totalBuildingCost}");
+            GUILayout.EndVertical();
+        }
+
+        int PendingCost = 0;
+        {
+            GUILayout.BeginVertical("box");
+            GUILayout.Label($"Factories Pending Cost");
+            GUILayout.BeginVertical("box");
+
+            foreach (Factory factory in Controller.Factories)
+            {
+                PendingCost += factory.GetPendingCost();
+                GUILayout.Label($"{factory.name} : {factory.GetPendingCost()}");
+            }
+
+            GUILayout.EndVertical();
+
+            GUILayout.Label($"Total Pending Cost: {PendingCost}");
+            GUILayout.EndVertical();
+        }
+
+        int totalSpent = totalBuildingCost + totalUnitCost;
+        int maximumPoints = Controller.StartingBuildPoints + Controller.CapturedTargets * 5 + 10;
+        {
+            GUILayout.BeginVertical("box");
+
+            GUILayout.Label($"Maximum Points: {maximumPoints}");
+            GUILayout.Label($"Available Points: {Controller.TotalBuildPoints}");
+            GUILayout.Label($"Total actually spent : {totalSpent}");
+            GUILayout.Label(
+                $"Missing points : {maximumPoints - (totalSpent + Controller.TotalBuildPoints + PendingCost)}");
+
+            GUILayout.EndVertical();
+        }
+
+        GUILayout.EndHorizontal();
     }
 
 #if UNITY_EDITOR
