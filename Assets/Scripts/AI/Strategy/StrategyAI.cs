@@ -173,6 +173,62 @@ public class StrategyAI : MonoBehaviour
         }
     }
 
+    IEnumerator RunLastTasks(List<List<IEnumerator>> tasksEnumerators)
+    {
+        objectiveUtilitySystem.Update();
+        var utilities = objectiveUtilitySystem.GetUtilities();
+
+        var dict = new Dictionary<string, float>();
+        foreach (var utility in utilities.Values)
+        {
+            dict[utility.Name] = utility.Value;
+        }
+
+        subjectiveUtilitySystem.UpdateStats(dict, true);
+        subjectiveUtilitySystem.Update();
+
+        int i = tasksEnumerators.Count - 1;
+        {
+            for (int j = 0; j < tasksEnumerators[i].Count; j++)
+            {
+                IEnumerator enumerator = tasksEnumerators[i][j];
+
+                bool isFinished;
+                object obj;
+
+                do
+                {
+                    isFinished = !enumerator.MoveNext();
+                    obj = enumerator.Current;
+
+                    if (!isFinished && obj is WaitForSeconds waitForSeconds)
+                    {
+                        yield return obj;
+                        //yield break;
+                    }
+                    else
+                        break;
+
+                } while (true);
+
+                if (!isFinished && !(obj is WaitForSeconds))
+                {
+                    //if (obj is WaitForSeconds waitForSeconds)
+                    //{
+                    //    yield return obj;
+                    //    //yield break;
+                    //}
+
+                    yield return obj;
+                    break;
+                }
+            }
+
+            yield return null;
+        }
+        yield break;
+    }
+
 
     // Update is called once per frame
     IEnumerator UpdateInterests()
@@ -257,6 +313,18 @@ public class StrategyAI : MonoBehaviour
                     break;
 
                 yield return enumerator.Current;
+            }
+
+            IEnumerator enumerator2 = RunLastTasks(tasksEnumerators);
+
+            // TODO : loop until a certain amount of time without reevaluatioon priorities
+            while (true)
+            {
+                //yield return RunTasks(tasksEnumerators);
+                if (!enumerator2.MoveNext())
+                    break;
+
+                yield return enumerator2.Current;
             }
         }
     }
