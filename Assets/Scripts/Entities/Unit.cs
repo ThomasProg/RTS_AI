@@ -286,7 +286,22 @@ public class Unit : BaseEntity
     // Moving Task
     public void AddTaskGoTo(Vector3 pos, float stoppingDistance = 1f)
     {
-        m_taskRunner.AddNewTask(new GoTo(this, new Vector2(pos.x, pos.z), stoppingDistance));
+        m_taskRunner.AddNewTask(new GoToAndDefend(this, new Vector2(pos.x, pos.z), stoppingDistance));
+    }
+
+    public void AddTask(Task newTask)
+    {
+        m_taskRunner.AddNewTask(newTask);
+    }
+
+    public Task[] GetRemainingTasks()
+    {
+        return m_taskRunner.tasks.ToArray();
+    }
+
+    public void AddTaskGoToAndDefend(Vector3 pos, float stoppingDistance = 1f)
+    {
+        m_taskRunner.AddNewTask(new GoToAndDefend(this, new Vector2(pos.x, pos.z), stoppingDistance));
     }
 
     // Targetting Task - attack
