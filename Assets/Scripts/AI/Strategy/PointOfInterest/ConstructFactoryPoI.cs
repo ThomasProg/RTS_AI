@@ -67,30 +67,61 @@ public class ConstructFactoryPoI : PointOfInterest
     
     int EvaluateFactoryToBuild()
     {
-        List<FactoryDataScriptable> unitDatas = new List<FactoryDataScriptable>(stratAI.controller.Factories[0].FactoryPrefabsCount);
-
+        // Get all buildable factory
+        FactoryDataScriptable tiere1Factory = null;
+        FactoryDataScriptable tiere2Factory = null;
+        
         for (int i = 0; i < stratAI.controller.Factories[0].FactoryPrefabsCount; i++)
         {
-            unitDatas.Add(stratAI.controller.Factories[0].GetBuildableFactoryData(i));
+            FactoryDataScriptable factory = stratAI.controller.Factories[0].GetBuildableFactoryData(i);
+            switch (factory.Caption)
+            {
+                case "Light Factory":
+                    tiere1Factory = factory;
+                    break;
+                
+                case "Heavy Factory":
+                    tiere2Factory = factory;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
-        // The first approach is to build random unity if we can
-        int unitIndex = -1;
-        do
+        float IAAnticipation = stratAI.subjectiveUtilitySystem.GetStat("Anticipation").Value;
+        float costAnticipationRatio = (1f + IAAnticipation / 2f);
+
+        if (stratAI.controller.TotalBuildPoints < tiere1Factory.Cost * costAnticipationRatio)
         {
-            if (unitIndex != -1)
-            {
-                unitDatas.RemoveAt(unitIndex);
-                
-                if (unitDatas.Count == 0)
-                    return -1; // Error
-            }
+            return -1; // No enough money to construct factory
+        }
 
-            unitIndex = UnityEngine.Random.Range(0, unitDatas.Count);
+        // Evaluate chance to construct tiere 2 factory
+        float constructFactoryTiere2Chance = 0f;
 
-        } while (unitDatas[unitIndex].Cost > stratAI.controller.TotalBuildPoints); // While we can't buy this unit, try another
-        
-        return unitIndex;
+        float rationPOIOccupiedByIA = GameServices.GetAIController().CapturedTargets /
+                                      (float) GameServices.GetTargetBuildings().Length;
+
+        constructFactoryTiere2Chance = rationPOIOccupiedByIA;
+
+        if (GameServices.GetPlayerController().IsTiere2())
+        {
+            constructFactoryTiere2Chance *= IAAnticipation * 2f;
+        }
+
+        float randomUnitValue = UnityEngine.Random.value;
+
+        if (randomUnitValue > 1f - Mathf.Min(constructFactoryTiere2Chance, 1f))
+        {
+            if (stratAI.controller.TotalBuildPoints < tiere2Factory.Cost * costAnticipationRatio)
+                return tiere2Factory.TypeId;
+            else
+                return -1;
+        }
+        else
+        {
+            return tiere1Factory.TypeId;
+        }
     }
 
     /// <summary>

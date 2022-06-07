@@ -102,6 +102,17 @@ public sealed class PlayerController : UnitController
         SelectedFactory?.CancelCurrentBuild();
         PlayerMenuController.HideAllFactoryBuildQueue();
     }
+    
+    public bool IsTiere2()
+    {
+        foreach (Factory factory in Factories)
+        {
+            if (factory.GetFactoryData.Caption == "Heavy Factory")
+                return true;
+        }
+
+        return false;
+    }
 
     #region MonoBehaviour methods
     protected override void Awake()
