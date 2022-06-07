@@ -133,14 +133,18 @@ public class Unit : BaseEntity
                     }
                 }
                 
-                foreach (Factory factory in opponentFactories)
+                // Attack factory only if unity can't be attacked
+                if (target == null)
                 {
-                    float sqrtDist = (factory.GetInfluencePosition() - GetInfluencePosition()).sqrMagnitude - factory.Size * factory.Size;
-                    if (sqrtDist < UnitData.AttackDistanceMax * UnitData.AttackDistanceMax &&
-                        (target == null || sqrtDist < targetDistance))
+                    foreach (Factory factory in opponentFactories)
                     {
-                        targetDistance = sqrtDist;
-                        target = factory;
+                        float sqrtDist = (factory.GetInfluencePosition() - GetInfluencePosition()).sqrMagnitude - factory.Size * factory.Size;
+                        if (sqrtDist < UnitData.AttackDistanceMax * UnitData.AttackDistanceMax &&
+                            (target == null || sqrtDist < targetDistance))
+                        {
+                            targetDistance = sqrtDist;
+                            target = factory;
+                        }
                     }
                 }
 
