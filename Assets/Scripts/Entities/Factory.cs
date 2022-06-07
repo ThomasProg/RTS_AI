@@ -220,7 +220,7 @@ public sealed class Factory : BaseEntity
 
     public bool CanRequestUnit(int unitCost)
     {
-        return Controller.TotalBuildPoints >= unitCost && BuildingQueue.Count < MaxBuildingQueueSize;
+        return Controller.TotalBuildPoints >= unitCost && BuildingQueue.Count < MaxBuildingQueueSize && CurrentState != State.UnderConstruction;
     }
     
     public bool RequestUnitBuild(int unitMenuIndex)
