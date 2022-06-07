@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   utilities:
   - Name: FetchInformation
-    value: 0
+    value: 0.5783294
     statImportances:
     - name: InformationNeed
       curve:
@@ -43,7 +43,7 @@ MonoBehaviour:
         m_RotationOrder: 0
       weight: 1
   - Name: Capture
-    value: 0
+    value: 0.21298853
     statImportances:
     - name: Cupidity
       curve:
@@ -98,7 +98,7 @@ MonoBehaviour:
         m_RotationOrder: 0
       weight: 1
   - Name: Attack
-    value: 0
+    value: 0.27878886
     statImportances:
     - name: Aggressivity
       curve:
@@ -127,7 +127,7 @@ MonoBehaviour:
         m_RotationOrder: 0
       weight: 1
   - Name: Protect
-    value: 0
+    value: 0.72121114
     statImportances:
     - name: Aggressivity
       curve:

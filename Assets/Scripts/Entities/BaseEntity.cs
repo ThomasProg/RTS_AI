@@ -1,9 +1,10 @@
 ﻿using System;
+using FogOfWarPackage;
 using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRepairable, IInfluencer
+public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRepairable, IInfluencer, IFogOfWarEntity
 {
     [SerializeField]
     protected ETeam Team;
@@ -128,5 +129,20 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
     public virtual float GetInfluenceRadius()
     {
         return 10f;
+    }
+
+    public Vector2 GetVisibilityPosition()
+    {
+        return GetInfluencePosition();
+    }
+
+    public virtual float GetVisibilityRadius()
+    {
+        return GetInfluenceRadius();
+    }
+
+    public virtual float GetPermanentVisibilityRadius()
+    {
+        return GetVisibilityRadius() * 1.5f;
     }
 }

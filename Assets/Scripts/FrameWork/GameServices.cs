@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FogOfWarPackage;
 using InfluenceMapPackage;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UtilitySystemPackage;
 using Random = System.Random;
@@ -105,7 +107,14 @@ public class GameServices : MonoBehaviour
     PlayerController playerController;
     TargetBuilding[] TargetBuildingArray;
     GameState CurrentGameState = null;
-    [SerializeField] private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
+
+    private TerrainInfluenceMap[] m_teamInfluenceMap = new TerrainInfluenceMap[(int) ETeam.TeamCount];
+    private TerrainFogOfWar m_teamPlayerFogOfWar;
+    private Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>[] m_teamsUnitsRenderer = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>[(int) ETeam.TeamCount];
+
+    [SerializeField] ForwardRendererData m_rendererData;
+    private PostProcessFogOfWarFeature m_fowFeature;
+    
 
     Terrain CurrentTerrain = null;
     Bounds PlayableBounds;
@@ -237,15 +246,39 @@ public class GameServices : MonoBehaviour
     ///}
     /// </example>
     /// <param name="team"></param>
-    public void RegisterUnit(ETeam team, IInfluencer unit)
+    public void RegisterUnit(ETeam team, BaseEntity entity)
     {
         if (m_teamInfluenceMap[(int) team] != null)
         {
-            m_teamInfluenceMap[(int) team].RegisterEntity(unit);
+            m_teamInfluenceMap[(int) team].RegisterEntity(entity);
         }
         else
         {
             Debug.LogWarning($"Influence map {(int) team} does not exist");
+        }
+        
+        if (team == GetPlayerController().Team)
+        {
+            m_teamPlayerFogOfWar.RegisterEntity(entity);
+        }
+        
+        m_teamsUnitsRenderer[(int) team].Add(entity, new Tuple<Renderer[], Canvas>(entity.GetComponentsInChildren<Renderer>(), entity.GetComponentInChildren<Canvas>()));
+    }
+    
+    public void RegisterUnit(ETeam team, TargetBuilding entity)
+    {
+        if (m_teamInfluenceMap[(int) team] != null)
+        {
+            m_teamInfluenceMap[(int) team].RegisterEntity(entity);
+        }
+        else
+        {
+            Debug.LogWarning($"Influence map {(int) team} does not exist");
+        }
+        
+        if (team == GetPlayerController().Team)
+        {
+            m_teamPlayerFogOfWar.RegisterEntity(entity);
         }
     }
 
@@ -260,9 +293,25 @@ public class GameServices : MonoBehaviour
     ///}
     /// </example>
     /// <param name="team"></param>
-    public void UnregisterUnit(ETeam team, IInfluencer unit)
+    public void UnregisterUnit(ETeam team, BaseEntity entity)
     {
-        m_teamInfluenceMap[(int) team]?.UnregisterEntity(unit);
+        m_teamInfluenceMap[(int) team]?.UnregisterEntity(entity);
+        
+        if (team == GetPlayerController().Team)
+        {
+            m_teamPlayerFogOfWar?.UnregisterEntity(entity);
+        }
+        m_teamsUnitsRenderer[(int) team].Remove(entity);
+    }
+    
+    public void UnregisterUnit(ETeam team, TargetBuilding entity)
+    {
+        m_teamInfluenceMap[(int) team]?.UnregisterEntity(entity);
+        
+        if (team == GetPlayerController().Team)
+        {
+            m_teamPlayerFogOfWar?.UnregisterEntity(entity);
+        }
     }
 
     #region MonoBehaviour methods
@@ -283,6 +332,8 @@ public class GameServices : MonoBehaviour
 
         // Store TargetBuildings
         TargetBuildingArray = FindObjectsOfType<TargetBuilding>();
+        m_teamInfluenceMap = FindObjectsOfType<TerrainInfluenceMap>();
+        m_teamPlayerFogOfWar = FindObjectOfType<TerrainFogOfWar>();
 
         // Store GameState ref
         if (CurrentGameState == null)
@@ -316,10 +367,31 @@ public class GameServices : MonoBehaviour
                 new Vector3(DefaultPlayableBoundsSize, 10.0f, DefaultPlayableBoundsSize) -
                 clampedOne * NonPlayableBorder / 2f);
         }
+        
+        m_fowFeature = m_rendererData.rendererFeatures.OfType<PostProcessFogOfWarFeature>().FirstOrDefault();
+     
+        if (m_fowFeature == null)
+            return;
+         
+        m_fowFeature.settings.terrainFogOfWars = new []{m_teamPlayerFogOfWar};
+        m_rendererData.SetDirty();
+        
+        m_teamsUnitsRenderer[0] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
+        m_teamsUnitsRenderer[1] = new Dictionary<BaseEntity, Tuple<Renderer[], Canvas>>();
     }
 
+    private bool fowPreviousSetting;
     private void Update()
     {
+        if (m_fowFeature.settings.IsEnabled)
+            UpdateHiddenObject();
+        else if (fowPreviousSetting != m_fowFeature.settings.IsEnabled)
+        {
+            ShowAllEntities();
+        }
+
+        fowPreviousSetting = m_fowFeature.settings.IsEnabled;
+
 #if UNITY_EDITOR
         if (debug.barycenter.prevDrawBarycenters != debug.barycenter.drawBarycenters)
         {
@@ -352,6 +424,44 @@ public class GameServices : MonoBehaviour
                 debug.barycenter.redBarycenterInstance.transform.position.y, redBarycenter.y);
         }
 #endif
+    }
+
+    void UpdateHiddenObject()
+    {
+        Color[] colors1 = m_teamPlayerFogOfWar.GetDatas();
+        
+        foreach (KeyValuePair<BaseEntity, Tuple<Renderer[], Canvas>> unitsRenderers in m_teamsUnitsRenderer[(int) GetAIController().Team])
+        {
+            Vector3 position = unitsRenderers.Key.transform.position;
+            float x = (position.x - m_teamPlayerFogOfWar.Terrain.GetPosition().x) / (float)m_teamPlayerFogOfWar.Terrain
+                .terrainData.size.x * (m_teamPlayerFogOfWar.RenderTexture.width - 1);
+            float y = (position.z - m_teamPlayerFogOfWar.Terrain.GetPosition().z) / (float)m_teamPlayerFogOfWar.Terrain
+                .terrainData.size.z * (m_teamPlayerFogOfWar.RenderTexture.height - 1);
+
+            bool shouldBeDisplay = colors1[((int) x + (int) y * m_teamPlayerFogOfWar.RenderTexture.width)].r > 0.5f;
+
+            foreach (Renderer unitsRenderer in unitsRenderers.Value.Item1)
+            {
+                unitsRenderer.enabled = shouldBeDisplay;
+            }
+
+            if (unitsRenderers.Value.Item2 != null)
+                unitsRenderers.Value.Item2.enabled = shouldBeDisplay;
+        }
+    }
+    
+    void ShowAllEntities()
+    {
+        foreach (KeyValuePair<BaseEntity, Tuple<Renderer[], Canvas>> unitsRenderers in m_teamsUnitsRenderer[(int) GetAIController().Team])
+        {
+            foreach (Renderer unitsRenderer in unitsRenderers.Value.Item1)
+            {
+                unitsRenderer.enabled = true;
+            }
+
+            if (unitsRenderers.Value.Item2 != null)
+                unitsRenderers.Value.Item2.enabled = true;
+        }
     }
 
     private void OnDrawGizmos()

@@ -1235,6 +1235,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f361e24ae60f5c8438582fd63c5eaeb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1162211806 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3124353299293301192, guid: 32676265f95fdeb40833df7b0b170998,
+    type: 3}
+  m_PrefabInstance: {fileID: 1758179112}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1162211812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1162211806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
 --- !u!4 &1163074007 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4162452776302188, guid: 0d9616ec63050ca4fa2fc0cc793599d0,
@@ -1624,6 +1663,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3124353299293301188, guid: 32676265f95fdeb40833df7b0b170998,
+        type: 3}
+      propertyPath: orthographic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124353299293301188, guid: 32676265f95fdeb40833df7b0b170998,
+        type: 3}
+      propertyPath: orthographic size
+      value: 66
+      objectReference: {fileID: 0}
     - target: {fileID: 3124353299293301191, guid: 32676265f95fdeb40833df7b0b170998,
         type: 3}
       propertyPath: m_RootOrder
@@ -1701,6 +1750,7 @@ GameObject:
   - component: {fileID: 1776657145}
   - component: {fileID: 1776657148}
   - component: {fileID: 1776657147}
+  - component: {fileID: 1776657149}
   m_Layer: 8
   m_Name: Terrain
   m_TagString: Untagged
@@ -1743,7 +1793,7 @@ Terrain:
   m_DrawInstanced: 0
   m_DrawTreesAndFoliage: 1
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 10652, guid: 0000000000000000f000000000000000, type: 0}
+  m_MaterialTemplate: {fileID: 2100000, guid: 594ea882c5a793440b60ff72d896021e, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -1854,6 +1904,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shader: {fileID: 7200000, guid: ee0b846ebcd601445a8da9e9303f5006, type: 3}
   resolution: 7
+  lowPrescision: 1
+  m_drawDebug: 0
+--- !u!114 &1776657149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776657141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 775d0091b2a336245980dce68792b76a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 2b07c0bbef7ec0b4ba96d3d8cc927376, type: 3}
+  resolution: 9
   lowPrescision: 1
   m_drawDebug: 0
 --- !u!4 &1824300080 stripped
@@ -2194,6 +2260,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: m_rendererData
+      value: 
+      objectReference: {fileID: 11400000, guid: 033a4e715226d1f41a22d8aa64d2fa0f,
+        type: 2}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: teamInfluenceMap.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -2224,6 +2296,11 @@ PrefabInstance:
       objectReference: {fileID: 1776657147}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: debug.poiDebugger.displayPriorities
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: debug.barycenter.redBarycenterPrefab
       value: 
       objectReference: {fileID: 3703286143503639579, guid: e12936fd818f81040b989457e3c4ff37,
@@ -2242,8 +2319,23 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
+      propertyPath: debug.poiDebugger.displayStrengthRequired
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
       propertyPath: debug.targetAnalysis.targetStatisticRadius
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: debug.utilitySystemDebug.displayUtilitySystem
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114251786700568190, guid: 571cee9f48b70384b98df7e222d6fee6,
+        type: 3}
+      propertyPath: debug.aiSquadDecisionPrevision.display3MainObjectif
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4669120816251285810, guid: 571cee9f48b70384b98df7e222d6fee6,
         type: 3}
