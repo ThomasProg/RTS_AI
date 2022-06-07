@@ -352,7 +352,11 @@ public class Unit : BaseEntity
         m_taskRunner.StopCurrentTask();
         m_taskRunner.Clear();
     }
-
+    
+    public override float GetVisibilityRadius()
+    {
+        return Mathf.Max(UnitData.AttackDistanceMax, UnitData.CaptureDistanceMax, UnitData.RepairDistanceMax);
+    }
 
     #endregion
 }

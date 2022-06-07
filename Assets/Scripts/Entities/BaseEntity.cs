@@ -136,13 +136,13 @@ public abstract class BaseEntity : MonoBehaviour, ISelectable, IDamageable, IRep
         return GetInfluencePosition();
     }
 
-    public float GetVisibilityRadius()
+    public virtual float GetVisibilityRadius()
     {
         return GetInfluenceRadius();
     }
 
-    public float GetPermanentVisibilityRadius()
+    public virtual float GetPermanentVisibilityRadius()
     {
-        return GetInfluenceRadius() * 1.5f;
+        return GetVisibilityRadius() * 1.5f;
     }
 }
