@@ -30,11 +30,11 @@ public class TopCamera : MonoBehaviour
     {
         if (value < 0f)
         {
-            Move.y += ZoomSpeed * Time.deltaTime;
+            Move.y += ZoomSpeed * Time.unscaledDeltaTime;
         }
         else if (value > 0f)
         {
-            Move.y -= ZoomSpeed * Time.deltaTime;
+            Move.y -= ZoomSpeed * Time.unscaledDeltaTime;
         }
     }
     float ComputeZoomSpeedModifier()
@@ -63,11 +63,11 @@ public class TopCamera : MonoBehaviour
     }
     public void MoveHorizontal(float value)
     {
-        Move.x += value * MoveSpeed * ComputeZoomSpeedModifier() * Time.deltaTime;
+        Move.x += value * MoveSpeed * ComputeZoomSpeedModifier() * Time.unscaledDeltaTime;
     }
     public void MoveVertical(float value)
     {
-        Move.z += value * MoveSpeed * ComputeZoomSpeedModifier() * Time.deltaTime;
+        Move.z += value * MoveSpeed * ComputeZoomSpeedModifier() * Time.unscaledDeltaTime;
     }
 
     // Direct focus on one entity (no smooth)
