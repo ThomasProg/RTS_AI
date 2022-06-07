@@ -203,16 +203,18 @@ public class StrategyAI : MonoBehaviour
             AllPointOfInterestsByPriority.Sort((PointOfInterest a, PointOfInterest b) =>
                 -a.priority.CompareTo(b.priority));
 
-            List<List<IPOITask<Blackboard>>> tasks =
-                new List<List<IPOITask<Blackboard>>>(AllPointOfInterestsByPriority.Count);
             List<List<IEnumerator>> tasksEnumerators = new List<List<IEnumerator>>(AllPointOfInterestsByPriority.Count);
             for (int i = 0; i < AllPointOfInterestsByPriority.Count; i++)
             {
-                tasks.Add(AllPointOfInterestsByPriority[i].GetProcessTasks(bb));
-                tasksEnumerators.Add(new List<IEnumerator>(tasks[i].Count));
-                for (int j = 0; j < tasks[i].Count; j++)
+                if (AllPointOfInterestsByPriority[i].priority > 0)
                 {
-                    tasksEnumerators[i].Add(tasks[i][j].Execute(bb));
+                    List<IPOITask<Blackboard>> poiTasks = AllPointOfInterestsByPriority[i].GetProcessTasks(bb);
+                    List<IEnumerator> taskEnumerators = new List<IEnumerator>(poiTasks.Count);
+                    for (int j = 0; j < poiTasks.Count; j++)
+                    {
+                        taskEnumerators.Add(poiTasks[j].Execute(bb));
+                    }
+                    tasksEnumerators.Add(taskEnumerators);
                 }
             }
 
