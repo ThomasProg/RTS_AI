@@ -45,6 +45,12 @@ public sealed class AIController : UnitController
 
         strategyAI = GetComponent<StrategyAI>();
         strategyAI.controller = this;
+
+        GameServices.GetGameState().OnGameOver += team =>
+        {
+            strategyAI.StopAllCoroutines();
+            Destroy(this);
+        };
     }
 
     protected override void OnEnable()
