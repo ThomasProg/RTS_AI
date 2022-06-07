@@ -134,7 +134,7 @@ public sealed class PlayerController : UnitController
         // Set up the new Pointer Event
         MenuPointerEventData = new PointerEventData(SceneEventSystem);
         
-        PreviewShader = Shader.Find("Legacy Shaders/Transparent/Diffuse");
+        PreviewShader = Shader.Find("Universal Render Pipeline/Simple Lit");
 
         // left click : selection
         OnMouseLeftPressed += StartSelection;
