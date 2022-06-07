@@ -26,9 +26,26 @@ public abstract class PointOfInterest
 
     public void RemoveAllSquads()
     {
-        for (int i = squads.Count - 1; i > -1; i--)
+        while (squads.Count > 0)
         {
-            squads[i].PointOfInterest = null;
+            squads[0].PointOfInterest = null;
+        }
+
+        foreach (var pair in squadManager.newUnitsPoI)
+        {
+            List<PointOfInterest> pois = new List<PointOfInterest>();
+            while (pair.Value.Count > 0)
+            {
+                pois.Add(pair.Value.Dequeue());
+            }
+
+            foreach (PointOfInterest poi in pois)
+            {
+                if (poi != this)
+                {
+                    pair.Value.Enqueue(poi);
+                }
+            }
         }
     }
 }

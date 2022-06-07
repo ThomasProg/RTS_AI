@@ -52,7 +52,7 @@ public class SquadPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(),stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f, 0.4f);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(),stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f, stratAI.subjectiveUtilitySystem.GetUtility("Attack").Value);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;
@@ -93,7 +93,7 @@ public class SquadPoI : PointOfInterest
         // Get all enemy squads should attack this point
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         List<GameUtility.POITargetByEnemySquad> playerSquadObjectives = 
-            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f, 0.4f);
+            GameUtility.GetPOITargetByEnemySquad(this, GameServices.GetAIController(), GameServices.GetPlayerController(), stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value * 2f, stratAI.subjectiveUtilitySystem.GetUtility("Protect").Value);
 
         float distPlayerUnitsToTarget = float.MinValue;
         float playerStrength = 0f;

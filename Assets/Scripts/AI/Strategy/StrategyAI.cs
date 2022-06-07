@@ -68,7 +68,11 @@ public class StrategyAI : MonoBehaviour
     {
         SquadPoI newSquadPoI = new SquadPoI(squad) {stratAI = this, squadManager = squadManager};
         AddTactic(newSquadPoI);
-        squad.OnSquadEmpty += current => AllPointOfInterests.Remove(newSquadPoI);
+        squad.OnSquadEmpty += current =>
+        {
+            newSquadPoI.RemoveAllSquads();
+            AllPointOfInterests.Remove(newSquadPoI);
+        };
     }
 
     // Start is called before the first frame update
@@ -183,9 +187,10 @@ public class StrategyAI : MonoBehaviour
                 //Remove previous player squad
                 foreach (PointOfInterest poi in AllPointOfInterests)
                 {
-                    if (poi is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam)
+                    if (poi is SquadPoI squadPoI)
                         poi.RemoveAllSquads();
                 }
+
                 AllPointOfInterests.RemoveAll(interest =>
                     interest is SquadPoI squadPoI && squadPoI.enemySquad.GetTeam() == playerTeam);
 

@@ -64,8 +64,11 @@ public class SquadManager : MonoBehaviour
             Squad newSquad = new Squad(unit);
             RegisterSquad(newSquad);
             Queue<PointOfInterest> poiQueue = newUnitsPoI[factory]; // should not crash
-            PointOfInterest newPoI = poiQueue.Dequeue();
-            newSquad.PointOfInterest = newPoI;
+            if (poiQueue.Count > 0)
+            {
+                PointOfInterest newPoI = poiQueue.Dequeue();
+                newSquad.PointOfInterest = newPoI;
+            }
         };
     }
 }
