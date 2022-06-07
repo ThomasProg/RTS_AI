@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using InfluenceMapPackage;
 using UnityEngine;
 using UnityEngine.AI;
@@ -260,9 +261,7 @@ public static class GameUtility
 
         foreach (EnemySquadPotentialObjectives enemySquadObjectives in enemySquadsObjectives)
         {
-            float efficiencyTotal = 0;
-            foreach (var objective in enemySquadObjectives.objectives) 
-                efficiencyTotal += objective.GetStrategyEffectivity();
+            float efficiencyTotal = enemySquadObjectives.objectives.Sum(objective => objective.GetStrategyEffectivity());
 
             if (efficiencyTotal == 0f)
                 continue;
@@ -300,9 +299,8 @@ public static class GameUtility
 
         public float GetStrategyEffectivity()
         {
-            efficiency = allyStrength / (Mathf.Max(enemyStrength, 1) * sqrtDistanceFromSquad) +
-                         directionWeight * 0.001f;
             // Add coefficient to direction to give him more or less importance in the equation
+            efficiency = allyStrength / (Mathf.Max(enemyStrength, 1) * Mathf.Sqrt(sqrtDistanceFromSquad)) + directionWeight * 0.08f;
             return efficiency;
         }
     }
@@ -324,11 +322,19 @@ public static class GameUtility
     {
         Squad[] squadsPlayer = ai.PlayerSquads;
         Squad[] squadsAI = ai.Squads;
-
-        List<PointOfInterest> pointOfInterests = ai.strategyAI.AllPointOfInterests;
+        
+        // Get all POI and remove POI with player squads
+        List<PointOfInterest> pointOfInterests = new List<PointOfInterest>(ai.strategyAI.AllPointOfInterests);
+        pointOfInterests.RemoveAll((interest =>
+        {
+            if (interest is SquadPoI poI)
+                return poI.enemySquad.GetTeam() == player.Team;
+                       
+            return false;
+        }));
+        
         List<EnemySquadPotentialObjectives> squadsObjective = new List<EnemySquadPotentialObjectives>();
         
-        // Need to compare squad distance with enemy squad, building and target building. 
         foreach (Squad squad in squadsPlayer)
         {
             EnemySquadPotentialObjectives squadPotentialObjectives = new EnemySquadPotentialObjectives();
