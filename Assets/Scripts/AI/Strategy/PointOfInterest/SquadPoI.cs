@@ -55,7 +55,7 @@ public class SquadPoI : PointOfInterest
         // Accept enemy squad only if probability is upper than X % (based on 50% +/- AI personality)
         AIController aiController = GameServices.GetAIController();
         PlayerController playerController = GameServices.GetPlayerController();
-        List<GameUtility.EnemySquadPotentialObjectives> enemySquadsObjectives = GameUtility.EvaluateEnemySquadObjective(aiController, playerController, aiController.PlayerSquads , new []{enemySquad}, 1f + stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value);
+        List<GameUtility.EnemySquadPotentialObjectives> enemySquadsObjectives = GameUtility.EvaluateEnemySquadObjective(aiController, playerController, new []{enemySquad}, aiController.Squads, 1f + stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value);
         
         // Loop but only 1 squad
         Assert.IsTrue(enemySquadsObjectives.Count == 1, "Only 1 squad need to be assigned in tis algorithm");
