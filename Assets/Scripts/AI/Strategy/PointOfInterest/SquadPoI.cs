@@ -58,10 +58,15 @@ public class SquadPoI : PointOfInterest
         List<GameUtility.EnemySquadPotentialObjectives> enemySquadsObjectives = GameUtility.EvaluateEnemySquadObjective(aiController, playerController, new []{enemySquad}, aiController.Squads, 1f + stratAI.subjectiveUtilitySystem.GetStat("InformationNeed").Value);
         
         // Loop but only 1 squad
-        Assert.IsTrue(enemySquadsObjectives.Count == 1, "Only 1 squad need to be assigned in tis algorithm");
+        Assert.IsTrue(enemySquadsObjectives.Count == 1, "Only 1 squad need to be assigned in this algorithm");
 
         GameUtility.EnemySquadPotentialObjectives enemySquadObjectives = enemySquadsObjectives.First();
         GameUtility.SquadObjective objective = GameUtility.GetGreaterObjective(enemySquadObjectives.objectives);
+        if (objective == null)
+        {
+            priority = 0;
+            return;
+        }
         
         strengthRequired = enemySquad.GetStrength();
         
