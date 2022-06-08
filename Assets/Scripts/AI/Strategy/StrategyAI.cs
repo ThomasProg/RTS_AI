@@ -62,7 +62,11 @@ public class StrategyAI : MonoBehaviour
     {
         FactoryPoI factoryPoI = new FactoryPoI(factory) {stratAI = this, squadManager = squadManager};
         AddTactic(factoryPoI);
-        factory.OnDeadEvent += current => AllPointOfInterests.Remove(factoryPoI);
+        factory.OnDeadEvent += current =>
+        {
+            factoryPoI.RemoveAllSquads();
+            AllPointOfInterests.Remove(factoryPoI);
+        };
     }
 
     void CreateSquadPoI(Squad squad)
