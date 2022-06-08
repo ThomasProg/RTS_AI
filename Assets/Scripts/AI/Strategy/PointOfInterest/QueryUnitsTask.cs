@@ -14,7 +14,7 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
     // Removed from the travel time of a unit if the unit was already on this point of interest 
     public float persistency = 0f;
 
-    public float timeToLeadSquadToPoI = 0f;
+    public float timeToLeadSquadToPoI = 0.3f;
     public float currentStrength = 0f;
 
     public bool queryAllAvailableUnits = false;
