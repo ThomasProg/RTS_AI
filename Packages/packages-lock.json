@@ -230,13 +230,13 @@
       "url": "https://packages.unity.com"
     },
     "open-source-unity-package.fog-of-war": {
-      "version": "https://github.com/OpenSourceUnityPackage/FogOfWar.git#1.2.0",
+      "version": "https://github.com/OpenSourceUnityPackage/FogOfWar.git#1.2.1",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.render-pipelines.universal": "10.8.1"
       },
-      "hash": "ceadf4c09e2f32603ff6da6f61d775ba0bcc52d8"
+      "hash": "8397f2c4f797e8a90998f79fa1ace2a5c904a64c"
     },
     "open-source-unity-package.influence-map": {
       "version": "https://github.com/OpenSourceUnityPackage/InfluenceMap.git#1.2.0",
@@ -246,11 +246,11 @@
       "hash": "7f34133214acd1b5a9722d074896147663dd9ae7"
     },
     "open-source-unity-package.utility-system": {
-      "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git#1.3.0",
+      "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git#1.3.1",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "f813fb7dc6f0b7b136071b3de3132f8e845716b1"
+      "hash": "63adb8a581fc6c181faf0838bced804ad64f1e2b"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
