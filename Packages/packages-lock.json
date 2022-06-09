@@ -239,11 +239,11 @@
       "hash": "8397f2c4f797e8a90998f79fa1ace2a5c904a64c"
     },
     "open-source-unity-package.influence-map": {
-      "version": "https://github.com/OpenSourceUnityPackage/InfluenceMap.git#1.2.0",
+      "version": "https://github.com/OpenSourceUnityPackage/InfluenceMap.git#1.2.1",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "7f34133214acd1b5a9722d074896147663dd9ae7"
+      "hash": "03ec8a2a0f1bd327a1fc2d26d6a726edaa1ade17"
     },
     "open-source-unity-package.utility-system": {
       "version": "https://github.com/OpenSourceUnityPackage/UtilitySystem.git#1.3.1",

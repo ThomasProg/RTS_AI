@@ -23,6 +23,10 @@ public class QueryUnitsTask : IPOITask<StrategyAI.Blackboard>
 
     public IEnumerator Execute(StrategyAI.Blackboard blackboard)
     {
+#if UNITY_EDITOR
+        timeToLeadSquadToPoI = GameServices.GetGameServices().debug.delay;
+#endif
+
         int nbUnitsBeingCreated;
         do
         {

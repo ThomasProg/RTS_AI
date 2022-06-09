@@ -105,6 +105,8 @@ public class GameServices : MonoBehaviour
         public UtilitySystemDebug utilitySystemDebug;
         public ResourcePointDebug ResourcePointDebug;
         public FogOfWarDebug fogOfWarDebug;
+
+        public float delay;
     }
 
 #endif
@@ -487,6 +489,7 @@ public class GameServices : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (Instance != null)
@@ -576,6 +579,7 @@ public class GameServices : MonoBehaviour
             }
         }
     }
+#endif
 
     private void OnGUI()
     {
