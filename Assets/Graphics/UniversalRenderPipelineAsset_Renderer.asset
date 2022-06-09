@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    IsEnabled: 0
+    IsEnabled: 1
     WhenToInsert: 550
     material: {fileID: 2100000, guid: 1534b02085d383a48bb4d226315bbc22, type: 2}
     terrainFogOfWars:

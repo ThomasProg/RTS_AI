@@ -122,7 +122,7 @@ public sealed class PlayerController : UnitController
         PlayerMenuController = GetComponent<MenuController>();
         if (PlayerMenuController == null)
             Debug.LogWarning("could not find MenuController component !");
-
+        
         OnBuildPointsUpdated += PlayerMenuController.UpdateBuildPointsUI;
         OnCaptureTarget += PlayerMenuController.UpdateCapturedTargetsUI;
 
@@ -214,6 +214,9 @@ public sealed class PlayerController : UnitController
                 SelectAllUnitsByTypeId(typeId);
             };
         }
+        
+        PlayerMenuController.UpdateBuildPointsUI();
+        PlayerMenuController.UpdateCapturedTargetsUI();
     }
     override protected void Update()
     {
